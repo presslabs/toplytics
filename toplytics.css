@@ -1,0 +1,57 @@
+#sidebar li {
+	list-style-type: none;
+}
+
+#sidebar .toplytics-box {
+    margin: 0 0 15px;
+}
+
+.toplytics-box ol li.top1 { background: url("img/top1.png") no-repeat scroll left top transparent; }
+.toplytics-box ol li.top2 { background: url("img/top2.png") no-repeat scroll left top transparent; }
+.toplytics-box ol li.top3 { background: url("img/top3.png") no-repeat scroll left top transparent; }
+.toplytics-box ol li.top4 { background: url("img/top4.png") no-repeat scroll left top transparent; }
+.toplytics-box ol li.top5 { background: url("img/top5.png") no-repeat scroll left top transparent; }
+.toplytics-box ol li.top6 { background: url("img/top6.png") no-repeat scroll left top transparent; }
+.toplytics-box ol li.top7 { background: url("img/top7.png") no-repeat scroll left top transparent; }
+.toplytics-box ol li.top8 { background: url("img/top8.png") no-repeat scroll left top transparent; }
+.toplytics-box ol li.top9 { background: url("img/top9.png") no-repeat scroll left top transparent; }
+.toplytics-box ol li.top10{ background: url("img/top10.png") no-repeat scroll left top transparent; }
+.toplytics-box ol li.top11{ background: url("img/top11.png") no-repeat scroll left top transparent; }
+.toplytics-box ol li.top12{ background: url("img/top12.png") no-repeat scroll left top transparent; }
+.toplytics-box ol li.top13{ background: url("img/top13.png") no-repeat scroll left top transparent; }
+.toplytics-box ol li.top14{ background: url("img/top14.png") no-repeat scroll left top transparent; }
+.toplytics-box ol li.top15{ background: url("img/top15.png") no-repeat scroll left top transparent; }
+
+.toplytics-box-views {
+	color: yellow;
+}
+
+.toplytics-box ol li {
+    height: 50px;
+    margin: 0;
+    overflow: hidden;
+    padding: 0 0 5px 52px;
+}
+
+.toplytics-box-bg {
+    height: 50px;
+    position: relative;
+    /*width: 245px;*/
+  	width: 315px;
+}
+
+.toplytics-box-bg a {
+    color: #FFFFFF;
+    line-height: 12px;
+    text-decoration: none;
+}
+
+.toplytics-box-title {
+    background: url("img/transparent.png") repeat scroll 0 0 transparent;
+    bottom: 0;
+    display: block;
+    left: 0;
+    padding: 5px;
+    position: absolute;
+}
+
