@@ -7,9 +7,7 @@
 <div class="toplytics-box">
 
 <?php if ( $title ) echo $before_title . $title . $after_title; $count = 0; ?>
-
-<h3>This is a simple toplytics template example!</h3>
-
+  <h3>This is a simple toplytics template example!</h3>
 <ol>
 	<?php foreach ($results[$type] as $post_id => $pv) : ?>
 				

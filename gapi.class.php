@@ -412,7 +412,9 @@ class gapi
     
     //Convert newline delimited variables into url format then import to array
     parse_str(str_replace(array("\n","\r\n"),'&',$response['body']),$auth_token);
-    
+
+	error_log(print_r($auth_token,true));    
+
     if(substr($response['code'],0,1) != '2' || !is_array($auth_token) || empty($auth_token['Auth']))
     {
       throw new Exception('GAPI: Failed to authenticate user. Error: "' . strip_tags($response['body']) . '"');

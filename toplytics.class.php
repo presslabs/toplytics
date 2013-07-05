@@ -7,8 +7,8 @@ class Toplytics{
 	  	// The credentials
 		$options = get_option('toplytics_options');		
 		$ga_email = $options['text_username'];
-		$ga_password = $options['text_pass'];
 		$ga_profile_id = $options['text_account'];
+		$ga_token = $options['text_token'];
 
 	  	$results = get_transient('gapi.cache'); // Actual data, cached if possible
 	  	if ($results && $results['_ts'] + 1800 > time()) { return $results; }
@@ -21,26 +21,36 @@ class Toplytics{
 	  	$results = array('_ts' => time());
 
 	  	try {
-			$ga = new gapi($ga_email,$ga_password);
-
-			// check if GA settings are correct
-		  /*if ( $ga->getAuthToken()==null ) {
-				return null;
-		  }*/
-
+			$token_need_refresh = true;
+			$ga = new gapi(null, null, $ga_token); // new gapi($ga_email,$ga_password);
+			$time_stamp = time();
 			foreach ($ranges as $name => $start_date) {
-				$ga->requestReportData($ga_profile_id,array('pagePath'),array('pageviews'),array('-pageviews'),'',$start_date,date('Y-m-d'));
+				$ga->requestReportData($ga_profile_id,array('pagePath'),
+									   array('pageviews'),array('-pageviews'),'',$start_date,date('Y-m-d'));
 				foreach ($ga->getResults() as $result) {
+					$token_need_refresh = false;
 					$post_id = url_to_postid((string)$result);
 					$post = get_post($post_id);
-					if ($post && 'post' == $post->post_type) $results[$name][$post_id] = $result->getPageviews();
+					if ($post && 'post' == $post->post_type) {
+						$results[$name][$post_id] = $result->getPageviews();
+					}
+
+					if ( $token_need_refresh ) {
+						$new_options = array();
+						$new_options['text_username'] = $ga_email;
+						$new_options['text_account'] = $ga_profile_id;
+						$data_array = array('option_value' => serialize($new_options) );
+						$where_array = array('option_name' => 'toplytics_options');
+						global $wpdb;
+						$wpdb->update( $wpdb->prefix . 'options', $data_array, $where_array );
+					}
 				}
 			}
 		} catch (Exception $e) {
-			set_transient('gapi.cache',$results,300);
+			set_transient('gapi.cache',$results);
 			return $results;
 		}
-		set_transient('gapi.cache',$results,48 * 1800);
+		set_transient('gapi.cache',$results);
 
 		return $results;
 	}

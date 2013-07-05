@@ -2,9 +2,9 @@
 Contributors: PressLabs
 Donate link: http://www.presslabs.com/
 Tags: presslabs, analytics, posts, top, most visited, toplytics
-Requires at least: 3.5.1
-Tested up to: 3.5
-Stable tag: 1.3
+Requires at least: 3.5
+Tested up to: 3.5.2
+Stable tag: 1.2.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -32,6 +32,9 @@ Use your plugin from the `Tools->Toplytics` page;
 You should use this plugin if you want to display the most visited posts of your site, from Google Analytics statistics.
 
 == Changelog ==
+
+= 1.2.1 =
+Fix security issue.
 
 = 1.2 =
 Add custom templates.
