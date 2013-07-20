@@ -2,14 +2,13 @@
 class Toplytics_WP_Widget_Most_Visited_Posts extends WP_Widget {
 
 	function Toplytics_WP_Widget_Most_Visited_Posts() {
-		$widget_ops = array('classname' => 'widget_most_visited_posts', 'description' => __( "Toplytics - The most visited posts on your site from Google Analytics") );
+		$widget_ops = array('classname' => 'widget_most_visited_posts', 
+			'description' => __( "Toplytics - The most visited posts on your site from Google Analytics") );
 		$this->WP_Widget('most-visited-posts', __('Most Visited Posts'), $widget_ops);
 		$this->alt_option_name = 'widget_most_visited_posts';
 	}
 
-
 	function widget($args, $instance) {
-		
 		require_once 'toplytics.class.php';
 
 		ob_start();
@@ -26,7 +25,7 @@ class Toplytics_WP_Widget_Most_Visited_Posts extends WP_Widget {
 	  
 		// Get the info from transient
 		$results = get_transient('gapi.cache');
-	  /*
+/*
 		if ( $results==null )
 			die("The Google Analytics settings are wrong!");
 						
@@ -35,34 +34,29 @@ class Toplytics_WP_Widget_Most_Visited_Posts extends WP_Widget {
 			toplytics_do_this_hourly();
 		}
 		
-	  $toplytics_templates = toplytics_get_templates_list();
-	  foreach($toplytics_templates as $template) {
-		echo $template."<br />";
-		echo toplytics_get_template_name($template)."<br />";
-	  }
-	  $toplytics_templates = toplytics_get_templates();
-	  foreach($toplytics_templates as $template) {
-		echo $template['template_slug']."<br />";
-		echo $template['template_name']."<br />";
-		echo $template['template_filename']."<br /><br />";
-		}*/
-		?>
+		$toplytics_templates = toplytics_get_templates_list();
+		foreach($toplytics_templates as $template) {
+			echo $template."<br />";
+			echo toplytics_get_template_name($template)."<br />";
+		}
+		$toplytics_templates = toplytics_get_templates();
+		foreach($toplytics_templates as $template) {
+			echo $template['template_slug']."<br />";
+			echo $template['template_name']."<br />";
+			echo $template['template_filename']."<br /><br />";
+		}
+*/
+		if (!empty($results[$type])) {
+			echo $before_widget;
+			include toplytics_get_template_path($instance['list_type']);
+			echo $after_widget;
 
-<?php if (!empty($results[$type])) { ?>
-
-<?php echo $before_widget; ?>
-
-<?php include toplytics_get_template_path($instance['list_type']); ?> 
-
-<?php echo $after_widget; ?>
-
-	<?php	// Reset the global $the_post as this query will have stomped on it
+			// Reset the global $the_post as this query will have stomped on it
 			wp_reset_postdata();
-	  
-} else {
-	  		echo "No info found!";
-} ?>
-		<?php ob_get_flush();
+		} else {
+			echo "The statistics found in GA account doesn't match with your posts/pages.";
+		}
+		ob_get_flush();
 	}
 
 	function update( $new_instance, $old_instance ) {

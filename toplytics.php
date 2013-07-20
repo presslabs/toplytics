@@ -4,7 +4,7 @@
  * Plugin URI: http://wordpress.org/extend/plugins/toplytics/ 
  * Description: Plugin for displaying most viewed content using data from a Google Analytics account. Relieves the DB from writing every click.
  * Author: PressLabs 
- * Version: 1.2.1
+ * Version: 1.2.2
  * Author URI: http://www.presslabs.com/ 
  */
 
@@ -112,7 +112,7 @@ add_action('toplytics_hourly_event', 'toplytics_do_this_hourly');
 
 //--------------------------------------------------------------------
 function toplytics_deactivate() {
-	error_log('delete_transient:'.delete_transient('gapi.cache'));
+	//error_log('delete_transient:'.delete_transient('gapi.cache'));
 	delete_option('toplytics_options');
 	wp_clear_scheduled_hook('toplytics_hourly_event');
 }
@@ -127,8 +127,11 @@ function toplytics_do_this_hourly() { // scan Google Analytics statistics every 
 //------------------------------------------------------------------
 function toplytics_widgets_init() {
 	$options = get_option('toplytics_options');
-	if ( !empty($options['text_username']) && !empty($options['text_account']) && !empty($options['text_token']) )
-		register_widget('Toplytics_WP_Widget_Most_Visited_Posts');
+	$transient = get_transient('gapi.cache');
+	//error_log(print_r($transient['today'],true));
+	if ( !empty($options['text_username']) && !empty($options['text_account']) 
+		&& !empty($options['text_token']) && !empty($transient['today']) )
+			register_widget('Toplytics_WP_Widget_Most_Visited_Posts');
 } 
 add_action('widgets_init','toplytics_widgets_init');
 
@@ -156,7 +159,7 @@ function toplytics_return_settings_link() {
 // Displays all messages registered to 'your-settings-error-slug'
 //
 function toplytics_admin_notices_action() {
-    settings_errors();
+	settings_errors();
 }
 add_action( 'admin_notices', 'toplytics_admin_notices_action' );
 
