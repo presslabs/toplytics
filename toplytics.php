@@ -29,7 +29,9 @@ function toplytics_str_between( $start, $end, $content ) {
 
 //--------------------------------------------------------------------
 function toplytics_get_templates_list_path() {
-	return glob( plugin_dir_path(__FILE__) . '/templates/t_*.php' );
+	$plugin_templates_list = glob( plugin_dir_path(__FILE__) . '/templates/t_*.php' );
+	$theme_templates_list = glob( get_stylesheet_directory() . '/t_*.php' );
+	return array_merge($theme_templates_list, $plugin_templates_list);
 }
 
 //--------------------------------------------------------------------

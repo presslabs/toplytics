@@ -75,7 +75,6 @@ class Toplytics_WP_Widget_Most_Visited_Posts extends WP_Widget {
 		$instance['type'] = $new_instance['type'];
 		if (!in_array($instance['type'],array('today','week','month')))	$instance['type'] = 'today';
 		$instance['list_type'] = $new_instance['list_type'];
-		if (!in_array($instance['list_type'],array('default','simple'))) $instance['list_type'] = 'default';
 		return $instance;
 	}
 
