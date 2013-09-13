@@ -1,0 +1,201 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Toplytics v1.3\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: 2013-09-12 13:49:17+0000\n"
+"Last-Translator: presslabs <marius@presslabs.com>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: CSL v1.x\n"
+"X-Poedit-Language: Romanian\n"
+"X-Poedit-Country: ROMANIA\n"
+"X-Poedit-SourceCharset: utf-8\n"
+"X-Poedit-KeywordsList: __;_e;__ngettext:1,2;_n:1,2;__ngettext_noop:1,2;_n_noop:1,2;_c,_nc:4c,1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;_nx_noop:4c,1,2;\n"
+"X-Poedit-Basepath: \n"
+"X-Poedit-Bookmarks: \n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Textdomain-Support: yes"
+
+#: toplytics.php:178
+#@ default
+msgid "Settings"
+msgstr ""
+
+#: toplytics.php:219
+#@ default
+msgid "You do not have sufficient permissions to access this page."
+msgstr ""
+
+#: toplytics.php:325
+#@ toplytics-text-domain
+msgid "Please try again later."
+msgstr "Vă rog să incercaţi mai târziu."
+
+#: toplytics.php:343
+#@ toplytics-text-domain
+msgid "<b>Note:</b> You will need to select an account and <b>click \"Save Changes\"</b> before the analytics dashboard will work."
+msgstr "<b>Notă:</b> Trebuie să selectaţi un profil Google Analitics şi <b>să apăsaţi \"Salvează opţiunile\"</b> înainte ca panoul aplicaţiei Anlytics să pornească."
+
+#: toplytics.php:354
+#@ toplytics-text-domain
+msgid "Available Accounts"
+msgstr "Profile disponibile"
+
+#: toplytics.php:359
+#@ toplytics-text-domain
+msgid "No accounts available."
+msgstr "Nici un profil GA disponibil."
+
+#: toplytics.php:378
+#@ toplytics-text-domain
+msgid "Save Changes"
+msgstr "Salvaţi opţiunile"
+
+#: toplytics.php:379
+#@ toplytics-text-domain
+msgid "Remove All Options"
+msgstr "Ştergeţi toate opţiunile"
+
+#: toplytics.php:391
+#@ toplytics-text-domain
+msgid "Please configure your Google Analytics Account to be used for this site:<br /><br />Login using Google's OAuth system."
+msgstr "Vă rog să configuraţi Profilul Google Analytics pentru a putea fi folosit de acest site: <br /><br />Autentificare cu ajutorul sistemului Google OAuth."
+
+#: toplytics.php:395
+#@ toplytics-text-domain
+msgid ""
+"This is the prefered method of attaching your Google account.<br/>\n"
+"                Clicking the 'Start the Login Process' button will redirect you to a login page at google.com.<br/>\n"
+"                After accepting the login there you will be returned here."
+msgstr ""
+"Aceasta este metoda cea mai bună de accesare a profilului Google Analytics.<br />\n"
+"                Apăsând butonul 'Porniţi procesul de autentificare' veţi fi redirectaţi către o pagina de autentificare pe google.com. <br />\n"
+"                După ce aceptaţi autentificarea acolo, veţi fi redirectaţi înapoi pe această pagină."
+
+#: toplytics.php:404
+#@ toplytics-text-domain
+msgid "Start the Login Process"
+msgstr "Porneşte procesul de autentificare"
+
+#: toplytics.php:442
+#@ toplytics-text-domain
+msgid "Enter here the details of your account:"
+msgstr "Introduceti aici detaliile profilului GA:"
+
+#: toplyticsauth.class.php:205
+#@ default
+msgid "Cheatin&#8217; uh?"
+msgstr ""
+
+#: widget-toplytics.php:7
+#@ toplytics-text-domain
+msgid "Toplytics - The most visited posts on your site from Google Analytics"
+msgstr "Toplytics - Cele mai vizitate articole din site obţinute din Google Analytics"
+
+#: widget-toplytics.php:9
+#: widget-toplytics.php:20
+#@ toplytics-text-domain
+msgid "Most Visited Posts"
+msgstr "Cele mai vizitate articole"
+
+#: widget-toplytics.php:122
+#@ default
+msgid "Template"
+msgstr ""
+
+#: toplytics.php:425
+#, php-format
+#@ toplytics-text-domain
+msgid "Toplytics needs configuration information on its <a href=\"%s\">Settings</a> page."
+msgstr "Toplytics are nevoie de informaţiile de configurare în pagina de <a href=\"%s\">setări.</a>"
+
+#: toplytics.php:227
+#@ toplytics-text-domain
+msgid "Options Saved"
+msgstr "Opţiuni salvate"
+
+#: toplytics.php:238
+#@ toplytics-text-domain
+msgid "Everything Reset"
+msgstr "Totul a fost resetat"
+
+#: widget-toplytics.php:45
+#@ toplytics-text-domain
+msgid "The statistics found in GA account doesn't match with your posts/pages."
+msgstr "Statisticile gasite in profilul GA nu corespund cu articolele/paginile din site."
+
+#: toplytics.php:323
+#@ toplytics-text-domain
+msgid "Error gathering analytics data from Google:"
+msgstr "Eroare în colectarea datelor din Google Analytics:"
+
+#: widget-toplytics.php:101
+#@ toplytics-text-domain
+msgid "Daily"
+msgstr "Zilnic"
+
+#: widget-toplytics.php:102
+#@ toplytics-text-domain
+msgid "Weekly"
+msgstr "Săptămânal"
+
+#: widget-toplytics.php:103
+#@ toplytics-text-domain
+msgid "Monthly"
+msgstr "Lunar"
+
+#: widget-toplytics.php:89
+#@ default
+msgid "Title"
+msgstr ""
+
+#: widget-toplytics.php:94
+#@ toplytics-text-domain
+msgid "Number of posts to show"
+msgstr "Numărul de articole de afişat"
+
+#: widget-toplytics.php:99
+#@ toplytics-text-domain
+msgid "Time period"
+msgstr "Perioada de timp"
+
+#: widget-toplytics.php:108
+#@ default
+msgid "Image"
+msgstr ""
+
+#: widget-toplytics.php:110
+#@ default
+msgid "None"
+msgstr ""
+
+#: widget-toplytics.php:111
+#@ toplytics-text-domain
+msgid "First image"
+msgstr "Prima imagine"
+
+#: widget-toplytics.php:112
+#@ default
+msgid "Featured Image"
+msgstr ""
+
+#: widget-toplytics.php:113
+#@ toplytics-text-domain
+msgid "Any Image"
+msgstr "Oricare imagine"
+
+#: widget-toplytics.php:118
+#@ toplytics-text-domain
+msgid "Show views"
+msgstr "Afişare vizualizări"
+
+#: templates/t_default.php:41
+#, php-format
+#@ toplytics-text-domain
+msgid "%d Views"
+msgstr "%d vizualizări"
+

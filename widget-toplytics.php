@@ -2,51 +2,39 @@
 class Toplytics_WP_Widget_Most_Visited_Posts extends WP_Widget {
 
 	function Toplytics_WP_Widget_Most_Visited_Posts() {
-		$widget_ops = array('classname' => 'widget_most_visited_posts', 
-			'description' => __( "Toplytics - The most visited posts on your site from Google Analytics") );
-		$this->WP_Widget('most-visited-posts', __('Most Visited Posts'), $widget_ops);
+		$widget_ops = array(
+			'classname' => 'widget_most_visited_posts', 
+			'description' => __("Toplytics - The most visited posts on your site from Google Analytics", TOPLYTICS_TEXTDOMAIN)
+		);
+		$this->WP_Widget('most-visited-posts', __('Most Visited Posts', TOPLYTICS_TEXTDOMAIN), $widget_ops);
 		$this->alt_option_name = 'widget_most_visited_posts';
 	}
 
 	function widget($args, $instance) {
-		require_once 'toplytics.class.php';
+	  //require_once 'toplytics.class.php';
 
 		ob_start();
 		extract($args);
 
-		$title = apply_filters('widget_title', empty($instance['title']) ? __('Most visited posts') : $instance['title'], $instance, $this->id_base);
+		$title = apply_filters('widget_title', 
+			empty($instance['title']) ? __('Most Visited Posts', TOPLYTICS_TEXTDOMAIN) : $instance['title'], 
+			$instance, $this->id_base);
 		
-		//$title = '';
 	  	$number = $instance['number'];
 	  	$counter= $number;
 		
-		$type = $instance['type'];
-		if (!in_array($type,array('today','week','month'))) $type = 'today';
+		$period = $instance['period'];
+		if (!in_array($period,array('today','week','month'))) $period = 'today';
+	  
+		$thumbnail = $instance['thumbnail'];
+		if (!in_array($thumbnail,array('none','firstimage','featuredimage','anyimage'))) $thumbnail = 'firstimage';
+
+		$show_views = $instance['show_views'] ? 1 : 0;
 	  
 		// Get the info from transient
-		$results = get_transient('gapi.cache');
-/*
-		if ( $results==null )
-			die("The Google Analytics settings are wrong!");
-						
-		// If the transient is empty then scan the visited posts from Google Analytics Account
-		if ( !($results) ) {
-			toplytics_do_this_hourly();
-		}
-		
-		$toplytics_templates = toplytics_get_templates_list();
-		foreach($toplytics_templates as $template) {
-			echo $template."<br />";
-			echo toplytics_get_template_name($template)."<br />";
-		}
-		$toplytics_templates = toplytics_get_templates();
-		foreach($toplytics_templates as $template) {
-			echo $template['template_slug']."<br />";
-			echo $template['template_name']."<br />";
-			echo $template['template_filename']."<br /><br />";
-		}
-*/
-		if (!empty($results[$type])) {
+		$results = get_transient('toplytics.cache');
+
+		if (!empty($results[$period])) {
 			echo $before_widget;
 			include toplytics_get_template_path($instance['list_type']);
 			echo $after_widget;
@@ -54,7 +42,7 @@ class Toplytics_WP_Widget_Most_Visited_Posts extends WP_Widget {
 			// Reset the global $the_post as this query will have stomped on it
 			wp_reset_postdata();
 		} else {
-			echo "The statistics found in GA account doesn't match with your posts/pages.";
+			_e("The statistics found in GA account doesn't match with your posts/pages.", TOPLYTICS_TEXTDOMAIN);
 		}
 		ob_get_flush();
 	}
@@ -71,41 +59,77 @@ class Toplytics_WP_Widget_Most_Visited_Posts extends WP_Widget {
 			$number = TOPLYTICS_MAX_POSTS;
 
 		$instance['number'] = $number;
-		  
-		$instance['type'] = $new_instance['type'];
-		if (!in_array($instance['type'],array('today','week','month')))	$instance['type'] = 'today';
+
+		$instance['period'] = $new_instance['period'];
+		if (!in_array($instance['period'],array('today','week','month')))	$instance['period'] = 'today';
+
+		$instance['thumbnail'] = $new_instance['thumbnail'];
+		if (!in_array($instance['thumbnail'],array('none','firstimage','featuredimage','anyimage')))	$instance['thumbnail'] = 'firstimage';
+
 		$instance['list_type'] = $new_instance['list_type'];
+		$instance['show_views'] = $new_instance['show_views'] ? 1 : 0;
+
 		return $instance;
 	}
 
 	function form( $instance ) {
-		$title = isset($instance['title']) ? esc_attr($instance['title']) : '';
+		$widget_title = isset($instance['title']) ? esc_attr($instance['title']) : '';
 		if ( !isset($instance['number']) || !$number = (int) $instance['number'] )
 			$number = 5;
-		$type = isset($instance['type']) ? $instance['type'] : 'today';
+		$period = isset($instance['period']) ? $instance['period'] : 'today';
+		$thumbnail = isset($instance['thumbnail']) ? $instance['thumbnail'] : 'firstimage';
 		$list_type = isset($instance['list_type']) ? $instance['list_type'] : 'default';
+
+		$show_views = isset($instance['show_views']) ? $instance['show_views'] : 0;
+		$show_views_checked = '';
+	    if ( isset( $instance[ 'show_views' ] ) )
+			$show_views_checked = $instance['show_views'] ? ' checked="checked" ' : '';
 ?>
-		<p><label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title:'); ?></label>
-		<input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo $title; ?>" /></p>
-		<p><label for="<?php echo $this->get_field_id('number'); ?>"><?php _e('Number of posts to show:'); ?></label>
-		<input id="<?php echo $this->get_field_id('number'); ?>" name="<?php echo $this->get_field_name('number'); ?>" type="text" value="<?php echo $number; ?>" size="3" /></p>
-		<p><label for="<?php echo $this->get_field_id('type'); ?>"><?php _e('Type of posts to show:'); ?></label>
-		<select id="<?php echo $this->get_field_id('type'); ?>" name="<?php echo $this->get_field_name('type'); ?>">
-			<option value="today" <?php if ($type == 'today') echo 'selected="selected"'; ?>>Today</option>
-			<option value="week" <?php if ($type == 'week') echo 'selected="selected"'; ?>>Week</option>
-			<option value="month" <?php if ($type == 'month') echo 'selected="selected"'; ?>>Month</option>
+		<p>
+		<label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title'); ?>:</label>
+		<input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo $widget_title; ?>" />
+		</p>
+
+		<p>
+		<label for="<?php echo $this->get_field_id('number'); ?>"><?php _e('Number of posts to show', TOPLYTICS_TEXTDOMAIN); ?>:</label>
+		<input id="<?php echo $this->get_field_id('number'); ?>" name="<?php echo $this->get_field_name('number'); ?>" type="text" value="<?php echo $number; ?>" size="3" />
+		</p>
+
+		<p>
+		<label for="<?php echo $this->get_field_id('period'); ?>"><?php _e('Time period', TOPLYTICS_TEXTDOMAIN); ?>:</label>
+		<select id="<?php echo $this->get_field_id('period'); ?>" name="<?php echo $this->get_field_name('period'); ?>">
+			<option value="today" <?php if ($period == 'today') echo 'selected="selected"'; echo '>' . __('Daily', TOPLYTICS_TEXTDOMAIN); ?></option>
+			<option value="week" <?php if ($period == 'week') echo 'selected="selected"'; echo '>' . __('Weekly', TOPLYTICS_TEXTDOMAIN); ?></option>
+			<option value="month" <?php if ($period == 'month') echo 'selected="selected"'; echo '>' . __('Monthly', TOPLYTICS_TEXTDOMAIN); ?></option>
 		</select>
 		</p>
-<p><label for="<?php echo $this->get_field_id('list_type'); ?>"><?php _e('Template'); ?>:</label>
-<select id="<?php echo $this->get_field_id('list_type'); ?>" name="<?php echo $this->get_field_name('list_type'); ?>">
+
+		<p>
+		<label for="<?php echo $this->get_field_id('thumbnail'); ?>"><?php _e('Image'); ?>:</label>
+		<select id="<?php echo $this->get_field_id('thumbnail'); ?>" name="<?php echo $this->get_field_name('thumbnail'); ?>">
+			<option value="none" <?php if ($thumbnail == 'none') echo 'selected="selected"'; echo '>' . __('None'); ?></option>
+			<option value="firstimage" <?php if ($thumbnail == 'firstimage') echo 'selected="selected"'; echo '>' . __('First image', TOPLYTICS_TEXTDOMAIN); ?></option>
+			<option value="featuredimage" <?php if ($thumbnail == 'featuredimage') echo 'selected="selected"'; echo '>' . __('Featured Image'); ?></option>
+			<option value="anyimage" <?php if ($thumbnail == 'anyimage') echo 'selected="selected"'; echo '>' . __('Any Image', TOPLYTICS_TEXTDOMAIN); ?></option>
+		</select>
+		</p>
+
+		<p>
+			<input class="checkbox" type="checkbox" <?php echo $show_views_checked; ?> id="<?php echo $this->get_field_id('show_views'); ?>" name="<?php echo $this->get_field_name('show_views'); ?>" /> <label for="<?php echo $this->get_field_id('show_views'); ?>"><?php echo __( 'Show views', TOPLYTICS_TEXTDOMAIN ); ?></label>
+		</p>
+
+		<p>
+		<label for="<?php echo $this->get_field_id('list_type'); ?>"><?php _e('Template'); ?>:</label>
+		<select id="<?php echo $this->get_field_id('list_type'); ?>" name="<?php echo $this->get_field_name('list_type'); ?>">
 <?php
 $toplytics_templates = toplytics_get_templates_list();
 	foreach($toplytics_templates as $slug) {
 ?>
 	<option value="<?php echo $slug; ?>"<?php if ($list_type == $slug) echo ' selected="selected"'; ?>><?php echo toplytics_get_template_name($slug); ?></option>
 <?php } ?>
-	</select>
-</p>
+		</select>
+		</p>
 <?php
 	}
 }
+
