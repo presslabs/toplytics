@@ -11,8 +11,6 @@ class Toplytics_WP_Widget_Most_Visited_Posts extends WP_Widget {
 	}
 
 	function widget($args, $instance) {
-	  //require_once 'toplytics.class.php';
-
 		ob_start();
 		extract($args);
 
@@ -24,10 +22,10 @@ class Toplytics_WP_Widget_Most_Visited_Posts extends WP_Widget {
 	  	$counter= $number;
 		
 		$period = $instance['period'];
-		if (!in_array($period,array('today','week','month'))) $period = 'today';
+		if (!in_array($period,array('today','week','month'))) $period = 'month';
 	  
 		$thumbnail = $instance['thumbnail'];
-		if (!in_array($thumbnail,array('none','firstimage','featuredimage','anyimage'))) $thumbnail = 'firstimage';
+		if (!in_array($thumbnail,array('none','featuredimage'))) $thumbnail = 'featuredimage';
 
 		$show_views = $instance['show_views'] ? 1 : 0;
 	  
@@ -64,7 +62,7 @@ class Toplytics_WP_Widget_Most_Visited_Posts extends WP_Widget {
 		if (!in_array($instance['period'],array('today','week','month')))	$instance['period'] = 'today';
 
 		$instance['thumbnail'] = $new_instance['thumbnail'];
-		if (!in_array($instance['thumbnail'],array('none','firstimage','featuredimage','anyimage')))	$instance['thumbnail'] = 'firstimage';
+		if (!in_array($instance['thumbnail'],array('none','featuredimage')))	$instance['thumbnail'] = 'featuredimage';
 
 		$instance['list_type'] = $new_instance['list_type'];
 		$instance['show_views'] = $new_instance['show_views'] ? 1 : 0;
@@ -77,7 +75,7 @@ class Toplytics_WP_Widget_Most_Visited_Posts extends WP_Widget {
 		if ( !isset($instance['number']) || !$number = (int) $instance['number'] )
 			$number = 5;
 		$period = isset($instance['period']) ? $instance['period'] : 'today';
-		$thumbnail = isset($instance['thumbnail']) ? $instance['thumbnail'] : 'firstimage';
+		$thumbnail = isset($instance['thumbnail']) ? $instance['thumbnail'] : 'featuredimage';
 		$list_type = isset($instance['list_type']) ? $instance['list_type'] : 'default';
 
 		$show_views = isset($instance['show_views']) ? $instance['show_views'] : 0;
@@ -108,9 +106,7 @@ class Toplytics_WP_Widget_Most_Visited_Posts extends WP_Widget {
 		<label for="<?php echo $this->get_field_id('thumbnail'); ?>"><?php _e('Image'); ?>:</label>
 		<select id="<?php echo $this->get_field_id('thumbnail'); ?>" name="<?php echo $this->get_field_name('thumbnail'); ?>">
 			<option value="none" <?php if ($thumbnail == 'none') echo 'selected="selected"'; echo '>' . __('None'); ?></option>
-			<option value="firstimage" <?php if ($thumbnail == 'firstimage') echo 'selected="selected"'; echo '>' . __('First image', TOPLYTICS_TEXTDOMAIN); ?></option>
 			<option value="featuredimage" <?php if ($thumbnail == 'featuredimage') echo 'selected="selected"'; echo '>' . __('Featured Image'); ?></option>
-			<option value="anyimage" <?php if ($thumbnail == 'anyimage') echo 'selected="selected"'; echo '>' . __('Any Image', TOPLYTICS_TEXTDOMAIN); ?></option>
 		</select>
 		</p>
 

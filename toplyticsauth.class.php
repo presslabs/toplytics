@@ -119,7 +119,7 @@ class ToplyticsAuth {
 
 				foreach ($return_values as $index => $value) {
 					$link = home_url() . $index;
-					// error_log("view=$value, link=$link\n"); // for debug
+					error_log("views=$value, link=$link\n"); // for debug
 					$post_id = url_to_postid( $link );
 					$post = get_post ($post_id );
 					if ($post && ($post->post_type == 'post')) {
@@ -129,14 +129,15 @@ class ToplyticsAuth {
 							$results[$name][$post_id] = $value;
 					}
 				}
-				arsort($results[$name]);
-				// error_log("\n---------------------------------------------\n"); // for debug
+				if ( is_array( $results[$name] ) )
+					arsort($results[$name]);
+				error_log("\n----- $name----------------------------------------\n"); // for debug
 			}
 		} catch (Exception $e) {
 		  	error_log('                Exception >>> ' . $e);
 		}
 		set_transient('toplytics.cache', $results);
-	  error_log('                toplytics.cache >>> ' . print_r($results,true));
+		//error_log('                toplytics.cache >>> ' . print_r($results,true));
 		return $results;
 	}
 //------------------------------------------------------------------------------

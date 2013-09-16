@@ -39,9 +39,9 @@ Here is an example of code:
 		'period' => 'month',
 		'number' => 7
 	);
-	$toplytics_new_results = toplytics_get_results( $toplytics_args );
+	$toplytics_results = toplytics_get_results( $toplytics_args );
 	$k = 0;
-	foreach ( $toplytics_new_results as $post_id => $post_views ) {
+	foreach ( $toplytics_results as $post_id => $post_views ) {
 		echo (++$k) . ") " . get_the_title( $post_id ) . " - " . $post_views . " Views<br />";
 		echo toplytics_get_thumbnail_src( $post_id ) . "<br /><br />";
 	}
@@ -51,7 +51,8 @@ Here is an example of code:
 
 = 1.4 =
 Fix some display bugs.
-Add 'thumbnail' and 'show views' options to widget.
+Add i18n support.
+Add 'featured image' option to widget.
 Add functions to use the functionality outside the sidebar.
 Search for custom theme templates in plugin folder and also in current theme folder.
 Simplify the template syntax.

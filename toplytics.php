@@ -155,11 +155,11 @@ register_deactivation_hook(__FILE__,'toplytics_deactivate');
 
 //------------------------------------------------------------------------------
 function toplytics_do_this_hourly() { // scan Google Analytics statistics every hour
-	//delete_transient('toplytics.cache');
+	delete_transient('toplytics.cache');
 	ToplyticsAuth::ga_statistics();
 
 	$transient = get_transient('toplytics.cache');
-	//error_log('         TRANSIENT >>>        ' . print_r($transient, true));
+	//error_log('        TRANSIENT >>>        ' . print_r($transient, true));
 }
 add_action('toplytics_hourly_event', 'toplytics_do_this_hourly');
 
@@ -433,26 +433,12 @@ function toplytics_admin_init(){
 
 	register_setting( 'toplytics_options', 'toplytics_options', 'toplytics_options_validate' );
 	add_settings_section('toplytics_main', 'Google Analytics account', 'toplytics_section_text', 'toplytics');
-	add_settings_field('toplytics_text_username', 'User name (your email):', 'toplytics_setting_username', 'toplytics', 'toplytics_main');
-	add_settings_field('toplytics_text_account', 'Account (your site ID):', 'toplytics_setting_account', 'toplytics', 'toplytics_main');
 }
 add_action('admin_init', 'toplytics_admin_init');
 
 //------------------------------------------------------------------------------
 function toplytics_section_text() {
 	echo '<p>' . __("Enter here the details of your account:", TOPLYTICS_TEXTDOMAIN) . '</p>';
-}
-
-//------------------------------------------------------------------------------
-function toplytics_setting_username() {
-	$options = get_option('toplytics_options');
-	echo "<input id='toplytics_text_username' name='toplytics_options[text_username]' size='40' type='text' value='{$options['text_username']}' />";
-}
-
-//------------------------------------------------------------------------------
-function toplytics_setting_account() {
-	$options = get_option('toplytics_options');
-	echo "<input id='toplytics_text_account' name='toplytics_options[text_account]' size='40' type='text' value='{$options['text_account']}' />";
 }
 
 //------------------------------------------------------------------------------
@@ -493,7 +479,6 @@ function toplytics_get_thumbnail_src($post_id, $thumbnail = 'anyimage') {
 	if ( ($thumbnail == 'firstimage') || ($thumbnail == 'anyimage') ) {
 		$images =& get_children( 'post_type=attachment&post_mime_type=image&post_parent=' . $post_id);
 		if ($images) {
-			//$firstImageSrc = wp_get_attachment_image_src(array_shift(array_keys($images)), 'toplytics-box', false);
 			$firstImageSrc = wp_get_attachment_image_src(array_shift(array_keys($images)));
 			$firstImg = $firstImageSrc[0];
 
