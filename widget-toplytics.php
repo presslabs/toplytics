@@ -25,7 +25,7 @@ class Toplytics_WP_Widget_Most_Visited_Posts extends WP_Widget {
 		if (!in_array($period,array('today','week','month'))) $period = 'month';
 	  
 		$thumbnail = $instance['thumbnail'];
-		if (!in_array($thumbnail,array('none','featuredimage'))) $thumbnail = 'featuredimage';
+		if (!in_array($thumbnail,array('none','featuredimage','firstimage','anyimage'))) $thumbnail = 'featuredimage';
 
 		$show_views = $instance['show_views'] ? 1 : 0;
 	  
@@ -62,7 +62,7 @@ class Toplytics_WP_Widget_Most_Visited_Posts extends WP_Widget {
 		if (!in_array($instance['period'],array('today','week','month')))	$instance['period'] = 'today';
 
 		$instance['thumbnail'] = $new_instance['thumbnail'];
-		if (!in_array($instance['thumbnail'],array('none','featuredimage')))	$instance['thumbnail'] = 'featuredimage';
+		if (!in_array($instance['thumbnail'],array('none','featuredimage','firstimage','anyimage')))	$instance['thumbnail'] = 'featuredimage';
 
 		$instance['list_type'] = $new_instance['list_type'];
 		$instance['show_views'] = $new_instance['show_views'] ? 1 : 0;
@@ -107,11 +107,13 @@ class Toplytics_WP_Widget_Most_Visited_Posts extends WP_Widget {
 		<select id="<?php echo $this->get_field_id('thumbnail'); ?>" name="<?php echo $this->get_field_name('thumbnail'); ?>">
 			<option value="none" <?php if ($thumbnail == 'none') echo 'selected="selected"'; echo '>' . __('None'); ?></option>
 			<option value="featuredimage" <?php if ($thumbnail == 'featuredimage') echo 'selected="selected"'; echo '>' . __('Featured Image'); ?></option>
+			<option value="firstimage" <?php if ($thumbnail == 'firstimage') echo 'selected="selected"'; echo '>' . __('First Image', TOPLYTICS_TEXTDOMAIN); ?></option>
+			<option value="anyimage" <?php if ($thumbnail == 'anyimage') echo 'selected="selected"'; echo '>' . __('Featured/First Image', TOPLYTICS_TEXTDOMAIN); ?></option>
 		</select>
 		</p>
 
 		<p>
-			<input class="checkbox" type="checkbox" <?php echo $show_views_checked; ?> id="<?php echo $this->get_field_id('show_views'); ?>" name="<?php echo $this->get_field_name('show_views'); ?>" /> <label for="<?php echo $this->get_field_id('show_views'); ?>"><?php echo __( 'Show views', TOPLYTICS_TEXTDOMAIN ); ?></label>
+			<input class="checkbox" type="checkbox" <?php echo $show_views_checked; ?> id="<?php echo $this->get_field_id('show_views'); ?>" name="<?php echo $this->get_field_name('show_views'); ?>" /> <label for="<?php echo $this->get_field_id('show_views'); ?>"><?php echo __( 'Display post views', TOPLYTICS_TEXTDOMAIN ); ?>?</label>
 		</p>
 
 		<p>

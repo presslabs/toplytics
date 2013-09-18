@@ -22,15 +22,18 @@
 ?>
         <a class="category-<?php echo $category->slug; ?>" href="<?php echo get_permalink($post_id) . $lang; ?>" title="<?php echo esc_attr($post_title); ?>">
 <?php
-if ($thumbnail == 'featuredimage') {
-	if ( has_post_thumbnail( $post_id ) ) // check if the post has a Post Thumbnail assigned to it.
-		echo get_the_post_thumbnail($post_id, 'thumbnail');
-}
+$thumbnail_src = toplytics_get_thumbnail_src($post_id, $thumbnail);
+if (@file_get_contents($thumbnail_src)):
+	echo '<img src="'.$thumbnail_src.'" width="315" height="50" border="0" alt="'.get_the_title($post_id).'" />';
+endif;
 ?>
 		  <div class="toplytics-box-title"><?php echo $post_title; ?>
-<?php if ( $show_views ) { ?><br /><span class="toplytics-box-views">
-<?php printf(__('%d Views', TOPLYTICS_TEXTDOMAIN), $pv); ?></span>
-<?php } ?>
+<?php
+	if ( $show_views ) { 
+		echo '<br /><span class="toplytics-box-views">';
+		printf(__('%d Views', TOPLYTICS_TEXTDOMAIN), $pv);
+		echo '</span>';
+} ?>
 		  </div>
 		</a>
 		</div><!-- end of .toplytics-box-bg -->

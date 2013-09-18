@@ -4,7 +4,7 @@
  * Plugin URI: http://wordpress.org/extend/plugins/toplytics/ 
  * Description: Plugin for displaying most viewed content using data from a Google Analytics account. Relieves the DB from writing every click.
  * Author: PressLabs 
- * Version: 1.3
+ * Version: 1.4
  * Author URI: http://www.presslabs.com/ 
  */
 
@@ -472,20 +472,9 @@ function toplytics_get_results( $args ) {
 }
 
 //------------------------------------------------------------------------------
-function toplytics_get_thumbnail_src($post_id, $thumbnail = 'anyimage') {
+function toplytics_get_thumbnail_src($post_id, $thumbnail = 'featuredimage') {
 	if ( $thumbnail == 'none' )
 		return '';
-
-	if ( ($thumbnail == 'firstimage') || ($thumbnail == 'anyimage') ) {
-		$images =& get_children( 'post_type=attachment&post_mime_type=image&post_parent=' . $post_id);
-		if ($images) {
-			$firstImageSrc = wp_get_attachment_image_src(array_shift(array_keys($images)));
-			$firstImg = $firstImageSrc[0];
-
-			if ( @file_get_contents($firstImg) )
-				return $firstImg;
-		}
-	}
 
 	if ( ($thumbnail == 'featuredimage') || ($thumbnail == 'anyimage') ) {
 		if ( has_post_thumbnail( $post_id ) ) {
@@ -494,6 +483,13 @@ function toplytics_get_thumbnail_src($post_id, $thumbnail = 'anyimage') {
 			if ( @file_get_contents($featuredimage) )
 				return $featuredimage;
 		}
+	}
+
+	if ( ($thumbnail == 'firstimage') || ($thumbnail == 'anyimage') ) {
+		$mypost = get_post( $post_id );
+		$output = preg_match('/<img(.+?)src=[\'"]([^\'"]+)[\'"]/i', $mypost->post_content, $matches);
+		$first_img = $matches[2];
+		return $first_img;
 	}
 
 	return '';
