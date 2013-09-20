@@ -440,23 +440,6 @@ function toplytics_section_text() {
 }
 
 //------------------------------------------------------------------------------
-function toplytics_firstimage($post_id) {
-	$images =& get_children( 'post_type=attachment&post_mime_type=image&post_parent=' . $post_id);
-	if ($images) {
-		$firstImageSrc = wp_get_attachment_image_src(array_shift(array_keys($images)), 'toplytics-box', false);
-		$firstImg = $firstImageSrc[0];
-
-		if (@file_get_contents($firstImg)):
-			echo '<img src="'.$firstImg.'" width="315" height="50" border="0" alt="'.get_the_title($post_id).'">';
-		endif;
-
-		return true;
-	}
-
-	return false;
-}
-
-//------------------------------------------------------------------------------
 function toplytics_get_results( $args ) {
 	$toplytics_results = get_transient('toplytics.cache');
 	$counter = 1;
@@ -467,29 +450,5 @@ function toplytics_get_results( $args ) {
 	}
 
 	return $toplytics_new_results;
-}
-
-//------------------------------------------------------------------------------
-function toplytics_get_thumbnail_src($post_id, $thumbnail = 'featuredimage') {
-	if ( $thumbnail == 'none' )
-		return '';
-
-	if ( ($thumbnail == 'featuredimage') || ($thumbnail == 'anyimage') ) {
-		if ( has_post_thumbnail( $post_id ) ) {
-			$featuredimage = wp_get_attachment_url( get_post_thumbnail_id($post_id) );
-
-			if ( @file_get_contents($featuredimage) )
-				return $featuredimage;
-		}
-	}
-
-	if ( ($thumbnail == 'firstimage') || ($thumbnail == 'anyimage') ) {
-		$mypost = get_post( $post_id );
-		$output = preg_match('/<img(.+?)src=[\'"]([^\'"]+)[\'"]/i', $mypost->post_content, $matches);
-		$first_img = $matches[2];
-		return $first_img;
-	}
-
-	return '';
 }
 
