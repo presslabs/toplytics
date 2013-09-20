@@ -430,14 +430,8 @@ function toplytics_admin_init(){
 	toplytics_needs_configuration_message();
 
 	register_setting( 'toplytics_options', 'toplytics_options', 'toplytics_options_validate' );
-	add_settings_section('toplytics_main', 'Google Analytics account', 'toplytics_section_text', 'toplytics');
 }
 add_action('admin_init', 'toplytics_admin_init');
-
-//------------------------------------------------------------------------------
-function toplytics_section_text() {
-	echo '<p>' . __("Enter here the details of your account:", TOPLYTICS_TEXTDOMAIN) . '</p>';
-}
 
 //------------------------------------------------------------------------------
 function toplytics_get_results( $args ) {
