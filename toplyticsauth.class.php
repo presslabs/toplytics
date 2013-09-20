@@ -136,6 +136,7 @@ class ToplyticsAuth {
 		} catch (Exception $e) {
 		  	error_log('                Exception >>> ' . $e);
 		}
+		$results = array_slice( $results, 0, TOPLYTICS_MAX_POSTS );
 		set_transient('toplytics.cache', $results);
 		//error_log('                toplytics.cache >>> ' . print_r($results,true));
 		return $results;
