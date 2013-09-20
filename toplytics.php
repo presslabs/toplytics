@@ -205,15 +205,6 @@ function toplytics_admin_notices_action() {
 add_action( 'admin_notices', 'toplytics_admin_notices_action' );
 
 //------------------------------------------------------------------------------
-//  Add CSS file to Front End
-function toplytics_add_wp_stylesheet() {
-	wp_register_style( 'toplytics-style', plugins_url('/toplytics.css', 
-		__FILE__), false, filemtime( dirname(__FILE__) . '/toplytics.css'));
-	wp_enqueue_style( 'toplytics-style');
-}
-add_action('wp_enqueue_scripts', 'toplytics_add_wp_stylesheet');
-
-//------------------------------------------------------------------------------
 // Dashboard integration (Tools)
 function toplytics_menu() {
 	add_management_page('Toplytics Options Page', 'Toplytics', 
@@ -223,7 +214,7 @@ add_action('admin_menu', 'toplytics_menu');
 
 //------------------------------------------------------------------------------
 function toplytics_options_page() {
-	if ( !current_user_can('manage_options') )
+	if ( ! current_user_can('manage_options') )
 		wp_die( __('You do not have sufficient permissions to access this page.') );
 
 	$info_message = '';

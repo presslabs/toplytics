@@ -7,10 +7,16 @@
 <ol>
 	<?php foreach ( $toplytics_results as $post_id => $post_views ) : ?>
 	<li>
-        <a href="<?php echo get_permalink( $post_id ); ?>" title="<?php echo esc_attr( get_the_title( $post_id ) ); ?>"><?php echo get_the_title( $post_id ); ?></a>
-	<?php if ( $show_views )
-		printf( __( '%d Views', TOPLYTICS_TEXTDOMAIN), $post_views ); ?>
+        <a href="<?php echo get_permalink( $post_id ); ?>" title="<?php echo esc_attr( get_the_title( $post_id ) ); ?>">
+			<?php echo get_the_title( $post_id ); ?>
+		</a>
+			<?php 
+				if ( $show_views ) {
+					echo '<span class="post-views">';
+					printf( __('%d Views', TOPLYTICS_TEXTDOMAIN), $post_views );
+					echo '</span>';
+				}
+			?>
 	</li>
-<?php endforeach; ?>
+	<?php endforeach; ?>
 </ol>
-
