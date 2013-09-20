@@ -119,7 +119,7 @@ class ToplyticsAuth {
 
 				foreach ($return_values as $index => $value) {
 					$link = home_url() . $index;
-					error_log("views=$value, link=$link\n"); // for debug
+					//error_log("views=$value, link=$link\n"); // for debug
 					$post_id = url_to_postid( $link );
 					$post = get_post ($post_id );
 					if ($post && ($post->post_type == 'post')) {
@@ -131,7 +131,7 @@ class ToplyticsAuth {
 				}
 				if ( is_array( $results[$name] ) )
 					arsort($results[$name]);
-				error_log("\n----- $name----------------------------------------\n"); // for debug
+				//error_log("\n----- $name----------------------------------------\n"); // for debug
 			}
 		} catch (Exception $e) {
 		  	error_log('                Exception >>> ' . $e);

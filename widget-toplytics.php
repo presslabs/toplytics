@@ -18,9 +18,6 @@ class Toplytics_WP_Widget_Most_Visited_Posts extends WP_Widget {
 			empty($instance['title']) ? __('Most Visited Posts', TOPLYTICS_TEXTDOMAIN) : $instance['title'], 
 			$instance, $this->id_base);
 		
-	  	$number = $instance['number'];
-	  	$counter= $number;
-		
 		$period = $instance['period'];
 		if (!in_array($period,array('today','week','month'))) $period = 'month';
 	  
@@ -31,6 +28,14 @@ class Toplytics_WP_Widget_Most_Visited_Posts extends WP_Widget {
 	  
 		// Get the info from transient
 		$results = get_transient('toplytics.cache');
+
+	  	$number = $instance['number'];
+	  	$counter= $number;
+		foreach ($results[$period] as $post_id => $pv) {
+			if ($number <= 0) break;
+			$toplytics_results[$post_id] = $pv;
+			$number--;
+		}
 
 		if (!empty($results[$period])) {
 			echo $before_widget;
