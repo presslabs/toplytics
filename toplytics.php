@@ -8,7 +8,14 @@
  * Author URI: http://www.presslabs.com/ 
  */
 
-include 'config.php'; // configuration file
+//
+// Configurations
+//
+define("TOPLYTICS_DEFAULT_POSTS", 5);
+define("TOPLYTICS_MIN_POSTS", 1);
+define("TOPLYTICS_MAX_POSTS", 20);
+define("TOPLYTICS_TEXTDOMAIN", "toplytics-text-domain");
+
 include 'widget-toplytics.php'; // Widget code integration
 
 include 'toplyticsauth.class.php'; // the main class
