@@ -13,7 +13,7 @@
 			<?php 
 				if ( $show_views ) {
 					echo '<span class="post-views">';
-					printf( __('%d Views', TOPLYTICS_TEXTDOMAIN), $post_views );
+					printf( __( '%d Views', TOPLYTICS_TEXTDOMAIN ), $post_views );
 					echo '</span>';
 				}
 			?>
