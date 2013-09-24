@@ -19,7 +19,7 @@ Please configure your plugin options in Tools->Toplytics.
 = Features =
 * Extract daily/weekly/monthly pageviews of posts from Google Analytics;
 * Connect to Google Analytics Account using OAuth method;
-* Custom template support direct into your theme structure;
+* Custom template support direct into your theme directory;
 * i18l support;
 
 
