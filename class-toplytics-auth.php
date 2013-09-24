@@ -125,14 +125,17 @@ class Toplytics_Auth {
 							$results[ $name ][ $post_id ] = $value;
 					}
 				}
-				if ( is_array( $results[ $name ] ) )
+
+				if ( is_array( $results[ $name ] ) ) {
 					arsort( $results[ $name ] );
+					$results[ $name ] = array_slice( $results[ $name ], 0, TOPLYTICS_MAX_POSTS, true );
+				}
 			}
 		} catch ( Exception $e ) {
 		  	error_log( '                Exception >>> ' . $e );
 		}
-		$results = array_slice( $results, 0, TOPLYTICS_MAX_POSTS );
 		set_transient( 'toplytics.cache', $results );
+		var_dump( count( $results['week'] ) );
 
 		return $results;
 	}

@@ -20,15 +20,12 @@ class Toplytics_WP_Widget_Most_Visited_Posts extends WP_Widget {
 			$instance, 
 			$this->id_base
 		 );
-		
+
 		$period = $instance['period'];
 		if ( ! in_array( $period, array( 'today', 'week', 'month' ) ) ) $period = 'month';
-	  
-		$thumbnail = $instance['thumbnail'];
-		if ( ! in_array( $thumbnail, array( 'none', 'featuredimage', 'firstimage', 'anyimage' ) ) ) $thumbnail = 'featuredimage';
 
 		$show_views = $instance['show_views'] ? 1 : 0;
-	  
+
 		// Get the info from transient
 		$results = get_transient( 'toplytics.cache' );
 
@@ -40,10 +37,13 @@ class Toplytics_WP_Widget_Most_Visited_Posts extends WP_Widget {
 			$number--;
 		}
 
-		if ( ! empty( $results[ $period ] ) )
-		{
+		if ( ! empty( $results[ $period ] ) ) {
 			echo $before_widget;
-			include toplytics_get_template_path( $instance['list_type'] );
+
+			$template_filename = toplytics_get_template_filename();
+			if ( '' != $template_filename )
+				include $template_filename;
+
 			echo $after_widget;
 
 			// Reset the global $the_post as this query will have stomped on it
@@ -71,11 +71,6 @@ class Toplytics_WP_Widget_Most_Visited_Posts extends WP_Widget {
 		if ( ! in_array( $instance['period'], array( 'today', 'week', 'month' ) ) )
 			$instance['period'] = 'today';
 
-		$instance['thumbnail'] = $new_instance['thumbnail'];
-		if ( ! in_array( $instance['thumbnail'], array( 'none', 'featuredimage', 'firstimage', 'anyimage' ) ) )
-			$instance['thumbnail'] = 'featuredimage';
-
-		$instance['list_type'] = $new_instance['list_type'];
 		$instance['show_views'] = $new_instance['show_views'] ? 1 : 0;
 
 		return $instance;
@@ -88,8 +83,6 @@ class Toplytics_WP_Widget_Most_Visited_Posts extends WP_Widget {
 			$number = 5;
 
 		$period     = isset( $instance['period']    ) ? $instance['period']     : 'today';
-		$thumbnail  = isset( $instance['thumbnail'] ) ? $instance['thumbnail']  : 'featuredimage';
-		$list_type  = isset( $instance['list_type'] ) ? $instance['list_type']  : 'default';
 		$show_views = isset( $instance['show_views']) ? $instance['show_views'] : 0;
 
 		$show_views_checked = '';
@@ -107,7 +100,7 @@ class Toplytics_WP_Widget_Most_Visited_Posts extends WP_Widget {
 		</p>
 
 		<p>
-		<label for="<?php echo $this->get_field_id( 'period' ); ?>"><?php _e( 'Time period', TOPLYTICS_TEXTDOMAIN ); ?>:</label>
+		<label for="<?php echo $this->get_field_id( 'period' ); ?>"><?php _e( 'Statistics period', TOPLYTICS_TEXTDOMAIN ); ?>:</label>
 		<select id="<?php echo $this->get_field_id( 'period' ); ?>" name="<?php echo $this->get_field_name('period'); ?>">
 			<option value="today"<?php if ( $period == 'today' ) echo ' selected="selected"'; echo '>' . __( 'Daily', TOPLYTICS_TEXTDOMAIN ); ?></option>
 			<option value="week"<?php  if ( $period == 'week'  ) echo ' selected="selected"'; echo '>' . __( 'Weekly', TOPLYTICS_TEXTDOMAIN ); ?></option>
@@ -116,29 +109,11 @@ class Toplytics_WP_Widget_Most_Visited_Posts extends WP_Widget {
 		</p>
 
 		<p>
-		<label for="<?php echo $this->get_field_id( 'thumbnail' ); ?>"><?php _e( 'Image' ); ?>:</label>
-		<select id="<?php echo $this->get_field_id( 'thumbnail' ); ?>" name="<?php echo $this->get_field_name( 'thumbnail' ); ?>">
-			<option value="none" <?php if ($thumbnail == 'none') echo 'selected="selected"'; echo '>' . __( 'None' ); ?></option>
-			<option value="featuredimage" <?php if ($thumbnail == 'featuredimage') echo 'selected="selected"'; echo '>' . __( 'Featured Image' ); ?></option>
-			<option value="firstimage" <?php if ($thumbnail == 'firstimage') echo 'selected="selected"'; echo '>' . __('First Image', TOPLYTICS_TEXTDOMAIN); ?></option>
-			<option value="anyimage" <?php if ($thumbnail == 'anyimage') echo 'selected="selected"'; echo '>' . __('Featured/First Image', TOPLYTICS_TEXTDOMAIN); ?></option>
-		</select>
-		</p>
-
-		<p>
 			<input class="checkbox" type="checkbox"<?php echo $show_views_checked; ?> id="<?php echo $this->get_field_id('show_views'); ?>" name="<?php echo $this->get_field_name('show_views'); ?>" /> <label for="<?php echo $this->get_field_id('show_views'); ?>"><?php echo __( 'Display post views', TOPLYTICS_TEXTDOMAIN ); ?>?</label>
 		</p>
 
 		<p>
-		<label for="<?php echo $this->get_field_id('list_type'); ?>"><?php _e('Template'); ?>:</label>
-		<select id="<?php echo $this->get_field_id('list_type'); ?>" name="<?php echo $this->get_field_name('list_type'); ?>">
-<?php
-	$toplytics_templates = toplytics_get_templates_list();
-	foreach ( $toplytics_templates as $slug ) {
-?>
-	<option value="<?php echo $slug; ?>"<?php if ($list_type == $slug) echo ' selected="selected"'; ?>><?php echo toplytics_get_template_name( $slug ); ?></option>
-<?php } ?>
-		</select>
+			<?php _e( 'Template' ); ?>:<br /><?php echo toplytics_get_template_filename(); ?>
 		</p>
 <?php
 	}

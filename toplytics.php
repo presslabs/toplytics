@@ -15,6 +15,7 @@ define( 'TOPLYTICS_DEFAULT_POSTS', 5 );
 define( 'TOPLYTICS_MIN_POSTS', 1 );
 define( 'TOPLYTICS_MAX_POSTS', 20 );
 define( 'TOPLYTICS_TEXTDOMAIN', 'toplytics-text-domain' );
+define( 'TOPLYTICS_TEMPLATE_FILENAME', 'toplytics-template.php' );
 
 include 'toplytics-widget.php'; // Widget code integration
 
@@ -51,72 +52,16 @@ function toplytics_str_between( $start, $end, $content ) {
 }
 
 //------------------------------------------------------------------------------
-function toplytics_get_templates_list_path() {
-	$plugin_templates_list = glob( plugin_dir_path( __FILE__ ) . '/templates/t_*.php' );
-	$theme_templates_list = glob( get_stylesheet_directory() . '/t_*.php' );
+function toplytics_get_template_filename() {
+	$theme_template = get_stylesheet_directory() . '/' . TOPLYTICS_TEMPLATE_FILENAME;
+	if ( file_exists( $theme_template ) )
+		return $theme_template;
 
-	return array_merge( $theme_templates_list, $plugin_templates_list );
-}
+	$plugin_template = plugin_dir_path( __FILE__ ) . TOPLYTICS_TEMPLATE_FILENAME;
+	if ( file_exists( $plugin_template ) )
+		return $plugin_template;
 
-//------------------------------------------------------------------------------
-function toplytics_get_template_path( $slug ) {
-	$files = toplytics_get_templates_list_path();
-
-	foreach ( $files as $filename ) {
-		$template_slug = substr( substr( basename( $filename ), 2 ), 0, -4 );
-		if ( $slug == $template_slug ) {
-			$content = file_get_contents( $filename );
-			$template_name = trim( toplytics_str_between( 'Toplytics Template:', "\n", $content ) );
-			if ( '' < $template_name ) return $filename;
-		}
-	}
-	return $slug;
-}
-
-//------------------------------------------------------------------------------
-function toplytics_get_template_name( $slug ) {
-	$files = toplytics_get_templates_list_path();
-
-	foreach ( $files as $filename ) {
-		$template_slug = substr( substr( basename( $filename ), 2 ), 0, -4 );
-		if ( $slug == $template_slug ) {
-			$content = file_get_contents( $filename );
-			$template_name = trim( toplytics_str_between( 'Toplytics Template:', "\n", $content ) );
-			if ( '' < $template_name ) return $template_name;
-		}
-	}
-	return $slug;
-}
-
-//------------------------------------------------------------------------------
-function toplytics_get_templates() {
-	$files = toplytics_get_templates_list_path();
-
-	foreach ( $files as $filename ) {
-		$content = file_get_contents( $filename );
-		$template_name = trim( toplytics_str_between( 'Toplytics Template:', "\n", $content ) );
-		if ( '' < $template_name ) {
-			$out[]['template_slug'] = substr( substr( basename( $filename ), 2 ), 0, -4 );
-			$out[]['template_name'] = $template_name;
-			$out[]['template_filename'] = $filename;
-		}
-	}
-	return $out;
-}
-
-//------------------------------------------------------------------------------
-function toplytics_get_templates_list() {
-	$files = toplytics_get_templates_list_path();
-
-	// remove t_ prefix and .php extension from template filename
-	foreach ( $files as $filename ) {
-		$content = file_get_contents( $filename );
-		$template_name = trim( toplytics_str_between( 'Toplytics Template:', "\n", $content ) );
-		if ( '' < $template_name ) {
-			$filename_with_no_ext[] = substr( substr( basename( $filename ), 2 ), 0, -4 );
-		}
-	}
-	return $filename_with_no_ext;
+	return '';
 }
 
 //------------------------------------------------------------------------------
@@ -133,6 +78,8 @@ function toplytics_has_configuration() {
 
 //------------------------------------------------------------------------------
 // Add cron job if all options are set
+// Scan Google Analytics statistics every hour
+//
 $options = get_option( 'toplytics_options' );
 if ( toplytics_has_configuration() ) {
 	if ( ! wp_next_scheduled( 'toplytics_hourly_event' ) )
@@ -157,27 +104,21 @@ function toplytics_deactivate() {
 	delete_option( 'toplytics_auth_token' );
 	delete_option( 'toplytics_account_id' );
 	delete_option( 'toplytics_cache_timeout' );
-	wp_clear_scheduled_hook( 'toplytics_hourly_event');
-	delete_transient( 'toplytics.cache');
+	wp_clear_scheduled_hook( 'toplytics_hourly_event' );
+	delete_transient( 'toplytics.cache' );
 }
 register_deactivation_hook( __FILE__, 'toplytics_deactivate' );
 
 //------------------------------------------------------------------------------
-function toplytics_do_this_hourly() { // scan Google Analytics statistics every hour
+function toplytics_do_this_hourly() {
 	delete_transient( 'toplytics.cache' );
-	ToplyticsAuth::ga_statistics();
-
-	$transient = get_transient( 'toplytics.cache' );
-	//error_log('        TRANSIENT >>>        ' . print_r($transient, true));
+	Toplytics_Auth::ga_statistics();
 }
 add_action( 'toplytics_hourly_event', 'toplytics_do_this_hourly' );
 
 //------------------------------------------------------------------------------
 function toplytics_widgets_init() {
-	$options = get_option( 'toplytics_options' );
-	$transient = get_transient( 'toplytics.cache' );
-
-	if ( toplytics_has_configuration() && ! empty( $transient['today'] ) )
+	if ( toplytics_has_configuration() )
 		register_widget( 'Toplytics_WP_Widget_Most_Visited_Posts' );
 } 
 add_action( 'widgets_init', 'toplytics_widgets_init' );
@@ -437,6 +378,12 @@ add_action( 'admin_init', 'toplytics_admin_init' );
 
 //------------------------------------------------------------------------------
 function toplytics_get_results( $args ) {
+	if ( 0 > $args['period'] )
+		$args['period'] = TOPLYTICS_MIN_POSTS;
+
+	if ( TOPLYTICS_MAX_POSTS < $args['period'] )
+		$args['period'] = TOPLYTICS_MAX_POSTS;
+
 	$toplytics_results = get_transient( 'toplytics.cache' );
 	$counter = 1;
 	foreach ( $toplytics_results[ $args['period'] ] as $index => $value ) {
