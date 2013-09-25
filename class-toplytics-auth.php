@@ -133,9 +133,10 @@ class Toplytics_Auth {
 			}
 		} catch ( Exception $e ) {
 		  	error_log( '                Exception >>> ' . $e );
+			return $results;
 		}
 		set_transient( 'toplytics.cache', $results );
-		var_dump( count( $results['week'] ) );
+		// error_log('>>>>>>>>>' . count( $results['week'] ) ); // for debug
 
 		return $results;
 	}

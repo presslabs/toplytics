@@ -89,6 +89,13 @@ if ( toplytics_has_configuration() ) {
 }
 
 //------------------------------------------------------------------------------
+function toplytics_do_this_hourly() {
+	// delete_transient( 'toplytics.cache' );
+	Toplytics_Auth::ga_statistics();
+}
+add_action( 'toplytics_hourly_event', 'toplytics_do_this_hourly' );
+
+//------------------------------------------------------------------------------
 function toplytics_activate() {
 	add_option( 'toplytics_options', array(null) );
 	add_option( 'toplytics_services', 'analytics' );
@@ -108,13 +115,6 @@ function toplytics_deactivate() {
 	delete_transient( 'toplytics.cache' );
 }
 register_deactivation_hook( __FILE__, 'toplytics_deactivate' );
-
-//------------------------------------------------------------------------------
-function toplytics_do_this_hourly() {
-	delete_transient( 'toplytics.cache' );
-	Toplytics_Auth::ga_statistics();
-}
-add_action( 'toplytics_hourly_event', 'toplytics_do_this_hourly' );
 
 //------------------------------------------------------------------------------
 function toplytics_widgets_init() {
@@ -349,7 +349,6 @@ TOPLYTICS_TEXTDOMAIN); ?></p>
           </tr>
 
         </table>
-
       </form>
 
 <?php } ?>
@@ -364,8 +363,7 @@ function toplytics_needs_configuration_message() {
 
 	if ( toplytics_needs_configuration() )
 		add_action( 'admin_notices', create_function( '', "echo '<div class=\"error\"><p>"
-			. sprintf( __('Toplytics needs configuration information on its <a href="%s">Settings</a> page.', TOPLYTICS_TEXTDOMAIN ), 
-  					 admin_url( 'tools.php?page=' . $plugin_page ) ) . "</p></div>';" ) );
+			. sprintf( __('Toplytics needs configuration information on its <a href="%s">Settings</a> page.', TOPLYTICS_TEXTDOMAIN ), admin_url( 'tools.php?page=' . $plugin_page ) ) . "</p></div>';" ) );
 }
 
 //------------------------------------------------------------------------------
@@ -377,20 +375,53 @@ function toplytics_admin_init(){
 add_action( 'admin_init', 'toplytics_admin_init' );
 
 //------------------------------------------------------------------------------
+function toplytics_validate_args( $args ) {
+	if ( ! isset( $args['period'] ) ) // set default value
+		$args['period'] = 'month';
+
+	if ( ! in_array( $args['period'], array( 'today', 'week', 'month' ) ) )
+		$args['period'] = 'month';
+
+	if ( ! isset( $args['numberposts'] ) ) // set default value
+		$args['numberposts'] = TOPLYTICS_DEFAULT_POSTS;
+
+	if ( 0 > $args['numberposts'] )
+		$args['numberposts'] = TOPLYTICS_MIN_POSTS;
+
+	if ( TOPLYTICS_MAX_POSTS < $args['numberposts'] )
+		$args['numberposts'] = TOPLYTICS_MAX_POSTS;
+
+	return $args;
+}
+
+//------------------------------------------------------------------------------
 function toplytics_get_results( $args ) {
-	if ( 0 > $args['period'] )
-		$args['period'] = TOPLYTICS_MIN_POSTS;
+	$args = toplytics_validate_args( $args );
 
-	if ( TOPLYTICS_MAX_POSTS < $args['period'] )
-		$args['period'] = TOPLYTICS_MAX_POSTS;
-
-	$toplytics_results = get_transient( 'toplytics.cache' );
+	$results = get_transient( 'toplytics.cache' );
 	$counter = 1;
-	foreach ( $toplytics_results[ $args['period'] ] as $index => $value ) {
-		if ( $counter > $args['number'] ) break;
+	foreach ( $results[ $args['period'] ] as $index => $value ) {
+		if ( $counter > $args['numberposts'] ) break;
 		$toplytics_new_results[ $index ] = $value;
 		$counter++;
 	}
 	return $toplytics_new_results;
 }
+
+//------------------------------------------------------------------------------
+function toplytics_results( $args ) {
+	$results = toplytics_get_results( $args );
+
+	echo '<ol>';
+	$k = 0;
+	foreach ( $results as $post_id => $post_views ) {
+		echo '<li><a href="' . get_permalink( $post_id ) 
+			. '" title="' . esc_attr( get_the_title( $post_id ) ) . '">' 
+			. get_the_title( $post_id ) . '</a> - <span class="post-views">' 
+			. sprintf( __( '%d Views', TOPLYTICS_TEXTDOMAIN ), $post_views )
+			. '</span></li>';
+	}
+	echo '</ol>';
+}
+add_shortcode( 'toplytics', 'toplytics_results' );
 
