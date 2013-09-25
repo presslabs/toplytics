@@ -376,6 +376,11 @@ add_action( 'admin_init', 'toplytics_admin_init' );
 
 //------------------------------------------------------------------------------
 function toplytics_validate_args( $args ) {
+	if ( isset( $args['showviews'] ) )
+		$args['showviews'] = true;
+	else
+		$args['showviews'] = false;
+
 	if ( ! isset( $args['period'] ) ) // set default value
 		$args['period'] = 'month';
 
@@ -417,9 +422,14 @@ function toplytics_results( $args ) {
 	foreach ( $results as $post_id => $post_views ) {
 		echo '<li><a href="' . get_permalink( $post_id ) 
 			. '" title="' . esc_attr( get_the_title( $post_id ) ) . '">' 
-			. get_the_title( $post_id ) . '</a> - <span class="post-views">' 
-			. sprintf( __( '%d Views', TOPLYTICS_TEXTDOMAIN ), $post_views )
-			. '</span></li>';
+			. get_the_title( $post_id ) . '</a>';
+
+		if ( $args['showviews'] )
+			echo ' - <span class="post-views">'
+				. sprintf( __( '%d Views', TOPLYTICS_TEXTDOMAIN ), $post_views )
+				. '</span>';
+
+		echo '</li>';
 	}
 	echo '</ol>';
 }

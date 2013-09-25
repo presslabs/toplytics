@@ -21,7 +21,7 @@ Please configure your plugin options in Tools->Toplytics.
 * Connect to Google Analytics Account using OAuth method;
 * Custom template support direct into your theme directory;
 * i18l support;
-* Shortcode support: [toplytics period="week" numberposts="3"]
+* Shortcode support: [toplytics period="week" numberposts="3" showviews="true"]
 
 
 == Installation ==
@@ -55,7 +55,18 @@ Here is an example of code:
 			. '" title="' . esc_attr( get_the_title( $post_id ) ) . '">' 
 			. get_the_title( $post_id ) . '</a> - ' . $post_views . ' Views<br />';
 	}
-?>	
+?>
+
+or you can simply use this code:
+
+<?php 
+	$toplytics_args = array(
+		'period' => 'month',  // default=month (today/week/month)
+		'numberposts' => 7,   // default=5 (min=1/max=20)
+		'showviews' => true   // default=false (true/false)
+	);
+	toplytics_results( $toplytics_args );
+?>
 
 = How to use custom template? =
 To use your custom template just copy and paste the file `toplytics-template.php` from toplytics plugin directory to your theme directory.
