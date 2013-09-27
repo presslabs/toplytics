@@ -22,6 +22,8 @@ include 'toplytics-widget.php'; // Widget code integration
 include 'class-toplytics-auth.php'; // the main class
 $obj = new Toplytics_Auth();
 
+include 'class-toplytics-documentation.php';
+
 //------------------------------------------------------------------------------
 function toplytics_init() {
 	load_plugin_textdomain( TOPLYTICS_TEXTDOMAIN, 
@@ -186,11 +188,19 @@ function toplytics_options_page() {
 			add_option( 'toplytics_cache_timeout', $_POST['ga_cache_timeout'] );
 	}
 
+	isset( $_GET['tab'] ) ? $tab = $_GET['tab'] : $tab = 'settings';
 ?>
 <div class="wrap">
 <div id="icon-tools" class="icon32">&nbsp;</div>
+<h2 class="nav-tab-wrapper">
+<a class="nav-tab<?php if ( 'settings' == $tab ) echo ' nav-tab-active'; ?>" href="tools.php?page=toplytics/toplytics.php&tab=settings">Settings</a>
+<a class="nav-tab<?php if ( 'documentation' == $tab ) echo ' nav-tab-active'; ?>" href="tools.php?page=toplytics/toplytics.php&tab=documentation">Documentation</a>
+</h2>
 
-<h2>Toplytics</h2>
+
+
+
+<?php if ( 'settings' == $tab ) { ?>
 
 <?php
 	// if settings are not empty then run the function called every hour (scan the GA statistics)
@@ -351,9 +361,27 @@ TOPLYTICS_TEXTDOMAIN); ?></p>
         </table>
       </form>
 
+	<?php } ?>
 <?php } ?>
 
-</div><?php
+
+
+
+
+
+
+<?php if ( 'documentation' == $tab ) { ?>
+
+	<?php new Toplytics_Documentation(); ?>
+
+<?php } ?>
+
+
+
+
+</div>
+
+<?php
 }
 
 //------------------------------------------------------------------------------
