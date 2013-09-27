@@ -376,6 +376,9 @@ add_action( 'admin_init', 'toplytics_admin_init' );
 
 //------------------------------------------------------------------------------
 function toplytics_validate_args( $args ) {
+	//
+	// showviews (true/false - default=false)
+	//
 	if ( isset( $args['showviews'] ) )
 		$args['showviews'] = true;
 	else
@@ -400,10 +403,12 @@ function toplytics_validate_args( $args ) {
 }
 
 //------------------------------------------------------------------------------
-function toplytics_get_results( $args ) {
+function toplytics_get_results( $args = '' ) {
 	$args = toplytics_validate_args( $args );
 
 	$results = get_transient( 'toplytics.cache' );
+	if ( ! $results[ $args['period'] ] ) return false;
+
 	$counter = 1;
 	foreach ( $results[ $args['period'] ] as $index => $value ) {
 		if ( $counter > $args['numberposts'] ) break;
@@ -414,8 +419,10 @@ function toplytics_get_results( $args ) {
 }
 
 //------------------------------------------------------------------------------
-function toplytics_results( $args ) {
+function toplytics_results( $args = '' ) {
+	$args = toplytics_validate_args( $args );
 	$results = toplytics_get_results( $args );
+	if ( ! $results ) return false;
 
 	echo '<ol>';
 	$k = 0;
@@ -425,13 +432,15 @@ function toplytics_results( $args ) {
 			. get_the_title( $post_id ) . '</a>';
 
 		if ( $args['showviews'] )
-			echo ' - <span class="post-views">'
-				. sprintf( __( '%d Views', TOPLYTICS_TEXTDOMAIN ), $post_views )
+			echo '<span class="post-views">'
+				. sprintf( __( '%d Views', TOPLYTICS_TEXTDOMAIN ), $post_views )	
 				. '</span>';
 
 		echo '</li>';
 	}
 	echo '</ol>';
+
+	return true;
 }
 add_shortcode( 'toplytics', 'toplytics_results' );
 

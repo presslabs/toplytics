@@ -14,42 +14,34 @@ class Toplytics_WP_Widget_Most_Visited_Posts extends WP_Widget {
 		ob_start();
 		extract( $args );
 
-		$title = apply_filters(
-			'widget_title', 
-			empty( $instance['title'] ) ? __( 'Most Visited Posts', TOPLYTICS_TEXTDOMAIN ) : $instance['title'], 
-			$instance, 
-			$this->id_base
-		 );
-
-		$period = $instance['period'];
-		if ( ! in_array( $period, array( 'today', 'week', 'month' ) ) ) $period = 'month';
-
-		$show_views = $instance['show_views'] ? 1 : 0;
-
 		// Get the info from transient
 		$results = get_transient( 'toplytics.cache' );
 
-	  	$number = $instance['number'];
-	  	$counter= $number;
-		foreach ( $results[ $period ] as $post_id => $pv ) {
-			if ( 0 >= $number ) break;
-			$toplytics_results[ $post_id ] = $pv;
-			$number--;
-		}
+		if ( $results ) {
+			$title = apply_filters(
+				'widget_title', 
+				empty( $instance['title'] ) ? __( 'Most Visited Posts', TOPLYTICS_TEXTDOMAIN ) : $instance['title'], 
+				$instance, 
+				$this->id_base
+			 );
 
-		if ( ! empty( $results[ $period ] ) ) {
+			$widget_period = $instance['period'];
+			if ( ! in_array( $widget_period, array( 'today', 'week', 'month' ) ) ) $widget_period = 'month';
+
+			$widget_showviews   = $instance['showviews'] ? 1 : 0;
+		  	$widget_numberposts = $instance['numberposts'];
+
 			echo $before_widget;
 
 			$template_filename = toplytics_get_template_filename();
-			if ( '' != $template_filename )
+			if ( '' != $template_filename ) {
+				if ( $title )
+					echo $before_title . $title . $after_title;
+
 				include $template_filename;
+			}
 
 			echo $after_widget;
-
-			// Reset the global $the_post as this query will have stomped on it
-			wp_reset_postdata();
-		} else {
-			_e( "The statistics found in GA account doesn't match with your posts/pages.", TOPLYTICS_TEXTDOMAIN );
 		}
 		ob_get_flush();
 	}
@@ -58,20 +50,20 @@ class Toplytics_WP_Widget_Most_Visited_Posts extends WP_Widget {
 		$instance = $old_instance;
 		$instance['title'] = strip_tags( $new_instance['title'] );
 	  
-		if ( ! $number = (int) $new_instance['number'] )
-			$number = TOPLYTICS_DEFAULT_POSTS;
-		else if ( $number < TOPLYTICS_MIN_POSTS )
-			$number = TOPLYTICS_MIN_POSTS;
-		else if ( $number > TOPLYTICS_MAX_POSTS )
-			$number = TOPLYTICS_MAX_POSTS;
+		if ( ! $widget_numberposts = (int) $new_instance['numberposts'] )
+			$widget_numberposts = TOPLYTICS_DEFAULT_POSTS;
+		else if ( $widget_numberposts < TOPLYTICS_MIN_POSTS )
+			$widget_numberposts = TOPLYTICS_MIN_POSTS;
+		else if ( $widget_numberposts > TOPLYTICS_MAX_POSTS )
+			$widget_numberposts = TOPLYTICS_MAX_POSTS;
 
-		$instance['number'] = $number;
+		$instance['numberposts'] = $widget_numberposts;
 
 		$instance['period'] = $new_instance['period'];
 		if ( ! in_array( $instance['period'], array( 'today', 'week', 'month' ) ) )
 			$instance['period'] = 'today';
 
-		$instance['show_views'] = $new_instance['show_views'] ? 1 : 0;
+		$instance['showviews'] = $new_instance['showviews'] ? 1 : 0;
 
 		return $instance;
 	}
@@ -79,15 +71,15 @@ class Toplytics_WP_Widget_Most_Visited_Posts extends WP_Widget {
 	function form( $instance ) {
 		$widget_title = isset( $instance['title'] ) ? esc_attr( $instance['title'] ) : '';
 
-		if ( ! isset( $instance['number'] ) || ! $number = (int) $instance['number'] )
-			$number = 5;
+		if ( ! isset( $instance['numberposts'] ) || ! $widget_numberposts = (int) $instance['numberposts'] )
+			$widget_numberposts = TOPLYTICS_DEFAULT_POSTS;
 
 		$period     = isset( $instance['period']    ) ? $instance['period']     : 'today';
-		$show_views = isset( $instance['show_views']) ? $instance['show_views'] : 0;
+		$showviews = isset( $instance['showviews']) ? $instance['showviews'] : 0;
 
-		$show_views_checked = '';
-	    if ( isset( $instance[ 'show_views' ] ) )
-			$show_views_checked = $instance['show_views'] ? ' checked="checked"' : '';
+		$showviews_checked = '';
+	    if ( isset( $instance[ 'showviews' ] ) )
+			$showviews_checked = $instance['showviews'] ? ' checked="checked"' : '';
 ?>
 		<p>
 		<label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e( 'Title' ); ?>:</label>
@@ -95,8 +87,8 @@ class Toplytics_WP_Widget_Most_Visited_Posts extends WP_Widget {
 		</p>
 
 		<p>
-		<label for="<?php echo $this->get_field_id( 'number' ); ?>"><?php _e( 'Number of posts to show', TOPLYTICS_TEXTDOMAIN ); ?>:</label>
-		<input id="<?php echo $this->get_field_id( 'number' ); ?>" name="<?php echo $this->get_field_name( 'number' ); ?>" type="text" value="<?php echo $number; ?>" size="3" />
+		<label for="<?php echo $this->get_field_id( 'numberposts' ); ?>"><?php _e( 'Number of posts to show', TOPLYTICS_TEXTDOMAIN ); ?>:</label>
+		<input id="<?php echo $this->get_field_id( 'numberposts' ); ?>" name="<?php echo $this->get_field_name( 'numberposts' ); ?>" type="text" value="<?php echo $widget_numberposts; ?>" size="3" />
 		</p>
 
 		<p>
@@ -109,7 +101,7 @@ class Toplytics_WP_Widget_Most_Visited_Posts extends WP_Widget {
 		</p>
 
 		<p>
-			<input class="checkbox" type="checkbox"<?php echo $show_views_checked; ?> id="<?php echo $this->get_field_id('show_views'); ?>" name="<?php echo $this->get_field_name('show_views'); ?>" /> <label for="<?php echo $this->get_field_id('show_views'); ?>"><?php echo __( 'Display post views', TOPLYTICS_TEXTDOMAIN ); ?>?</label>
+			<input class="checkbox" type="checkbox"<?php echo $showviews_checked; ?> id="<?php echo $this->get_field_id('showviews'); ?>" name="<?php echo $this->get_field_name('showviews'); ?>" /> <label for="<?php echo $this->get_field_id('showviews'); ?>"><?php echo __( 'Display post views', TOPLYTICS_TEXTDOMAIN ); ?>?</label>
 		</p>
 
 		<p>

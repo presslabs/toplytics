@@ -20,6 +20,7 @@ Please configure your plugin options in Tools->Toplytics.
 * Extract daily/weekly/monthly pageviews of posts from Google Analytics;
 * Connect to Google Analytics Account using OAuth method;
 * Custom template support direct into your theme directory;
+* Widget support (`Most Visited Posts`);
 * i18l support;
 * Shortcode support: [toplytics period="week" numberposts="3" showviews="true"]
 
@@ -41,23 +42,7 @@ Use your `Most Visited Posts` widget from the `Appearance->Widgets` page;
 You should use this plugin if you want to display the most visited posts of your site, from Google Analytics statistics.
 
 = How can I use the plugin functionality outside the sidebar? =
-Here is an example of code:
-
-<?php 
-	$toplytics_args = array(
-		'period' => 'month',  // default=month (today/week/month)
-		'numberposts' => 7    // default=5 (min=1/max=20)
-	);
-	$toplytics_results = toplytics_get_results( $toplytics_args );
-	$k = 0;
-	foreach ( $toplytics_results as $post_id => $post_views ) {
-		echo (++$k) . ') <a href="' . get_permalink( $post_id ) 
-			. '" title="' . esc_attr( get_the_title( $post_id ) ) . '">' 
-			. get_the_title( $post_id ) . '</a> - ' . $post_views . ' Views<br />';
-	}
-?>
-
-or you can simply use this code:
+Here is a simple example:
 
 <?php 
 	$toplytics_args = array(
@@ -65,8 +50,30 @@ or you can simply use this code:
 		'numberposts' => 7,   // default=5 (min=1/max=20)
 		'showviews' => true   // default=false (true/false)
 	);
-	toplytics_results( $toplytics_args );
+	if ( function_exists( 'toplytics_results' ) )
+		toplytics_results( $toplytics_args );
 ?>
+
+or you can customize your HTML code:
+
+<?php
+	if ( function_exists( 'toplytics_get_results' ) ) {
+		$toplytics_args = array(
+			'period' => 'month',  // default=month (today/week/month)
+			'numberposts' => 7    // default=5 (min=1/max=20)
+		);
+		$toplytics_results = toplytics_get_results( $toplytics_args );
+		if ( $toplytics_results ) {
+			$k = 0;
+			foreach ( $toplytics_results as $post_id => $post_views ) {
+				echo (++$k) . ') <a href="' . get_permalink( $post_id ) 
+					. '" title="' . esc_attr( get_the_title( $post_id ) ) . '">' 
+					. get_the_title( $post_id ) . '</a> - ' . $post_views . ' Views<br />';
+			}
+		}
+	}
+?>
+
 
 = How to use custom template? =
 To use your custom template just copy and paste the file `toplytics-template.php` from toplytics plugin directory to your theme directory.
