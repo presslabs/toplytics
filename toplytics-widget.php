@@ -3,11 +3,11 @@ class Toplytics_WP_Widget_Most_Visited_Posts extends WP_Widget {
 
 	function Toplytics_WP_Widget_Most_Visited_Posts() {
 		$widget_ops = array(
-			'classname'   => 'widget_most_visited_posts', 
-			'description' => __( 'Toplytics - The most visited posts on your site from Google Analytics', TOPLYTICS_TEXTDOMAIN )
+			'classname'   => 'toplytics_widget', 
+			'description' => __( 'The most visited posts on your site from Google Analytics', TOPLYTICS_TEXTDOMAIN )
 		);
-		$this->WP_Widget( 'most-visited-posts', __( 'Most Visited Posts', TOPLYTICS_TEXTDOMAIN ), $widget_ops );
-		$this->alt_option_name = 'widget_most_visited_posts';
+		$this->WP_Widget( 'toplytics-widget', __( 'Toplytics', TOPLYTICS_TEXTDOMAIN ), $widget_ops );
+		$this->alt_option_name = 'toplytics_widget';
 	}
 
 	function widget( $args, $instance ) {
