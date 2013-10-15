@@ -29,7 +29,6 @@ class Toplytics_Auth {
 
 	  	try { 
 	  		// The credentials
-			$options      = get_option( 'toplytics_options' );		
 			$account_id   = get_option( 'toplytics_account_id' );
 			$oauth_token  = get_option( 'toplytics_oauth_token' );
 			$oauth_secret = get_option( 'toplytics_oauth_secret' );
