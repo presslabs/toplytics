@@ -16,10 +16,10 @@ class Toplytics_Auth {
 //------------------------------------------------------------------------------
 	static function ga_statistics() { // Loading all that's required
 		require_once 'gapi.oauth.class.php'; // GAPI code
-
+/*
 		$results = get_transient( 'toplytics.cache' ); // Actual data, cached if possible
 		if ( $results && time() < ($results['_ts'] + 1800) ) { return $results; }
-
+*/
 	  	$ranges = array(
 			'today' => date( 'Y-m-d', strtotime( 'yesterday' ) ),
 			'week'  => date( 'Y-m-d', strtotime( '-7 days'   ) ),
@@ -42,14 +42,14 @@ class Toplytics_Auth {
 			$max_results  = '1000';
 
 			foreach ( $ranges as $name => $start_date ) {
-    			$url  = $base_url . 'data';
-    			$url .= '?ids=' . $account_id;
-    			$url .= sizeof( $dimensions ) > 0 ? ( '&dimensions=' . join( array_reverse( $dimensions ), ',' ) ) : '';
-    			$url .= sizeof( $metrics ) > 0 ? ( '&metrics=' . join( $metrics, ',' ) ) : '';
+    				$url  = $base_url . 'data';
+    				$url .= '?ids=' . $account_id;
+    				$url .= sizeof( $dimensions ) > 0 ? ( '&dimensions=' . join( array_reverse( $dimensions ), ',' ) ) : '';
+    				$url .= sizeof( $metrics ) > 0 ? ( '&metrics=' . join( $metrics, ',' ) ) : '';
 				$url .= sizeof( $sort ) > 0 ? '&sort=' . join( $sort, ',' ) : '';
-		    	$url .= '&start-date=' . $start_date;
-    			$url .= '&end-date=' . $end_date;
-    			$url .= '&max-results=' . $max_results;
+		    		$url .= '&start-date=' . $start_date;
+    				$url .= '&end-date=' . $end_date;
+    				$url .= '&max-results=' . $max_results;
 
 				$ch = curl_init();
 			  
@@ -89,28 +89,28 @@ class Toplytics_Auth {
 					if ( '' == $dimensions )
 					{
 						$dim_name = 'value';
-          			}
-          			else
-          			{
-            			$dimension = $entry->xpath( 'dxp:dimension' );
-            			$dimension_attributes = $dimension[0]->attributes();
-            			$dim_name = (string) $dimension_attributes['value'];
-          			}
+          				}
+          				else
+          				{
+            					$dimension = $entry->xpath( 'dxp:dimension' );
+            					$dimension_attributes = $dimension[0]->attributes();
+            					$dim_name = (string) $dimension_attributes['value'];
+          				}
 
-          			$metric = $entry->xpath( 'dxp:metric' );
-          			if ( 1 < sizeof( $metric ) )
-          			{
-            			foreach ( $metric as $single_metric )
-            			{ 
-              				$metric_attributes = $single_metric->attributes();
-              				$return_values[ $dim_name ][ (string) $metric_attributes['name'] ] = (string) $metric_attributes['value'];
-            			}
-          			}
-          			else
-          			{
-            			$metric_attributes = $metric[0]->attributes();
-            			$return_values[ $dim_name ] = (string) $metric_attributes['value'];
-          			}
+          				$metric = $entry->xpath( 'dxp:metric' );
+          				if ( 1 < sizeof( $metric ) )
+          				{
+            					foreach ( $metric as $single_metric )
+            					{ 
+              						$metric_attributes = $single_metric->attributes();
+              						$return_values[ $dim_name ][ (string) $metric_attributes['name'] ] = (string) $metric_attributes['value'];
+            					}
+          				}
+          				else
+          				{
+            					$metric_attributes = $metric[0]->attributes();
+            					$return_values[ $dim_name ] = (string) $metric_attributes['value'];
+          				}
 				}
 
 				foreach ( $return_values as $index => $value ) {
@@ -130,13 +130,12 @@ class Toplytics_Auth {
 					arsort( $results[ $name ] );
 					$results[ $name ] = array_slice( $results[ $name ], 0, TOPLYTICS_MAX_POSTS, true );
 				}
-			}
+			} // enf foreach ( $ranges as $name...
 		} catch ( Exception $e ) {
 		  	error_log( '                Exception >>> ' . $e );
 			return $results;
 		}
 		set_transient( 'toplytics.cache', $results );
-		// error_log('>>>>>>>>>' . count( $results['week'] ) ); // for debug
 
 		return $results;
 	}
