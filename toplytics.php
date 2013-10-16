@@ -25,6 +25,25 @@ $obj = new Toplytics_Auth();
 include 'class-toplytics-documentation.php';
 
 //------------------------------------------------------------------------------
+function toplytics_activate() {
+	add_option( 'toplytics_options', array(null) );
+	add_option( 'toplytics_services', 'analytics' );
+}
+register_activation_hook( __FILE__, 'toplytics_activate' );
+
+//------------------------------------------------------------------------------
+function toplytics_deactivate() {
+	wp_clear_scheduled_hook( 'toplytics_hourly_event' );
+}
+register_deactivation_hook( __FILE__, 'toplytics_deactivate' );
+
+//------------------------------------------------------------------------------
+function toplytics_uninstall() {
+	toplytics_remove_all_options();
+}
+add_action( 'uninstall_' . plugin_basename( __FILE__ ), 'toplytics_uninstall' );
+
+//------------------------------------------------------------------------------
 function toplytics_init() {
 	load_plugin_textdomain( TOPLYTICS_TEXTDOMAIN, 
 		false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
@@ -82,7 +101,6 @@ function toplytics_has_configuration() {
 // Add cron job if all options are set
 // Scan Google Analytics statistics every hour
 //
-$options = get_option( 'toplytics_options' );
 if ( toplytics_has_configuration() ) {
 	if ( ! wp_next_scheduled( 'toplytics_hourly_event' ) )
 		wp_schedule_event( time(), 'hourly', 'toplytics_hourly_event' );
@@ -98,25 +116,21 @@ function toplytics_do_this_hourly() {
 add_action( 'toplytics_hourly_event', 'toplytics_do_this_hourly' );
 
 //------------------------------------------------------------------------------
-function toplytics_activate() {
-	add_option( 'toplytics_options', array(null) );
-	add_option( 'toplytics_services', 'analytics' );
-}
-register_activation_hook( __FILE__, 'toplytics_activate' );
-
-//------------------------------------------------------------------------------
-function toplytics_deactivate() {
-	delete_option( 'toplytics_options' );
+function toplytics_remove_credentials() {
 	delete_option( 'toplytics_services' );
 	delete_option( 'toplytics_oauth_token' );
 	delete_option( 'toplytics_oauth_secret' );
 	delete_option( 'toplytics_auth_token' );
 	delete_option( 'toplytics_account_id' );
 	delete_option( 'toplytics_cache_timeout' );
-	wp_clear_scheduled_hook( 'toplytics_hourly_event' );
+}
+
+//------------------------------------------------------------------------------
+function toplytics_remove_all_options() {
+	delete_option( 'toplytics_options' );
+	toplytics_remove_credentials();
 	delete_transient( 'toplytics.cache' );
 }
-register_deactivation_hook( __FILE__, 'toplytics_deactivate' );
 
 //------------------------------------------------------------------------------
 function toplytics_widgets_init() {
@@ -171,14 +185,8 @@ function toplytics_options_page() {
 		$info_message = __( 'Options Saved', TOPLYTICS_TEXTDOMAIN );
 	}
 
-    if ( isset( $_POST['SubmitRemoveAllOptions'] ) ) {
-		delete_option( 'toplytics_services' );
-		delete_option( 'toplytics_options' );
-		delete_option( 'toplytics_oauth_token' );
-		delete_option( 'toplytics_oauth_secret' );
-		delete_option( 'toplytics_auth_token' );
-		delete_option( 'toplytics_account_id' );
-        delete_option( 'toplytics_cache_timeout' );
+    if ( isset( $_POST['SubmitRemoveCredentials'] ) ) {
+    		toplytics_remove_credentials();
 		$info_message = __( 'Everything Reset', TOPLYTICS_TEXTDOMAIN );
 	}
 
@@ -205,7 +213,6 @@ function toplytics_options_page() {
 <?php
 	// if settings are not empty then run the function called every hour (scan the GA statistics)
 	// this case is useful when you change the GA account settings
-	$options = get_option( 'toplytics_options' );
 	if ( toplytics_has_configuration() ) {
 		toplytics_do_this_hourly();
 
@@ -328,7 +335,7 @@ TOPLYTICS_TEXTDOMAIN); ?></p>
 
         <p class="submit">
           <input type="submit" name="SubmitOptions" class="button-primary" value="<?php _e( 'Save Changes', TOPLYTICS_TEXTDOMAIN ); ?>" />&nbsp;&nbsp;
-          <input type="submit" name="SubmitRemoveAllOptions" class="button" value="<?php _e( 'Remove All Options', TOPLYTICS_TEXTDOMAIN ); ?>" />
+          <input type="submit" name="SubmitRemoveCredentials" class="button" value="<?php _e( 'Remove Credentials', TOPLYTICS_TEXTDOMAIN ); ?>" />
         </p>
 
       </form>
