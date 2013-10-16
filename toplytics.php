@@ -4,7 +4,7 @@
  * Plugin URI: http://wordpress.org/extend/plugins/toplytics/ 
  * Description: Plugin for displaying most viewed content using data from a Google Analytics account. Relieves the DB from writing every click.
  * Author: PressLabs 
- * Version: 1.4
+ * Version: 1.4.1
  * Author URI: http://www.presslabs.com/ 
  */
 
@@ -196,19 +196,10 @@ function toplytics_options_page() {
 			add_option( 'toplytics_cache_timeout', $_POST['ga_cache_timeout'] );
 	}
 
-	isset( $_GET['tab'] ) ? $tab = $_GET['tab'] : $tab = 'settings';
 ?>
 <div class="wrap">
 <div id="icon-tools" class="icon32">&nbsp;</div>
-<h2 class="nav-tab-wrapper">
-<a class="nav-tab<?php if ( 'settings' == $tab ) echo ' nav-tab-active'; ?>" href="tools.php?page=toplytics/toplytics.php&tab=settings">Settings</a>
-<a class="nav-tab<?php if ( 'documentation' == $tab ) echo ' nav-tab-active'; ?>" href="tools.php?page=toplytics/toplytics.php&tab=documentation">Documentation</a>
-</h2>
-
-
-
-
-<?php if ( 'settings' == $tab ) { ?>
+<h2><?php _e( 'Settings' ); ?></h2>
 
 <?php
 	// if settings are not empty then run the function called every hour (scan the GA statistics)
@@ -369,21 +360,6 @@ TOPLYTICS_TEXTDOMAIN); ?></p>
       </form>
 
 	<?php } ?>
-<?php } ?>
-
-
-
-
-
-
-
-<?php if ( 'documentation' == $tab ) { ?>
-
-	<?php new Toplytics_Documentation(); ?>
-
-<?php } ?>
-
-
 
 
 </div>
@@ -478,4 +454,3 @@ function toplytics_results( $args = '' ) {
 	return true;
 }
 add_shortcode( 'toplytics', 'toplytics_results' );
-
