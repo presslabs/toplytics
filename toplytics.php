@@ -8,14 +8,19 @@
  * Author URI: http://www.presslabs.com/ 
  */
 
-//
-// Configurations
-//
 define( 'TOPLYTICS_DEFAULT_POSTS', 5 );
 define( 'TOPLYTICS_MIN_POSTS', 1 );
 define( 'TOPLYTICS_MAX_POSTS', 20 );
+define( 'TOPLYTICS_GET_MAX_POSTS', 1000 );
 define( 'TOPLYTICS_TEXTDOMAIN', 'toplytics-text-domain' );
 define( 'TOPLYTICS_TEMPLATE_FILENAME', 'toplytics-template.php' );
+
+$ranges = array(
+	'today' => date( 'Y-m-d', strtotime( 'yesterday' ) ),
+	'week'  => date( 'Y-m-d', strtotime( '-7 days'   ) ),
+	'month' => date( 'Y-m-d', strtotime( '-30 days'  ) )
+);
+define( 'TOPLYTICS_STATISTICS_PERIODS', $ranges );
 
 include 'toplytics-widget.php'; // Widget code integration
 
