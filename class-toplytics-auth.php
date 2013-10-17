@@ -41,18 +41,18 @@ class Toplytics_Auth {
 			$max_results  = '1000';
 
 			foreach ( $ranges as $name => $start_date ) {
-    				$url  = $base_url . 'data';
-    				$url .= '?ids=' . $account_id;
-    				$url .= sizeof( $dimensions ) > 0 ? ( '&dimensions=' . join( array_reverse( $dimensions ), ',' ) ) : '';
-    				$url .= sizeof( $metrics ) > 0 ? ( '&metrics=' . join( $metrics, ',' ) ) : '';
+				$url  = $base_url . 'data';
+				$url .= '?ids=' . $account_id;
+				$url .= sizeof( $dimensions ) > 0 ? ( '&dimensions=' . join( array_reverse( $dimensions ), ',' ) ) : '';
+				$url .= sizeof( $metrics ) > 0 ? ( '&metrics=' . join( $metrics, ',' ) ) : '';
 				$url .= sizeof( $sort ) > 0 ? '&sort=' . join( $sort, ',' ) : '';
-		    		$url .= '&start-date=' . $start_date;
-    				$url .= '&end-date=' . $end_date;
-    				$url .= '&max-results=' . $max_results;
+				$url .= '&start-date=' . $start_date;
+				$url .= '&end-date=' . $end_date;
+				$url .= '&max-results=' . $max_results;
 
 				$ch = curl_init();
 			  
-			  	// AUTH PROCESS
+				// AUTH PROCESS
 				$request_type     = 'GET';
 				$signature_method = new GADOAuthSignatureMethod_HMAC_SHA1();
 
@@ -158,7 +158,7 @@ class Toplytics_Auth {
 		$signature_method = new GADOAuthSignatureMethod_HMAC_SHA1();
 		$params = array();
 
-		$params['oauth_callback']     = toplytics_get_admin_url( '/tools.php' ) . '?page=toplytics/toplytics.php&oauth_return=true';
+		$params['oauth_callback']     = toplytics_get_admin_url( '/options-general.php' ) . '?page=toplytics/toplytics.php&oauth_return=true';
 		$params['scope']              = 'https://www.googleapis.com/auth/analytics.readonly'; // This is a space seperated list of applications we want access to
 		$params['xoauth_displayname'] = 'Analytics Dashboard';
 
@@ -177,7 +177,7 @@ class Toplytics_Auth {
 		if ( curl_errno( $ch ) )
 		{
 			$error_message = curl_error( $ch );
-			$info_redirect = toplytics_get_admin_url( '/tools.php' ) . '?page=toplytics/toplytics.php&error_message=' . urlencode( $error_message );
+			$info_redirect = toplytics_get_admin_url( '/options-general.php' ) . '?page=toplytics/toplytics.php&error_message=' . urlencode( $error_message );
 			header( 'Location: ' . $info_redirect );
 			die();
 		}
@@ -193,7 +193,7 @@ class Toplytics_Auth {
 
 			header( 'Location: https://www.google.com/accounts/OAuthAuthorizeToken?oauth_token=' . urlencode( $access_params['oauth_token'] ) );
 		} else {
-			$info_redirect = toplytics_get_admin_url( '/tools.php' ) . '?page=toplytics/toplytics.php&error_message=' . urlencode( $oa_response );
+			$info_redirect = toplytics_get_admin_url( '/options-general.php' ) . '?page=toplytics/toplytics.php&error_message=' . urlencode( $oa_response );
 			header( 'Location: ' . $info_redirect );
 		}
 
@@ -228,7 +228,7 @@ class Toplytics_Auth {
 		if ( curl_errno( $ch ) )
 		{
 			$error_message = curl_error( $ch );
-			$info_redirect = toplytics_get_admin_url( '/tools.php' ) 
+			$info_redirect = toplytics_get_admin_url( '/options-general.php' ) 
 				. '?page=toplytics/toplytics.php&error_message=' 
 				. urlencode( $error_message );
 
@@ -248,13 +248,13 @@ class Toplytics_Auth {
 			update_option( 'toplytics_oauth_secret', $access_params['oauth_token_secret'] );
 			update_option( 'toplytics_auth_token', 'toplytics_see_oauth' );
 
-			$info_redirect = toplytics_get_admin_url( '/tools.php' ) 
+			$info_redirect = toplytics_get_admin_url( '/options-general.php' ) 
 				. '?page=toplytics/toplytics.php&info_message=' 
 				. urlencode( 'Authenticated!' );
 
 			header( 'Location: ' . $info_redirect );
 		} else {
-			$info_redirect = toplytics_get_admin_url( '/tools.php' ) 
+			$info_redirect = toplytics_get_admin_url( '/options-general.php' ) 
 				. '?page=toplytics/toplytics.php&error_message=' 
 				. urlencode( $oa_response );
 
