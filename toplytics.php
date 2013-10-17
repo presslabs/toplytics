@@ -12,6 +12,7 @@ define( 'TOPLYTICS_DEFAULT_POSTS', 5 );
 define( 'TOPLYTICS_MIN_POSTS', 1 );
 define( 'TOPLYTICS_MAX_POSTS', 20 );
 define( 'TOPLYTICS_GET_MAX_RESULTS', 1000 );
+define( 'TOPLYTICS_ADD_PAGEVIEWS', true );
 define( 'TOPLYTICS_TEXTDOMAIN', 'toplytics-text-domain' );
 define( 'TOPLYTICS_TEMPLATE_FILENAME', 'toplytics-template.php' );
 
