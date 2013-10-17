@@ -117,7 +117,6 @@ add_action( 'toplytics_hourly_event', 'toplytics_do_this_hourly' );
 
 //------------------------------------------------------------------------------
 function toplytics_remove_credentials() {
-	delete_option( 'toplytics_services' );
 	delete_option( 'toplytics_oauth_token' );
 	delete_option( 'toplytics_oauth_secret' );
 	delete_option( 'toplytics_auth_token' );
@@ -128,6 +127,7 @@ function toplytics_remove_credentials() {
 //------------------------------------------------------------------------------
 function toplytics_remove_all_options() {
 	delete_option( 'toplytics_options' );
+	delete_option( 'toplytics_services' );
 	toplytics_remove_credentials();
 	delete_transient( 'toplytics.cache' );
 }
@@ -153,7 +153,7 @@ add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), 'toplytics_set
 function toplytics_return_settings_link() {
 	$plugin_page = plugin_basename( __FILE__ );
 
-	return admin_url( 'tools.php?page=' . $plugin_page );
+	return admin_url( 'options-general.php?page=' . $plugin_page );
 }
 
 //------------------------------------------------------------------------------
@@ -164,9 +164,9 @@ function toplytics_admin_notices_action() {
 add_action( 'admin_notices', 'toplytics_admin_notices_action' );
 
 //------------------------------------------------------------------------------
-// Dashboard integration (Tools)
+// Dashboard integration (Settings)
 function toplytics_menu() {
-	add_management_page( 'Toplytics Options Page', 'Toplytics', 
+	add_options_page( 'Toplytics Options Page', 'Toplytics', 
 		'manage_options', __FILE__, 'toplytics_options_page' );
 }
 add_action( 'admin_menu', 'toplytics_menu' );
@@ -187,7 +187,7 @@ function toplytics_options_page() {
 
     if ( isset( $_POST['SubmitRemoveCredentials'] ) ) {
     		toplytics_remove_credentials();
-		$info_message = __( 'Everything Reset', TOPLYTICS_TEXTDOMAIN );
+		$info_message = __( 'Credentials Removed', TOPLYTICS_TEXTDOMAIN );
 	}
 
 	if ( isset( $_POST['ga_cache_timeout'] ) ) {
@@ -198,15 +198,13 @@ function toplytics_options_page() {
 
 ?>
 <div class="wrap">
-<div id="icon-tools" class="icon32">&nbsp;</div>
-<h2><?php _e( 'Settings' ); ?></h2>
+<div id="icon-options-general" class="icon32">&nbsp;</div>
+<h2>Toplytics <?php _e( 'Settings' ); ?></h2>
 
 <?php
 	// if settings are not empty then run the function called every hour (scan the GA statistics)
 	// this case is useful when you change the GA account settings
 	if ( toplytics_has_configuration() ) {
-		toplytics_do_this_hourly();
-
 		$base_url         = 'https://www.googleapis.com/analytics/v2.4/';
 		$account_base_url = 'https://www.googleapis.com/analytics/v2.4/management/';
 		$auth_type        = 'oauth';
@@ -333,35 +331,31 @@ TOPLYTICS_TEXTDOMAIN); ?></p>
 <?php
 	} else {
 ?>
-      <form action="" method="post">
+	<form action="" method="post">
 
-        <table class="form-table">
+	<table class="form-table">
+	<tr valign="top">
+		<th><?php _e( "Please configure your Google Analytics Account to be used for this site:<br /><br />Login using Google's OAuth system.", TOPLYTICS_TEXTDOMAIN ); ?></th>
+	</tr>
 
-          <tr valign="top">
-            <th><?php _e( "Please configure your Google Analytics Account to be used for this site:<br /><br />Login using Google's OAuth system.", TOPLYTICS_TEXTDOMAIN ); ?></th>
-          </tr>
-
-          <tr valign="top">
-            <th><?php _e( "This is the prefered method of attaching your Google account.<br/>
+	<tr valign="top">
+		<th><?php _e( "This is the prefered method of attaching your Google account.<br/>
                 Clicking the 'Start the Login Process' button will redirect you to a login page at google.com.<br/>
                 After accepting the login there you will be returned here.", TOPLYTICS_TEXTDOMAIN ); ?></th>
-          </tr>
+	</tr>
 
-          <tr valign="top">
-            <td>
-				<p class="submit">
-        			<input type="hidden" name="toplytics_login_type" value="oauth" />
-					<input type="submit" name="SubmitLogin" class="button-primary" value="<?php _e( 'Start the Login Process', TOPLYTICS_TEXTDOMAIN ); ?>&nbsp;&raquo;" />
-				</p>
-			</td>
-          </tr>
-
-        </table>
-      </form>
+	<tr valign="top">
+		<td>
+		<p class="submit">
+        	<input type="hidden" name="toplytics_login_type" value="oauth" />
+		<input type="submit" name="SubmitLogin" class="button-primary" value="<?php _e( 'Start the Login Process', TOPLYTICS_TEXTDOMAIN ); ?>&nbsp;&raquo;" />
+		</p>
+		</td>
+	</tr>
+	</table>
+	</form>
 
 	<?php } ?>
-
-
 </div>
 
 <?php
@@ -374,7 +368,7 @@ function toplytics_needs_configuration_message() {
 
 	if ( toplytics_needs_configuration() )
 		add_action( 'admin_notices', create_function( '', "echo '<div class=\"error\"><p>"
-			. sprintf( __('Toplytics needs configuration information on its <a href="%s">Settings</a> page.', TOPLYTICS_TEXTDOMAIN ), admin_url( 'tools.php?page=' . $plugin_page ) ) . "</p></div>';" ) );
+			. sprintf( __('Toplytics needs configuration information on its <a href="%s">Settings</a> page.', TOPLYTICS_TEXTDOMAIN ), admin_url( 'options-general.php?page=' . $plugin_page ) ) . "</p></div>';" ) );
 }
 
 //------------------------------------------------------------------------------
