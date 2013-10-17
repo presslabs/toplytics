@@ -17,11 +17,17 @@ define( 'TOPLYTICS_TEXTDOMAIN', 'toplytics-text-domain' );
 define( 'TOPLYTICS_TEMPLATE_FILENAME', 'toplytics-template.php' );
 
 $ranges = array(
+	'month' => date( 'Y-m-d', strtotime( '-30 days'  ) ),
 	'today' => date( 'Y-m-d', strtotime( 'yesterday' ) ),
-	'week'  => date( 'Y-m-d', strtotime( '-7 days'   ) ),
-	'month' => date( 'Y-m-d', strtotime( '-30 days'  ) )
+	'week'  => date( 'Y-m-d', strtotime( '-7 days'   ) )
 );
 define( 'TOPLYTICS_STATISTICS_PERIODS', $ranges );
+$ranges_label = array(
+	'Monthly',
+	'Daily',
+	'Weekly'
+);
+define( 'TOPLYTICS_STATISTICS_PERIODS_LABEL', $ranges_label );
 
 include 'toplytics-widget.php'; // Widget code integration
 
