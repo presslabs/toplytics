@@ -20,11 +20,7 @@ class Toplytics_Auth {
 		$results = get_transient( 'toplytics.cache' ); // Actual data, cached if possible
 		if ( $results && time() < ($results['_ts'] + 1800) ) { return $results; }
 */
-	  	$ranges = array(
-			'today' => date( 'Y-m-d', strtotime( 'yesterday' ) ),
-			'week'  => date( 'Y-m-d', strtotime( '-7 days'   ) ),
-			'month' => date( 'Y-m-d', strtotime( '-30 days'  ) )
-	  	);
+	  	$ranges = TOPLYTICS_STATISTICS_PERIODS;
 	  	$results = array( '_ts' => time() );
 
 	  	try { 
@@ -38,7 +34,7 @@ class Toplytics_Auth {
 			$metrics      = array( 'ga:pageviews' );
 			$sort         = array( '-ga:pageviews' );
 			$end_date     = date( 'Y-m-d') ;
-			$max_results  = '1000';
+			$max_results  = TOPLYTICS_GET_MAX_RESULTS;
 
 			foreach ( $ranges as $name => $start_date ) {
 				$url  = $base_url . 'data';
@@ -65,6 +61,9 @@ class Toplytics_Auth {
 
 				$auth_header = array( $oauth_req->to_header() ); 
 				// END OF AUTH PROCESS
+
+				if ( defined( TOPLYTICS_DEBUG_MODE ) )
+					error_log( "TOPLYTICS(" . basename( __FILE__ ) . "|" . __LINE__ . ") \$url -> '" . $url . "'\n\n");
 
 				curl_setopt( $ch, CURLOPT_URL, $url );
 				curl_setopt( $ch, CURLOPT_SSL_VERIFYPEER, 0 );
@@ -116,14 +115,10 @@ class Toplytics_Auth {
 					$link = home_url() . $index;
 					$post_id = url_to_postid( $link );
 					$post = get_post( $post_id );
-					if ( $post && ( 'post' == $post->post_type ) )
-					{
-						if ( isset( $results[ $name ][ $post_id ] ) )
-							$results[ $name ][ $post_id ] += $value;
-						else
-							$results[ $name ][ $post_id ] = $value;
-					}
-				}
+					if ( TOPLYTICS_ADD_PAGEVIEWS && $post && ( 'post' == $post->post_type ) && isset( $results[ $name ][ $post_id ] ) )
+						$results[ $name ][ $post_id ] += $value;
+					else
+						$results[ $name ][ $post_id ] = $value;
 
 				if ( is_array( $results[ $name ] ) ) {
 					arsort( $results[ $name ] );
@@ -135,6 +130,8 @@ class Toplytics_Auth {
 			return $results;
 		}
 		set_transient( 'toplytics.cache', $results );
+		if ( defined( TOPLYTICS_DEBUG_MODE ) )
+			error_log( "TOPLYTICS(" . basename( __FILE__ ) . "|" . __LINE__ . ") \$results -> " . print_r( $results, true ) . "\n\n" );
 
 		return $results;
 	}
