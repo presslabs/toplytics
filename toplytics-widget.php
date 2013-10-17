@@ -1,5 +1,7 @@
 <?php
 class Toplytics_WP_Widget_Most_Visited_Posts extends WP_Widget {
+	
+	private $stats_periods;
 
 	function Toplytics_WP_Widget_Most_Visited_Posts() {
 		$widget_ops = array(
@@ -8,6 +10,11 @@ class Toplytics_WP_Widget_Most_Visited_Posts extends WP_Widget {
 		);
 		$this->WP_Widget( 'toplytics-widget', __( 'Toplytics', TOPLYTICS_TEXTDOMAIN ), $widget_ops );
 		$this->alt_option_name = 'toplytics_widget';
+		
+		$periods = TOPLYTICS_STATISTICS_PERIODS;
+		foreach ( $periods as $key => $value )
+			$this->stats_periods[] = $key;
+		
 	}
 
 	function widget( $args, $instance ) {
@@ -26,7 +33,7 @@ class Toplytics_WP_Widget_Most_Visited_Posts extends WP_Widget {
 			 );
 
 			$widget_period = $instance['period'];
-			if ( ! in_array( $widget_period, array( 'today', 'week', 'month' ) ) ) $widget_period = 'month';
+			if ( ! in_array( $widget_period, $this->stats_periods ) ) $widget_period = $this->stats_periods[0];
 
 			$widget_showviews   = $instance['showviews'] ? 1 : 0;
 		  	$widget_numberposts = $instance['numberposts'];
@@ -60,8 +67,8 @@ class Toplytics_WP_Widget_Most_Visited_Posts extends WP_Widget {
 		$instance['numberposts'] = $widget_numberposts;
 
 		$instance['period'] = $new_instance['period'];
-		if ( ! in_array( $instance['period'], array( 'today', 'week', 'month' ) ) )
-			$instance['period'] = 'today';
+		if ( ! in_array( $instance['period'], $this->stats_periods ) )
+			$instance['period'] = $this->stats_periods[0];
 
 		$instance['showviews'] = $new_instance['showviews'] ? 1 : 0;
 
@@ -74,7 +81,7 @@ class Toplytics_WP_Widget_Most_Visited_Posts extends WP_Widget {
 		if ( ! isset( $instance['numberposts'] ) || ! $widget_numberposts = (int) $instance['numberposts'] )
 			$widget_numberposts = TOPLYTICS_DEFAULT_POSTS;
 
-		$period     = isset( $instance['period']    ) ? $instance['period']     : 'today';
+		$period     = isset( $instance['period']    ) ? $instance['period']     : $this->stats_periods[0];
 		$showviews = isset( $instance['showviews']) ? $instance['showviews'] : 0;
 
 		$showviews_checked = '';
