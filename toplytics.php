@@ -226,7 +226,9 @@ function toplytics_options_page() {
 		$ids              = '';
 		$cache_timeout    = false !== get_option( 'toplytics_cache_timeout' ) ? get_option( 'toplytics_cache_timeout' ) : 60;
 		$error_message    = '';
-//----------
+
+//--- Start Google API Request ----------------------------------------------------------------------------------
+
 		$url = $account_base_url . 'accounts/~all/webproperties/~all/profiles';
 		$request_type = 'GET';
 		if ( NULL == $url ) error_log( 'No URL to sign.' );
@@ -274,7 +276,9 @@ function toplytics_options_page() {
 			}
 			$account_hash = $vhash;
 		}
-//----------
+
+//--- End of Google API Request ----------------------------------------------------------------------------------
+
 	if ( 200 != $http_code ) {
 		if ( 401 == $http_code ) {
 			delete_option( 'toplytics_auth_token' ); // this is removed so login will happen again
