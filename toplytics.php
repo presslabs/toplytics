@@ -122,7 +122,6 @@ if ( toplytics_has_configuration() ) {
 
 //------------------------------------------------------------------------------
 function toplytics_do_this_hourly() {
-	// delete_transient( 'toplytics.cache' );
 	Toplytics_Auth::ga_statistics();
 }
 add_action( 'toplytics_hourly_event', 'toplytics_do_this_hourly' );
@@ -227,7 +226,7 @@ function toplytics_options_page() {
 		$cache_timeout    = false !== get_option( 'toplytics_cache_timeout' ) ? get_option( 'toplytics_cache_timeout' ) : 60;
 		$error_message    = '';
 
-//--- Start Google API Request ----------------------------------------------------------------------------------
+//--- Start Google API Request -------------------------------------------------
 
 		$url = $account_base_url . 'accounts/~all/webproperties/~all/profiles';
 		$request_type = 'GET';
@@ -277,7 +276,7 @@ function toplytics_options_page() {
 			$account_hash = $vhash;
 		}
 
-//--- End of Google API Request ----------------------------------------------------------------------------------
+//--- End of Google API Request ------------------------------------------------
 
 	if ( 200 != $http_code ) {
 		if ( 401 == $http_code ) {
