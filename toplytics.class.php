@@ -48,7 +48,6 @@ class Toplytics{
 				}
 			}
 		} catch (Exception $e) {
-			//set_transient('gapi.cache',$results);
 			return $results;
 		}
 		set_transient('gapi.cache',$results);
