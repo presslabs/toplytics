@@ -4,10 +4,10 @@
  * Plugin URI: http://wordpress.org/extend/plugins/toplytics/ 
  * Description: Plugin for displaying most viewed content using data from a Google Analytics account. Relieves the DB from writing every click.
  * Author: PressLabs 
- * Version: 1.4.1
+ * Version: 35c15d6
  * Author URI: http://www.presslabs.com/ 
  */
-
+define( 'TOPLYTICS_DEBUG_MODE', true );
 define( 'TOPLYTICS_DEFAULT_POSTS', 5 );
 define( 'TOPLYTICS_MIN_POSTS', 1 );
 define( 'TOPLYTICS_MAX_POSTS', 20 );
@@ -16,18 +16,19 @@ define( 'TOPLYTICS_ADD_PAGEVIEWS', true );
 define( 'TOPLYTICS_TEXTDOMAIN', 'toplytics-text-domain' );
 define( 'TOPLYTICS_TEMPLATE_FILENAME', 'toplytics-template.php' );
 
+global $ranges, $ranges_label;
+
 $ranges = array(
 	'month' => date( 'Y-m-d', strtotime( '-30 days'  ) ),
 	'today' => date( 'Y-m-d', strtotime( 'yesterday' ) ),
 	'week'  => date( 'Y-m-d', strtotime( '-7 days'   ) )
 );
-define( 'TOPLYTICS_STATISTICS_PERIODS', $ranges );
+
 $ranges_label = array(
 	'Monthly',
 	'Daily',
 	'Weekly'
 );
-define( 'TOPLYTICS_STATISTICS_PERIODS_LABEL', $ranges_label );
 
 include 'toplytics-widget.php'; // Widget code integration
 
@@ -139,7 +140,7 @@ function toplytics_remove_credentials() {
 function toplytics_remove_all_options() {
 	delete_option( 'toplytics_options' );
 	delete_option( 'toplytics_services' );
-	toplytics_remove_credentials();
+	//toplytics_remove_credentials();
 	delete_transient( 'toplytics.cache' );
 }
 
@@ -290,6 +291,8 @@ function toplytics_options_page() {
 			return;
 		}
 	}
+
+	toplytics_do_this_hourly();
 
 	if ( isset( $info_message ) && '' != trim( $info_message ) )
 		echo '<div id="message" class="updated fade"><p><strong>' . $info_message . '</strong></p></div>';
