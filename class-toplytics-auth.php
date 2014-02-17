@@ -18,9 +18,9 @@ class Toplytics_Auth {
 		require_once 'gapi.oauth.class.php'; // GAPI code
 
 		$results = get_transient( 'toplytics.cache' ); // Actual data, cached if possible
-		if ( $results && time() < ($results['_ts'] + 1800) ) { return $results; }
+		//if ( $results && time() < ($results['_ts'] + 1800) ) { return $results; }
 
-	  	$ranges = TOPLYTICS_STATISTICS_PERIODS;
+	  	global $ranges;
 	  	$results = array( '_ts' => time() );
 
 	  	try { 
@@ -119,12 +119,13 @@ class Toplytics_Auth {
 						$results[ $name ][ $post_id ] += $value;
 					else
 						$results[ $name ][ $post_id ] = $value;
-
+				}
 				if ( is_array( $results[ $name ] ) ) {
 					arsort( $results[ $name ] );
 					$results[ $name ] = array_slice( $results[ $name ], 0, TOPLYTICS_MAX_POSTS, true );
 				}
-			} // enf foreach ( $ranges as $name...
+
+			} // end foreach ( $ranges as $name...
 		} catch ( Exception $e ) {
 		  	error_log( '                Exception >>> ' . $e );
 			return $results;

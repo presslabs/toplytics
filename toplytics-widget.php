@@ -11,8 +11,8 @@ class Toplytics_WP_Widget_Most_Visited_Posts extends WP_Widget {
 		$this->WP_Widget( 'toplytics-widget', __( 'Toplytics', TOPLYTICS_TEXTDOMAIN ), $widget_ops );
 		$this->alt_option_name = 'toplytics_widget';
 		
-		$periods = TOPLYTICS_STATISTICS_PERIODS;
-		foreach ( $periods as $key => $value )
+		global $ranges;
+		foreach ( $ranges as $key => $value )
 			$this->stats_periods[] = $key;
 		
 	}
