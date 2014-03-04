@@ -1,10 +1,10 @@
 === Toplytics ===
-Contributors: PressLabs
+Contributors: PressLabs, olarmarius
 Donate link: http://www.presslabs.com/
-Tags: presslabs, analytics, posts, top, most visited, most viewed posts, top content, toplytics
+Tags: presslabs, analytics, posts, top, most visited, most viewed posts, top content, toplytics, popular, google analytics, high traffic, popular posts, oauth, server resources, settings, widget, embed code, javascript, json, json file, simple, post views
 Requires at least: 3.5
-Tested up to: 3.6.1
-Stable tag: 1.4
+Tested up to: 3.8.1
+Stable tag: 1.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -14,7 +14,7 @@ Displays the most visited posts as a widget using data from Google Analytics. De
 This plugin displays the most visited posts as a widget using data extracted from Google Analytics. It is designed to work with high-traffic sites and all types of caching.
 
 = IMPORTANT! =
-You need to have Google Analytics active on your site for this plugin to work!
+You need to have Google Analytics active on your site if you want to use this plugin!
 
 = Features: =
 * Connection with Google Analytics Account using OAuth method; the plugin doesn't store any passwords or account details;
@@ -151,6 +151,10 @@ The outcome will look like this:
 
 == Changelog ==
 
+= 1.5 =
+* Added `Display posts in real time` option
+* Fixed one shortcode bug.
+
 = 1.4 =
 * Removed multiple templates support. You can use only one custom template placed in your theme folder.
 * Fixed some display bugs.
@@ -178,6 +182,9 @@ The outcome will look like this:
 * First version on WP.
 
 == Upgrade Notice ==
+
+= 1.5 =
+The option `Display posts in real time` will let you get the results from one JSON file with JavaScript code. All HTML code is generated dynamically and as a result, the SEO will be affected.
 
 = 1.4 =
 Major plugin changes & code rewrite. Added theme custom templates, OAuth login, i18n support, shortcode support, filter & hooks.
