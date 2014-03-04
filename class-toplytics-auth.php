@@ -114,11 +114,14 @@ class Toplytics_Auth {
 				foreach ( $return_values as $index => $value ) {
 					$link = home_url() . $index;
 					$post_id = url_to_postid( $link );
-					$post = get_post( $post_id );
-					if ( TOPLYTICS_ADD_PAGEVIEWS && $post && ( 'post' == $post->post_type ) && isset( $results[ $name ][ $post_id ] ) )
-						$results[ $name ][ $post_id ] += $value;
-					else
-						$results[ $name ][ $post_id ] = $value;
+
+					if ( "post" == get_post_type ( $post_id ) ) { // filter all posts
+						$post = get_post( $post_id );
+						if ( TOPLYTICS_ADD_PAGEVIEWS && $post && isset( $results[ $name ][ $post_id ] ) )
+							$results[ $name ][ $post_id ] += $value;
+						else
+							$results[ $name ][ $post_id ] = $value;
+					}
 				}
 				if ( is_array( $results[ $name ] ) ) {
 					arsort( $results[ $name ] );
@@ -127,7 +130,7 @@ class Toplytics_Auth {
 
 			} // end foreach ( $ranges as $name...
 		} catch ( Exception $e ) {
-		  	error_log( '                Exception >>> ' . $e );
+		  	error_log( 'Exception >>> ' . $e );
 			return $results;
 		}
 		set_transient( 'toplytics.cache', $results );

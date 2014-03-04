@@ -1,120 +1,139 @@
-<?php
-class Toplytics_WP_Widget_Most_Visited_Posts extends WP_Widget {
-	
-	private $stats_periods;
+<?php class Toplytics_WP_Widget_Most_Visited_Posts extends WP_Widget {
 
-	function Toplytics_WP_Widget_Most_Visited_Posts() {
-		$widget_ops = array(
-			'classname'   => 'toplytics_widget', 
-			'description' => __( 'The most visited posts on your site from Google Analytics', TOPLYTICS_TEXTDOMAIN )
-		);
-		$this->WP_Widget( 'toplytics-widget', __( 'Toplytics', TOPLYTICS_TEXTDOMAIN ), $widget_ops );
-		$this->alt_option_name = 'toplytics_widget';
-		
-		global $ranges;
-		foreach ( $ranges as $key => $value )
-			$this->stats_periods[] = $key;
-		
-	}
+  private $stats_periods;
 
-	function widget( $args, $instance ) {
-		ob_start();
-		extract( $args );
+  function Toplytics_WP_Widget_Most_Visited_Posts() {
+    $widget_ops = array(
+      'classname'   => 'toplytics_widget', 
+      'description' => __( 'The most visited posts on your site from Google Analytics', TOPLYTICS_TEXTDOMAIN )
+    );
+    $this->WP_Widget( 'toplytics-widget', __( 'Toplytics', TOPLYTICS_TEXTDOMAIN ), $widget_ops );
+    $this->alt_option_name = 'toplytics_widget';
 
-		// Get the info from transient
-		$results = get_transient( 'toplytics.cache' );
+    global $ranges;
+    foreach ( $ranges as $key => $value )
+      $this->stats_periods[] = $key;
+  }
 
-		if ( $results ) {
-			$title = apply_filters(
-				'widget_title', 
-				empty( $instance['title'] ) ? __( 'Most Visited Posts', TOPLYTICS_TEXTDOMAIN ) : $instance['title'], 
-				$instance, 
-				$this->id_base
-			 );
+  function widget( $args, $instance ) {
+    ob_start();
 
-			$widget_period = $instance['period'];
-			if ( ! in_array( $widget_period, $this->stats_periods ) ) $widget_period = $this->stats_periods[0];
+    // Get the info from transient
+    $results = get_transient( 'toplytics.cache' );
 
-			$widget_showviews   = $instance['showviews'] ? 1 : 0;
-		  	$widget_numberposts = $instance['numberposts'];
+    if ( $results ) {
+      $title = apply_filters(
+        'widget_title', 
+        empty( $instance['title'] ) ? __( 'Most Visited Posts', TOPLYTICS_TEXTDOMAIN ) : $instance['title'], 
+        $instance, 
+        $this->id_base
+      );
 
-			echo $before_widget;
+      $widget_period = $instance['period'];
+      if ( ! in_array( $widget_period, $this->stats_periods ) ) $widget_period = $this->stats_periods[0];
 
-			$template_filename = toplytics_get_template_filename();
-			if ( '' != $template_filename ) {
-				if ( $title )
-					echo $before_title . $title . $after_title;
+      $widget_showviews   = $instance['showviews'] ? 1 : 0;
+      $widget_realtime    = $instance['realtime'] ? 1 : 0; // real time update
+      $widget_numberposts = $instance['numberposts'];
 
-				include $template_filename;
-			}
+      echo $before_widget;
+      $template_filename = toplytics_get_template_filename();
+      if ( '' != $template_filename ) {
+        if ( $title ) echo $before_title . $title . $after_title;
 
-			echo $after_widget;
-		}
-		ob_get_flush();
-	}
-
-	function update( $new_instance, $old_instance ) {
-		$instance = $old_instance;
-		$instance['title'] = strip_tags( $new_instance['title'] );
-	  
-		if ( ! $widget_numberposts = (int) $new_instance['numberposts'] )
-			$widget_numberposts = TOPLYTICS_DEFAULT_POSTS;
-		else if ( $widget_numberposts < TOPLYTICS_MIN_POSTS )
-			$widget_numberposts = TOPLYTICS_MIN_POSTS;
-		else if ( $widget_numberposts > TOPLYTICS_MAX_POSTS )
-			$widget_numberposts = TOPLYTICS_MAX_POSTS;
-
-		$instance['numberposts'] = $widget_numberposts;
-
-		$instance['period'] = $new_instance['period'];
-		if ( ! in_array( $instance['period'], $this->stats_periods ) )
-			$instance['period'] = $this->stats_periods[0];
-
-		$instance['showviews'] = $new_instance['showviews'] ? 1 : 0;
-
-		return $instance;
-	}
-
-	function form( $instance ) {
-		$widget_title = isset( $instance['title'] ) ? esc_attr( $instance['title'] ) : '';
-
-		if ( ! isset( $instance['numberposts'] ) || ! $widget_numberposts = (int) $instance['numberposts'] )
-			$widget_numberposts = TOPLYTICS_DEFAULT_POSTS;
-
-		$period     = isset( $instance['period']    ) ? $instance['period']     : $this->stats_periods[0];
-		$showviews = isset( $instance['showviews']) ? $instance['showviews'] : 0;
-
-		$showviews_checked = '';
-	    if ( isset( $instance[ 'showviews' ] ) )
-			$showviews_checked = $instance['showviews'] ? ' checked="checked"' : '';
+        if ( $widget_realtime ) {
 ?>
-		<p>
-		<label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e( 'Title' ); ?>:</label>
-		<input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" type="text" value="<?php echo $widget_title; ?>" />
-		</p>
-
-		<p>
-		<label for="<?php echo $this->get_field_id( 'numberposts' ); ?>"><?php _e( 'Number of posts to show', TOPLYTICS_TEXTDOMAIN ); ?>:</label>
-		<input id="<?php echo $this->get_field_id( 'numberposts' ); ?>" name="<?php echo $this->get_field_name( 'numberposts' ); ?>" type="text" value="<?php echo $widget_numberposts; ?>" size="3" />
-		</p>
-
-		<p>
-		<label for="<?php echo $this->get_field_id( 'period' ); ?>"><?php _e( 'Statistics period', TOPLYTICS_TEXTDOMAIN ); ?>:</label>
-		<select id="<?php echo $this->get_field_id( 'period' ); ?>" name="<?php echo $this->get_field_name('period'); ?>">
-			<option value="today"<?php if ( $period == 'today' ) echo ' selected="selected"'; echo '>' . __( 'Daily', TOPLYTICS_TEXTDOMAIN ); ?></option>
-			<option value="week"<?php  if ( $period == 'week'  ) echo ' selected="selected"'; echo '>' . __( 'Weekly', TOPLYTICS_TEXTDOMAIN ); ?></option>
-			<option value="month"<?php if ( $period == 'month' ) echo ' selected="selected"'; echo '>' . __( 'Monthly', TOPLYTICS_TEXTDOMAIN ); ?></option>
-		</select>
-		</p>
-
-		<p>
-			<input class="checkbox" type="checkbox"<?php echo $showviews_checked; ?> id="<?php echo $this->get_field_id('showviews'); ?>" name="<?php echo $this->get_field_name('showviews'); ?>" /> <label for="<?php echo $this->get_field_id('showviews'); ?>"><?php echo __( 'Display post views', TOPLYTICS_TEXTDOMAIN ); ?>?</label>
-		</p>
-
-		<p>
-			<?php _e( 'Template' ); ?>:<br /><?php echo toplytics_get_template_filename(); ?>
-		</p>
-<?php
-	}
+<script type="text/javascript">
+toplytics_args = {
+  period       : '<?php print $widget_period; ?>',
+  numberposts  : <?php print $widget_numberposts; ?>,
+  showviews    : <?php print $widget_showviews; ?>,
+  widget_id    : '<?php print $args["widget_id"]; ?>'
 }
+</script>
+<div id="<?php print $args['widget_id']; ?>"></div>
+<?php
+        } else {
+          include $template_filename;
+        }
+      }
+      echo $after_widget;
+      if ( $widget_realtime ) include toplytics_get_template_filename( $widget_realtime );
+    }
+    ob_get_flush();
+  }
 
+  function update( $new_instance, $old_instance ) {
+    $instance = $old_instance;
+    $instance['title'] = strip_tags( $new_instance['title'] );
+
+    if ( ! $widget_numberposts = (int) $new_instance['numberposts'] )
+      $widget_numberposts = TOPLYTICS_DEFAULT_POSTS;
+    else if ( $widget_numberposts < TOPLYTICS_MIN_POSTS )
+      $widget_numberposts = TOPLYTICS_MIN_POSTS;
+    else if ( $widget_numberposts > TOPLYTICS_MAX_POSTS )
+      $widget_numberposts = TOPLYTICS_MAX_POSTS;
+
+    $instance['numberposts'] = $widget_numberposts;
+
+    $instance['period'] = $new_instance['period'];
+    if ( ! in_array( $instance['period'], $this->stats_periods ) )
+      $instance['period'] = $this->stats_periods[0];
+
+    $instance['showviews'] = $new_instance['showviews'] ? 1 : 0;
+    $instance['realtime'] = $new_instance['realtime'] ? 1 : 0;
+
+    return $instance;
+  }
+
+  function form( $instance ) {
+    $widget_title = isset( $instance['title'] ) ? esc_attr( $instance['title'] ) : '';
+
+    if ( ! isset( $instance['numberposts'] ) || ! $widget_numberposts = (int) $instance['numberposts'] )
+      $widget_numberposts = TOPLYTICS_DEFAULT_POSTS;
+
+    $period = isset( $instance['period'] ) ? $instance['period'] : $this->stats_periods[0];
+
+    $showviews = isset( $instance['showviews']) ? $instance['showviews'] : 0;
+    $showviews_checked = '';
+    if ( isset( $instance[ 'showviews' ] ) )
+      $showviews_checked = $instance['showviews'] ? ' checked="checked"' : '';
+
+    $realtime = isset( $instance['realtime']) ? $instance['realtime'] : 0;
+    $realtime_checked = '';
+    if ( isset( $instance[ 'realtime' ] ) )
+      $realtime_checked = $instance['realtime'] ? ' checked="checked"' : '';
+?>
+    <p>
+      <label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e( 'Title' ); ?>:</label>
+      <input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" type="text" value="<?php echo $widget_title; ?>" />
+    </p>
+
+    <p>
+      <label for="<?php echo $this->get_field_id( 'numberposts' ); ?>"><?php _e( 'Number of posts to show', TOPLYTICS_TEXTDOMAIN ); ?>:</label>
+      <input id="<?php echo $this->get_field_id( 'numberposts' ); ?>" name="<?php echo $this->get_field_name( 'numberposts' ); ?>" type="text" value="<?php echo $widget_numberposts; ?>" size="3" />
+    </p>
+
+    <p>
+      <label for="<?php echo $this->get_field_id( 'period' ); ?>"><?php _e( 'Statistics period', TOPLYTICS_TEXTDOMAIN ); ?>:</label>
+      <select id="<?php echo $this->get_field_id( 'period' ); ?>" name="<?php echo $this->get_field_name('period'); ?>">
+        <?php global $ranges, $ranges_label;
+          foreach ( $ranges as $key => $item ) {
+        ?>
+        <option value="<?php echo $key; ?>"<?php if ( $period == $key ) echo ' selected="selected"'; echo '>' . __( $ranges_label[ $key ], TOPLYTICS_TEXTDOMAIN ); ?></option>
+        <?php } ?>
+      </select>
+    </p>
+
+    <p>
+      <input class="checkbox" type="checkbox"<?php echo $showviews_checked; ?> id="<?php echo $this->get_field_id('showviews'); ?>" name="<?php echo $this->get_field_name('showviews'); ?>" /> <label for="<?php echo $this->get_field_id('showviews'); ?>"><?php echo __( 'Display post views', TOPLYTICS_TEXTDOMAIN ); ?>?</label>
+    </p>
+
+    <p>
+      <input class="checkbox" type="checkbox"<?php echo $realtime_checked; ?> id="<?php echo $this->get_field_id('realtime'); ?>" name="<?php echo $this->get_field_name('realtime'); ?>" /><label title="<?php echo __( 'If you choose this, the content will be generated dynamically and your SEO will be affected', TOPLYTICS_TEXTDOMAIN ); ?>" for="<?php echo $this->get_field_id('realtime'); ?>"><?php echo __( 'Display posts in real time', TOPLYTICS_TEXTDOMAIN ); ?>?</label>
+    </p>
+
+    <p><?php _e( 'Template' ); ?>:<br /><?php echo toplytics_get_template_filename( $realtime ); ?></p>
+<?php
+  }
+}
