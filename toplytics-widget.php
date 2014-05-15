@@ -17,24 +17,26 @@
 
   function widget( $args, $instance ) {
     ob_start();
-
+	
+	extract($args);
+    extract($instance);
+	
     // Get the info from transient
     $results = get_transient( 'toplytics.cache' );
 
     if ( $results ) {
       $title = apply_filters(
         'widget_title', 
-        empty( $instance['title'] ) ? __( 'Most Visited Posts', TOPLYTICS_TEXTDOMAIN ) : $instance['title'], 
+        empty( $title ) ? __( 'Most Visited Posts', TOPLYTICS_TEXTDOMAIN ) : $title, 
         $instance, 
         $this->id_base
       );
 
-      $widget_period = $instance['period'];
-      if ( ! in_array( $widget_period, $this->stats_periods ) ) $widget_period = $this->stats_periods[0];
 
-      $widget_showviews   = $instance['showviews'] ? 1 : 0;
-      $widget_realtime    = $instance['realtime'] ? 1 : 0; // real time update
-      $widget_numberposts = $instance['numberposts'];
+      if ( ! in_array( $period, $this->stats_periods ) ) $period = $this->stats_periods[0];
+
+      $showviews   = $showviews ? 1 : 0;
+      $realtime    = $realtime ? 1 : 0; // real time update
 
       echo $before_widget;
       $template_filename = toplytics_get_template_filename();
@@ -45,20 +47,20 @@
 ?>
 <script type="text/javascript">
 toplytics_args = {
-  period       : '<?php print $widget_period; ?>',
-  numberposts  : <?php print $widget_numberposts; ?>,
-  showviews    : <?php print $widget_showviews; ?>,
-  widget_id    : '<?php print $args["widget_id"]; ?>'
+  period       : '<?php print $period; ?>',
+  numberposts  : <?php print $numberposts; ?>,
+  showviews    : <?php print $showviews; ?>,
+  widget_id    : '<?php print $widget_id; ?>'
 }
 </script>
-<div id="<?php print $args['widget_id']; ?>"></div>
+<div id="<?php print $widget_id; ?>"></div>
 <?php
         } else {
           include $template_filename;
         }
       }
       echo $after_widget;
-      if ( $widget_realtime ) include toplytics_get_template_filename( $widget_realtime );
+      if ( $realtime ) include toplytics_get_template_filename( $realtime );
     }
     ob_get_flush();
   }
