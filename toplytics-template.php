@@ -1,8 +1,8 @@
 <?php 
 $toplytics_args = array(
-  'period'      => $widget_period,
-  'numberposts' => $widget_numberposts,
-  'showviews'   => $widget_showviews
+  'period'      => $period,
+  'numberposts' => $numberposts,
+  'showviews'   => $showviews
 );
 
 $toplytics_results = false;
@@ -18,7 +18,7 @@ if ( $toplytics_results ) {
     <?php echo get_the_title( $post_id ); ?>
     </a>
     <?php 
-      if ( $widget_showviews ) {
+      if ( $showviews ) {
         echo '<span class="post-views">';
         printf( __( '%d Views', TOPLYTICS_TEXTDOMAIN ), $post_views );
         echo '</span>';
