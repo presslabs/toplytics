@@ -9,6 +9,22 @@ class Toplytics_Auth {
 		add_action( 'admin_init', array( &$this, 'admin_handle_oauth_login_header' ) );
 	}
 
+	static function auth_process( $url ) {
+		$oauth_token      = get_option( 'toplytics_oauth_token' );
+		$oauth_secret     = get_option( 'toplytics_oauth_secret' );
+		$request_type     = 'GET';
+		$signature_method = new GADOAuthSignatureMethod_HMAC_SHA1();
+
+		$params    = array();
+		$consumer  = new GADOAuthConsumer( 'anonymous', 'anonymous', NULL );
+		$token     = new GADOAuthConsumer( $oauth_token, $oauth_secret );
+		$oauth_req = GADOAuthRequest::from_consumer_and_token( $consumer, $token, $request_type, $url, $params );
+
+		$oauth_req->sign_request( $signature_method, $consumer, $token );
+
+		return array( $oauth_req->to_header() );
+	}
+
 	static function ga_statistics() { // Loading all that's required
 		require_once 'gapi.oauth.class.php'; // GAPI code
 
@@ -20,16 +36,14 @@ class Toplytics_Auth {
 
 		try {
 			// The credentials
-			$account_id   = get_option( 'toplytics_account_id' );
-			$oauth_token  = get_option( 'toplytics_oauth_token' );
-			$oauth_secret = get_option( 'toplytics_oauth_secret' );
-			$time_stamp   = time();
-			$base_url     = 'https://www.googleapis.com/analytics/v2.4/';
-			$dimensions   = array( 'ga:pagePath' );
-			$metrics      = array( 'ga:pageviews' );
-			$sort         = array( '-ga:pageviews' );
-			$end_date     = date( 'Y-m-d' );
-			$max_results  = TOPLYTICS_GET_MAX_RESULTS;
+			$account_id  = get_option( 'toplytics_account_id' );
+			$time_stamp  = time();
+			$base_url    = 'https://www.googleapis.com/analytics/v2.4/';
+			$dimensions  = array( 'ga:pagePath' );
+			$metrics     = array( 'ga:pageviews' );
+			$sort        = array( '-ga:pageviews' );
+			$end_date    = date( 'Y-m-d' );
+			$max_results = TOPLYTICS_GET_MAX_RESULTS;
 
 			foreach ( $ranges as $name => $start_date ) {
 				$url  = $base_url . 'data';
@@ -41,20 +55,8 @@ class Toplytics_Auth {
 				$url .= '&end-date=' . $end_date;
 				$url .= '&max-results=' . $max_results;
 
-				$ch = curl_init();
-				// AUTH PROCESS
-				$request_type     = 'GET';
-				$signature_method = new GADOAuthSignatureMethod_HMAC_SHA1();
-
-				$params    = array();
-				$consumer  = new GADOAuthConsumer( 'anonymous', 'anonymous', NULL );
-				$token     = new GADOAuthConsumer( $oauth_token, $oauth_secret );
-				$oauth_req = GADOAuthRequest::from_consumer_and_token( $consumer, $token, $request_type, $url, $params );
-
-				$oauth_req->sign_request( $signature_method, $consumer, $token );
-
-				$auth_header = array( $oauth_req->to_header() ); 
-				// END OF AUTH PROCESS
+				$ch          = curl_init();
+				$auth_header = Toplytics_Auth::auth_process( $url );
 
 				if ( defined( TOPLYTICS_DEBUG_MODE ) )
 					error_log( 'TOPLYTICS(' . basename( __FILE__ ) . '|' . __LINE__ . ") \$url -> '" . $url . "'\n\n" );
