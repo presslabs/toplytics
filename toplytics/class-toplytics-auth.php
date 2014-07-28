@@ -186,6 +186,32 @@ class Toplytics_Auth {
 		die();
 	}
 
+	function admin_handle_oauth_complete_redirect( $oa_response, $http_code ) {
+		delete_option( 'toplytics_oa_anon_token' );
+		delete_option( 'toplytics_oa_anon_secret' );
+
+		if ( 200 == $http_code ) {
+			$access_params = $this->split_params( $oa_response );
+
+			update_option( 'toplytics_oauth_token', $access_params['oauth_token'] );
+			update_option( 'toplytics_oauth_secret', $access_params['oauth_token_secret'] );
+			update_option( 'toplytics_auth_token', 'toplytics_see_oauth' );
+
+			$info_redirect = toplytics_get_admin_url( '/options-general.php' )
+				. '?page=toplytics/toplytics.php&info_message='
+				. urlencode( 'Authenticated!' );
+
+			header( 'Location: ' . $info_redirect );
+		} else {
+			$info_redirect = toplytics_get_admin_url( '/options-general.php' )
+				. '?page=toplytics/toplytics.php&error_message='
+				. urlencode( $oa_response );
+
+			header( 'Location: ' . $info_redirect );
+		}
+		die();
+	}
+
 	function admin_handle_oauth_complete() { // step two in oauth login process
 		if ( function_exists( 'current_user_can' ) && ! current_user_can( 'manage_options' ) )
 			die( __( 'Cheatin&#8217; uh?' ) );
@@ -220,31 +246,7 @@ class Toplytics_Auth {
 		}
 
 		$http_code = curl_getinfo( $ch, CURLINFO_HTTP_CODE );
-
-		delete_option( 'toplytics_oa_anon_token' );
-		delete_option( 'toplytics_oa_anon_secret' );
-
-		if ( 200 == $http_code ) {
-			$access_params = $this->split_params( $oa_response );
-
-			update_option( 'toplytics_oauth_token', $access_params['oauth_token'] );
-			update_option( 'toplytics_oauth_secret', $access_params['oauth_token_secret'] );
-			update_option( 'toplytics_auth_token', 'toplytics_see_oauth' );
-
-			$info_redirect = toplytics_get_admin_url( '/options-general.php' )
-				. '?page=toplytics/toplytics.php&info_message='
-				. urlencode( 'Authenticated!' );
-
-			header( 'Location: ' . $info_redirect );
-		} else {
-			$info_redirect = toplytics_get_admin_url( '/options-general.php' )
-				. '?page=toplytics/toplytics.php&error_message='
-				. urlencode( $oa_response );
-
-			header( 'Location: ' . $info_redirect );
-		}
-
-		die();
+		$this->admin_handle_oauth_complete_redirect( $oa_response, $http_code );
 	}
 
 	function split_params( $response ) {
