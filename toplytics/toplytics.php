@@ -7,6 +7,7 @@
  * Version: 1.5
  * Author URI: http://www.presslabs.com/ 
  */
+
 define( 'TOPLYTICS_DEBUG_MODE', true );
 define( 'TOPLYTICS_DEFAULT_POSTS', 5 );
 define( 'TOPLYTICS_MIN_POSTS', 1 );
