@@ -1,5 +1,7 @@
 <?php require_once( dirname( __FILE__ ) . '/OAuth.php' );
 
+$dimensions = array( 'ga:pagePath' );
+
 class Toplytics_Auth {
 	function Toplytics_Auth() {
 		$this->__construct();
@@ -25,11 +27,37 @@ class Toplytics_Auth {
 		return array( $oauth_req->to_header() );
 	}
 
+	static function get_result_from_xml( $xml ) {
+		global $dimensions;
+		$return_values = array();
+		foreach ( $xml->entry as $entry ) {
+			if ( '' == $dimensions ) {
+				$dim_name = 'value';
+			} else {
+				$dimension            = $entry->xpath( 'dxp:dimension' );
+				$dimension_attributes = $dimension[0]->attributes();
+				$dim_name             = (string) $dimension_attributes['value'];
+			}
+
+			$metric = $entry->xpath( 'dxp:metric' );
+			if ( 1 < sizeof( $metric ) ) {
+				foreach ( $metric as $single_metric ) {
+					$metric_attributes = $single_metric->attributes();
+					$return_values[ $dim_name ][ (string) $metric_attributes['name'] ] = (string) $metric_attributes['value'];
+				}
+			} else {
+				$metric_attributes = $metric[0]->attributes();
+				$return_values[ $dim_name ] = (string) $metric_attributes['value'];
+			}
+		}
+		return $return_values;
+	}
+
 	static function ga_statistics() { // Loading all that's required
+		global $dimensions;
 		require_once 'gapi.oauth.class.php'; // GAPI code
 
 		$results = get_transient( 'toplytics.cache' ); // Actual data, cached if possible
-		//if ( $results && time() < ($results['_ts'] + 1800) ) { return $results; }
 
 		global $ranges;
 		$results = array( '_ts' => time() );
@@ -39,7 +67,6 @@ class Toplytics_Auth {
 			$account_id  = get_option( 'toplytics_account_id' );
 			$time_stamp  = time();
 			$base_url    = 'https://www.googleapis.com/analytics/v2.4/';
-			$dimensions  = array( 'ga:pagePath' );
 			$metrics     = array( 'ga:pageviews' );
 			$sort        = array( '-ga:pageviews' );
 			$end_date    = date( 'Y-m-d' );
@@ -73,31 +100,10 @@ class Toplytics_Auth {
 					return ;
 				}
 
-				$xml = simplexml_load_string( $ch_result );
-
 				curl_close( $ch );
 
-				$return_values = array();
-				foreach ( $xml->entry as $entry ) {
-					if ( '' == $dimensions ) {
-						$dim_name = 'value';
-					} else {
-						$dimension            = $entry->xpath( 'dxp:dimension' );
-						$dimension_attributes = $dimension[0]->attributes();
-						$dim_name             = (string) $dimension_attributes['value'];
-					}
-
-					$metric = $entry->xpath( 'dxp:metric' );
-					if ( 1 < sizeof( $metric ) ) {
-						foreach ( $metric as $single_metric ) {
-							$metric_attributes = $single_metric->attributes();
-							$return_values[ $dim_name ][ (string) $metric_attributes['name'] ] = (string) $metric_attributes['value'];
-						}
-					} else {
-						$metric_attributes = $metric[0]->attributes();
-						$return_values[ $dim_name ] = (string) $metric_attributes['value'];
-					}
-				}
+				$xml           = simplexml_load_string( $ch_result );
+				$return_values = Toplytics_Auth::get_result_from_xml( $xml );
 
 				foreach ( $return_values as $index => $value ) {
 					$link    = home_url() . $index;
