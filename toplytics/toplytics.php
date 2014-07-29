@@ -216,12 +216,15 @@ function toplytics_save_stats_in_json() {
 		foreach ( $toplytics_results as $period => $result ) {
 			if ( '_ts' != $period ) {
 				foreach ( $result as $post_id => $views ) {
-					$post_data[ $period ][ $post_id ]['permalink'] = get_permalink( $post_id );
-					$post_data[ $period ][ $post_id ]['title']     = get_the_title( $post_id );
-					$post_data[ $period ][ $post_id ]['views']     = $views;
+					$data['permalink'] = get_permalink( $post_id );
+					$data['title']     = get_the_title( $post_id );
+					$data['post_id']   = $post_id;
+					$data['views']     = $views;
+
+					$post_data[ $period ][] = $data;
 				}
 			}
 		}
-		file_put_contents( $filepath, json_encode( $post_data, TRUE ) );
+		file_put_contents( $filepath, json_encode( $post_data, JSON_FORCE_OBJECT ) );
 	}
 }

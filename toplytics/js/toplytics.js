@@ -12,10 +12,11 @@ function toplytics_results( args ) {
       var results = toplytics_json_data[args.period];
       var k = 0;
       var html = '';
-      for ( post_id in results ) {
-        var permalink = results[ post_id ]['permalink'];
-        var title = results[ post_id ]['title'];
-        var views = results[ post_id ]['views'];
+      for ( index in results ) {
+        var permalink = results[ index ]['permalink'];
+        var title     = results[ index ]['title'];
+        var post_id   = results[ index ]['post_id'];
+        var views     = results[ index ]['views'];
         k++;
         if ( k > args.numberposts ) break;
 
