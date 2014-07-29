@@ -16,12 +16,12 @@ function toplytics_results( args ) {
       for ( var index in results ) {
         var permalink = results[ index ].permalink;
         var title     = results[ index ].title;
-        var post_id   = results[ index ].post_id;
+        //var post_id   = results[ index ].post_id;
         var views     = results[ index ].views;
         k++;
-        if ( k > args.numberposts ) { break };
+        if ( k > args.numberposts ) { break; }
 
-        views_html = "";
+        var views_html = "";
         if ( args.showviews ) {
           views_html = '<span class="post-views">' + views + ' views</span>';
         }
@@ -34,7 +34,7 @@ function toplytics_results( args ) {
       element.innerHTML = html;
       document.getElementById( args.widget_id ).appendChild( element );
     }
-  }
+  };
   xmlhttp.open("GET", "/wp-content/plugins/toplytics/toplytics.json?ver=" + Math.floor(new Date().getTime() / 1000), true);
   xmlhttp.send();
 }
