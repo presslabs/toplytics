@@ -13,10 +13,10 @@ function toplytics_results( args ) {
       var k = 0;
       var html = '';
       for ( index in results ) {
-        var permalink = results[ index ]['permalink'];
-        var title     = results[ index ]['title'];
-        var post_id   = results[ index ]['post_id'];
-        var views     = results[ index ]['views'];
+        var permalink = results[ index ].permalink;
+        var title     = results[ index ].title;
+        var post_id   = results[ index ].post_id;
+        var views     = results[ index ].views;
         k++;
         if ( k > args.numberposts ) break;
 
