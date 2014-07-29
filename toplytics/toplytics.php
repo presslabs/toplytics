@@ -1,11 +1,11 @@
 <?php
 /**
  * Plugin Name: Toplytics
- * Plugin URI: http://wordpress.org/extend/plugins/toplytics/ 
+ * Plugin URI: http://wordpress.org/extend/plugins/toplytics/
  * Description: Plugin for displaying most viewed content using data from a Google Analytics account. Relieves the DB from writing every click.
- * Author: PressLabs 
+ * Author: PressLabs
  * Version: 1.5
- * Author URI: http://www.presslabs.com/ 
+ * Author URI: http://www.presslabs.com/
  */
 define( 'TOPLYTICS_DEBUG_MODE', true );
 define( 'TOPLYTICS_DEFAULT_POSTS', 5 );
