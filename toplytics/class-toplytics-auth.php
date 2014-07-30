@@ -53,8 +53,24 @@ class Toplytics_Auth {
 		return $return_values;
 	}
 
-	static function ga_statistics() { // Loading all that's required
+	static function get_api_url( $start_date ) {
 		global $dimensions;
+
+		$account_id = get_option( 'toplytics_account_id' );
+		$base_url   = 'https://www.googleapis.com/analytics/v2.4/';
+		$metrics    = array( 'ga:pageviews' );
+		$sort       = array( '-ga:pageviews' );
+
+		$url  = $base_url . 'data' . '?ids=' . $account_id;
+		$url .= sizeof( $dimensions ) > 0 ? ( '&dimensions=' . join( array_reverse( $dimensions ), ',' ) ) : '';
+		$url .= sizeof( $metrics ) > 0 ? ( '&metrics=' . join( $metrics, ',' ) ) : '';
+		$url .= sizeof( $sort ) > 0 ? '&sort=' . join( $sort, ',' ) : '';
+		$url .= '&start-date=' . $start_date . '&end-date=' . date( 'Y-m-d' ) . '&max-results=' . TOPLYTICS_GET_MAX_RESULTS;
+
+		return $url;
+	}
+
+	static function ga_statistics() { // Loading all that's required
 		require_once 'gapi.oauth.class.php'; // GAPI code
 
 		$results = get_transient( 'toplytics.cache' ); // Actual data, cached if possible
@@ -63,26 +79,9 @@ class Toplytics_Auth {
 		$results = array( '_ts' => time() );
 
 		try {
-			// The credentials
-			$account_id  = get_option( 'toplytics_account_id' );
-			$time_stamp  = time();
-			$base_url    = 'https://www.googleapis.com/analytics/v2.4/';
-			$metrics     = array( 'ga:pageviews' );
-			$sort        = array( '-ga:pageviews' );
-			$end_date    = date( 'Y-m-d' );
-			$max_results = TOPLYTICS_GET_MAX_RESULTS;
-
 			foreach ( $ranges as $name => $start_date ) {
-				$url  = $base_url . 'data';
-				$url .= '?ids=' . $account_id;
-				$url .= sizeof( $dimensions ) > 0 ? ( '&dimensions=' . join( array_reverse( $dimensions ), ',' ) ) : '';
-				$url .= sizeof( $metrics ) > 0 ? ( '&metrics=' . join( $metrics, ',' ) ) : '';
-				$url .= sizeof( $sort ) > 0 ? '&sort=' . join( $sort, ',' ) : '';
-				$url .= '&start-date=' . $start_date;
-				$url .= '&end-date=' . $end_date;
-				$url .= '&max-results=' . $max_results;
-
 				$ch          = curl_init();
+				$url         = Toplytics_Auth::get_api_url( $start_date );
 				$auth_header = Toplytics_Auth::auth_process( $url );
 
 				if ( defined( TOPLYTICS_DEBUG_MODE ) )
