@@ -70,6 +70,21 @@ class Toplytics_Auth {
 		return $url;
 	}
 
+	static function filter_all_posts( $return_values, &$results, $name ) {
+		foreach ( $return_values as $index => $value ) {
+			$link    = home_url() . $index;
+			$post_id = url_to_postid( $link );
+
+			if ( 'post' == get_post_type( $post_id ) ) { // filter all posts
+				$post = get_post( $post_id );
+				if ( TOPLYTICS_ADD_PAGEVIEWS && $post && isset( $results[ $name ][ $post_id ] ) )
+					$results[ $name ][ $post_id ] += $value;
+				else
+					$results[ $name ][ $post_id ] = $value;
+			}
+		}
+	}
+
 	static function ga_statistics() { // Loading all that's required
 		require_once 'gapi.oauth.class.php'; // GAPI code
 
@@ -103,19 +118,8 @@ class Toplytics_Auth {
 
 				$xml           = simplexml_load_string( $ch_result );
 				$return_values = Toplytics_Auth::get_result_from_xml( $xml );
+				Toplytics_Auth::filter_all_posts( $return_values, $results, $name );
 
-				foreach ( $return_values as $index => $value ) {
-					$link    = home_url() . $index;
-					$post_id = url_to_postid( $link );
-
-					if ( 'post' == get_post_type( $post_id ) ) { // filter all posts
-						$post = get_post( $post_id );
-						if ( TOPLYTICS_ADD_PAGEVIEWS && $post && isset( $results[ $name ][ $post_id ] ) )
-							$results[ $name ][ $post_id ] += $value;
-						else
-							$results[ $name ][ $post_id ] = $value;
-					}
-				}
 				if ( is_array( $results[ $name ] ) ) {
 					arsort( $results[ $name ] );
 					$results[ $name ] = array_slice( $results[ $name ], 0, TOPLYTICS_MAX_POSTS, true );
