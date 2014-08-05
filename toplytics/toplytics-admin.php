@@ -25,21 +25,6 @@ function toplytics_validate_args( $args ) {
 }
 
 /**
- *  Add settings link on plugin page
- */
-function toplytics_settings_link( $links ) {
-	$settings_link = '<a href="' . toplytics_return_settings_link() . '">' . __( 'Settings' ) . '</a>';
-	array_unshift( $links, $settings_link );
-	return $links;
-}
-add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), 'toplytics_settings_link' );
-
-function toplytics_return_settings_link() {
-	$plugin_page = plugin_basename( __FILE__ );
-	return admin_url( 'options-general.php?page=' . $plugin_page );
-}
-
-/**
  *  Displays all messages registered to 'your-settings-error-slug'
  */
 function toplytics_admin_notices_action() {
@@ -214,24 +199,4 @@ function toplytics_options_page() {
 		toplytics_info_page();
 	}
 	?></div><?php
-}
-
-function toplytics_needs_configuration_message() {
-	$plugin_page = plugin_basename( __FILE__ );
-	$plugin_link = toplytics_return_settings_link();
-
-	if ( toplytics_needs_configuration() ) {
-		add_action(
-			'admin_notices',
-			create_function(
-				'',
-				"echo '<div class=\"error\"><p>"
-				. sprintf(
-					__( 'Toplytics needs configuration information on its <a href="%s">Settings</a> page.', TOPLYTICS_TEXTDOMAIN ),
-					admin_url( 'options-general.php?page=' . $plugin_page )
-				)
-				. "</p></div>';"
-			)
-		);
-	}
 }
