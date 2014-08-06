@@ -65,9 +65,9 @@ class Toplytics_Auth {
 		$url .= sizeof( $dimensions ) > 0 ? ( '&dimensions=' . join( array_reverse( $dimensions ), ',' ) ) : '';
 		$url .= sizeof( $metrics ) > 0 ? ( '&metrics=' . join( $metrics, ',' ) ) : '';
 		$url .= sizeof( $sort ) > 0 ? '&sort=' . join( $sort, ',' ) : '';
-		$url .= '&start-date=' . $start_date . '&end-date=' . date( 'Y-m-d' ) . '&max-results=' . TOPLYTICS_GET_MAX_RESULTS;
+		$url .= '&start-date=' . $start_date . '&end-date=' . date_i18n( 'Y-m-d' ) . '&max-results=' . TOPLYTICS_GET_MAX_RESULTS;
 
-		return $url;
+		return apply_filters( 'toplytics_ga_api_url', $url );
 	}
 
 	static function filter_all_posts( $return_values, &$results, $name ) {
@@ -87,7 +87,6 @@ class Toplytics_Auth {
 
 	static function ga_statistics() { // Loading all that's required
 		require_once 'gapi.oauth.class.php'; // GAPI code
-
 
 		global $ranges;
 		$results = array( '_ts' => time() );
