@@ -88,7 +88,6 @@ class Toplytics_Auth {
 	static function ga_statistics() { // Loading all that's required
 		require_once 'gapi.oauth.class.php'; // GAPI code
 
-		$results = get_transient( 'toplytics.cache' ); // Actual data, cached if possible
 
 		global $ranges;
 		$results = array( '_ts' => time() );
@@ -129,7 +128,13 @@ class Toplytics_Auth {
 			error_log( 'Exception >>> ' . $e );
 			return $results;
 		}
-		set_transient( 'toplytics.cache', $results );
+
+		if ( 1 < count( $results ) ) {
+			set_transient( 'toplytics.cache', $results );
+		} else {
+			$results = get_transient( 'toplytics.cache' ); // Actual data, cached if possible
+		}
+
 		if ( defined( TOPLYTICS_DEBUG_MODE ) )
 			error_log( 'TOPLYTICS(' . basename( __FILE__ ) . '|' . __LINE__ . ') $results -> ' . print_r( $results, true ) . "\n\n" );
 
