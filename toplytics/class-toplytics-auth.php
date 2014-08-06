@@ -88,8 +88,6 @@ class Toplytics_Auth {
 	static function ga_statistics() { // Loading all that's required
 		require_once 'gapi.oauth.class.php'; // GAPI code
 
-		$results = get_transient( 'toplytics.cache' ); // Actual data, cached if possible
-
 		global $ranges;
 		$results = array( '_ts' => time() );
 
