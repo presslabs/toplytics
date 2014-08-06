@@ -56,18 +56,22 @@ class Toplytics_Auth {
 	static function get_api_url( $start_date ) {
 		global $dimensions;
 
-		$account_id = get_option( 'toplytics_account_id' );
-		$base_url   = 'https://www.googleapis.com/analytics/v2.4/';
-		$metrics    = array( 'ga:pageviews' );
-		$sort       = array( '-ga:pageviews' );
+		$ids         = get_option( 'toplytics_account_id' );
+		$base_url    = 'https://www.googleapis.com/analytics/v2.4/';
+		$metrics     = array( 'ga:pageviews' );
+		$sort        = array( '-ga:pageviews' );
+		$end_date    = date_i18n( 'Y-m-d' );
+		$max_results = TOPLYTICS_GET_MAX_RESULTS;
 
-		$url  = $base_url . 'data' . '?ids=' . $account_id;
+		$url  = "{$base_url}data?ids={$ids}";
 		$url .= sizeof( $dimensions ) > 0 ? ( '&dimensions=' . join( array_reverse( $dimensions ), ',' ) ) : '';
 		$url .= sizeof( $metrics ) > 0 ? ( '&metrics=' . join( $metrics, ',' ) ) : '';
 		$url .= sizeof( $sort ) > 0 ? '&sort=' . join( $sort, ',' ) : '';
-		$url .= '&start-date=' . $start_date . '&end-date=' . date_i18n( 'Y-m-d' ) . '&max-results=' . TOPLYTICS_GET_MAX_RESULTS;
+		$url .= "&start-date={$start_date}&end-date={$end_date}&max-results=$max_results";
 
-		return apply_filters( 'toplytics_ga_api_url', $url );
+		$args = compact( $metrics, $sort, $dimensions, $ids, $start_date, $end_date, $max_results );
+
+		return apply_filters( 'toplytics_ga_api_url', $url, $base_url, $args );
 	}
 
 	static function filter_all_posts( $return_values, &$results, $name ) {
