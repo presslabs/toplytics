@@ -67,7 +67,7 @@ class Toplytics_Auth {
 		$url .= sizeof( $sort ) > 0 ? '&sort=' . join( $sort, ',' ) : '';
 		$url .= '&start-date=' . $start_date . '&end-date=' . date( 'Y-m-d' ) . '&max-results=' . TOPLYTICS_GET_MAX_RESULTS;
 
-		return $url;
+		return apply_filters( 'toplytics_ga_api_url', $url );
 	}
 
 	static function filter_all_posts( $return_values, &$results, $name ) {
