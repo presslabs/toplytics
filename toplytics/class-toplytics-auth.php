@@ -1,4 +1,5 @@
-<?php require_once( dirname( __FILE__ ) . '/OAuth.php' );
+<?php
+require_once( dirname( __FILE__ ) . '/OAuth.php' );
 
 $dimensions = array( 'ga:pagePath' );
 
@@ -18,7 +19,7 @@ class Toplytics_Auth {
 		$signature_method = new GADOAuthSignatureMethod_HMAC_SHA1();
 
 		$params    = array();
-		$consumer  = new GADOAuthConsumer( 'anonymous', 'anonymous', NULL );
+		$consumer  = new GADOAuthConsumer( 'anonymous', 'anonymous', null );
 		$token     = new GADOAuthConsumer( $oauth_token, $oauth_secret );
 		$oauth_req = GADOAuthRequest::from_consumer_and_token( $consumer, $token, $request_type, $url, $params );
 
@@ -81,10 +82,11 @@ class Toplytics_Auth {
 
 			if ( 'post' == get_post_type( $post_id ) ) { // filter all posts
 				$post = get_post( $post_id );
-				if ( TOPLYTICS_ADD_PAGEVIEWS && $post && isset( $results[ $name ][ $post_id ] ) )
+				if ( TOPLYTICS_ADD_PAGEVIEWS && $post && isset( $results[ $name ][ $post_id ] ) ) {
 					$results[ $name ][ $post_id ] += $value;
-				else
+				} else {
 					$results[ $name ][ $post_id ] = $value;
+				}
 			}
 		}
 	}
@@ -101,8 +103,7 @@ class Toplytics_Auth {
 				$url         = Toplytics_Auth::get_api_url( $start_date );
 				$auth_header = Toplytics_Auth::auth_process( $url );
 
-				if ( defined( TOPLYTICS_DEBUG_MODE ) )
-					error_log( 'TOPLYTICS(' . basename( __FILE__ ) . '|' . __LINE__ . ") \$url -> '" . $url . "'\n\n" );
+				toplytics_log( basename( __FILE__ ) . '|' . __LINE__ . ": \$url -> '" . $url );
 
 				curl_setopt( $ch, CURLOPT_URL, $url );
 				curl_setopt( $ch, CURLOPT_SSL_VERIFYPEER, 0 );
@@ -138,8 +139,7 @@ class Toplytics_Auth {
 			$results = get_transient( 'toplytics.cache' ); // Actual data, cached if possible
 		}
 
-		if ( defined( TOPLYTICS_DEBUG_MODE ) )
-			error_log( 'TOPLYTICS(' . basename( __FILE__ ) . '|' . __LINE__ . ') $results -> ' . print_r( $results, true ) . "\n\n" );
+		toplytics_log( basename( __FILE__ ) . '|' . __LINE__ . ': $results -> ' . print_r( $results, true ) );
 
 		return $results;
 	}
@@ -167,10 +167,10 @@ class Toplytics_Auth {
 		$params['scope']              = 'https://www.googleapis.com/auth/analytics.readonly'; // This is a space seperated list of applications we want access to
 		$params['xoauth_displayname'] = 'Analytics Dashboard';
 
-		$consumer = new GADOAuthConsumer( 'anonymous', 'anonymous', NULL );
-		$req_req  = GADOAuthRequest::from_consumer_and_token( $consumer, NULL, 'GET', 'https://www.google.com/accounts/OAuthGetRequestToken', $params );
+		$consumer = new GADOAuthConsumer( 'anonymous', 'anonymous', null );
+		$req_req  = GADOAuthRequest::from_consumer_and_token( $consumer, null, 'GET', 'https://www.google.com/accounts/OAuthGetRequestToken', $params );
 
-		$req_req->sign_request( $signature_method, $consumer, NULL );
+		$req_req->sign_request( $signature_method, $consumer, null );
 
 		$ch = curl_init();
 		curl_setopt( $ch, CURLOPT_URL, $req_req->to_url() );
@@ -230,15 +230,16 @@ class Toplytics_Auth {
 	}
 
 	function admin_handle_oauth_complete() { // step two in oauth login process
-		if ( function_exists( 'current_user_can' ) && ! current_user_can( 'manage_options' ) )
+		if ( function_exists( 'current_user_can' ) && ! current_user_can( 'manage_options' ) ) {
 			die( __( 'Cheatin&#8217; uh?' ) );
+		}
 
 		$signature_method = new GADOAuthSignatureMethod_HMAC_SHA1();
 		$params = array();
 
 		$params['oauth_verifier'] = $_REQUEST['oauth_verifier'];
 
-		$consumer      = new GADOAuthConsumer( 'anonymous', 'anonymous', NULL );
+		$consumer      = new GADOAuthConsumer( 'anonymous', 'anonymous', null );
 		$upgrade_token = new GADOAuthConsumer( get_option( 'toplytics_oa_anon_token' ), get_option( 'toplytics_oa_anon_secret' ) );
 
 		$acc_req = GADOAuthRequest::from_consumer_and_token( $consumer, $upgrade_token, 'GET', 'https://www.google.com/accounts/OAuthGetAccessToken', $params );
