@@ -1,25 +1,31 @@
 <?php
 
 function toplytics_validate_args( $args ) {
-	if ( isset( $args['showviews'] ) ) // showviews (true/false - default=false)
+	if ( isset( $args['showviews'] ) ) { // showviews (true/false - default=false)
 		$args['showviews'] = true;
-	else
+	} else {
 		$args['showviews'] = false;
+	}
 
-	if ( ! isset( $args['period'] ) ) // set default value
+	if ( ! isset( $args['period'] ) ) { // set default value
 		$args['period'] = 'month';
+	}
 
-	if ( ! in_array( $args['period'], array( 'today', 'week', 'month' ) ) )
+	if ( ! in_array( $args['period'], array( 'today', 'week', 'month' ) ) ) {
 		$args['period'] = 'month';
+	}
 
-	if ( ! isset( $args['numberposts'] ) ) // set default value
+	if ( ! isset( $args['numberposts'] ) ) { // set default value
 		$args['numberposts'] = TOPLYTICS_DEFAULT_POSTS;
+	}
 
-	if ( 0 > $args['numberposts'] )
+	if ( 0 > $args['numberposts'] ) {
 		$args['numberposts'] = TOPLYTICS_MIN_POSTS;
+	}
 
-	if ( TOPLYTICS_MAX_POSTS < $args['numberposts'] )
+	if ( TOPLYTICS_MAX_POSTS < $args['numberposts'] ) {
 		$args['numberposts'] = TOPLYTICS_MAX_POSTS;
+	}
 
 	return $args;
 }
@@ -50,14 +56,14 @@ function toplytics_configuration_page( $info_message = '', $error_message = '' )
 
 	if ( curl_errno( $ch ) ) {
 		$error_message = curl_error( $ch );
-		$account_hash  = FALSE;
+		$account_hash  = false;
 	}
 
 	$http_code = curl_getinfo( $ch, CURLINFO_HTTP_CODE );
 
 	if ( $http_code != 200 ) {
 		$error_message = $return;
-		$account_hash  = FALSE;
+		$account_hash  = false;
 	} else {
 		$error_message = '';
 		$xml = new SimpleXMLElement( $return );
@@ -67,8 +73,8 @@ function toplytics_configuration_page( $info_message = '', $error_message = '' )
 		$vhash = array();
 		foreach ( $xml->entry as $entry ) {
 			$value = (string) $entry->id;
-			list( $part1, $part2 ) = explode( 'profiles/', $value );
-			$vhash['ga:' . $part2] = (string) $entry->title;
+			list( $part1, $part2 )   = explode( 'profiles/', $value );
+			$vhash[ 'ga:' . $part2 ] = (string) $entry->title;
 		}
 		$account_hash = $vhash;
 	}
@@ -162,8 +168,9 @@ function toplytics_info_page() {
 }
 
 function toplytics_options_page() {
-	if ( ! current_user_can( 'manage_options' ) )
+	if ( ! current_user_can( 'manage_options' ) ) {
 		wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
+	}
 
 	$info_message  = '';
 	$error_message = '';
@@ -181,8 +188,9 @@ function toplytics_options_page() {
 
 	if ( isset( $_POST['ga_cache_timeout'] ) ) {
 		delete_option( 'toplytics_cache_timeout' );
-		if ( '' != $_POST['ga_cache_timeout'] )
+		if ( '' != $_POST['ga_cache_timeout'] ) {
 			add_option( 'toplytics_cache_timeout', $_POST['ga_cache_timeout'] );
+		}
 	}
 	?>
 	<div class="wrap">
