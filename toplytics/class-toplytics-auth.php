@@ -1,4 +1,5 @@
-<?php require_once( dirname( __FILE__ ) . '/OAuth.php' );
+<?php
+require_once( dirname( __FILE__ ) . '/OAuth.php' );
 
 $dimensions = array( 'ga:pagePath' );
 
