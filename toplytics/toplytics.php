@@ -15,7 +15,7 @@ define( 'TOPLYTICS_GET_MAX_RESULTS', 1000 );
 define( 'TOPLYTICS_ADD_PAGEVIEWS', true );
 define( 'TOPLYTICS_TEXTDOMAIN', 'toplytics-text-domain' );
 define( 'TOPLYTICS_TEMPLATE_FILENAME', 'toplytics-template.php' );
-define( 'TOPLYTICS_REALTIME_TEMPLATE_FILENAME', 'toplytics-template.html' );
+define( 'TOPLYTICS_REALTIME_TEMPLATE_FILENAME', 'toplytics-template-realtime.php' );
 
 global $ranges, $ranges_label;
 
