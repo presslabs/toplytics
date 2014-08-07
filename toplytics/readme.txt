@@ -4,7 +4,7 @@ Donate link: http://www.presslabs.com/
 Tags: presslabs, analytics, posts, top, most visited, most viewed posts, top content, toplytics, popular, google analytics, high traffic, popular posts, oauth, server resources, settings, widget, embed code, javascript, json, json file, simple, post views
 Requires at least: 3.5
 Tested up to: 3.8.1
-Stable tag: 1.5
+Stable tag: 2.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -23,7 +23,8 @@ You need to have Google Analytics active on your site if you want to use this pl
 * You can set the number of posts to be displayed between 1 and 20;
 * It can also display the number of views as counted by Google Analytics;
 * i18n support, requests for translations are more than welcomed;
-* **New:** custom templates for displaying the widget are now available and should be included in the active theme folder;
+* **New:** generate the list of the most viewed posts dynamicaly with JavaScript;
+* **New:** custom template for displaying the widget is now available and should be included in the active theme folder;
 * **New:** the plugin has a set of filters & hooks to be used from the theme files;
 * **New:** you can use some of the plugin's functions if the above are not enough for your customization needs. Check FAQ for details;
 * **New:** shortcodes are now supported for easier integration into posts/pages or other widgets. Check FAQ for details;

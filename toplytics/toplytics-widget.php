@@ -43,7 +43,7 @@
       if ( '' != $template_filename ) {
         if ( $title ) echo $before_title . $title . $after_title;
 
-        if ( $widget_realtime ) {
+        if ( $realtime ) {
 ?>
 <script type="text/javascript">
 toplytics_args = {
