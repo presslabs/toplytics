@@ -1,5 +1,6 @@
 <?php
-require_once( dirname( __FILE__ ) . '/OAuth.php' );
+
+require_once( dirname( __FILE__ ) . '/lib/OAuth.php' );
 
 $dimensions = array( 'ga:pagePath' );
 
@@ -92,7 +93,7 @@ class Toplytics_Auth {
 	}
 
 	static function ga_statistics() { // Loading all that's required
-		require_once 'gapi.oauth.class.php'; // GAPI code
+		require_once 'lib/gapi.oauth.class.php'; // GAPI code
 
 		global $ranges;
 		$results = array( '_ts' => time() );
