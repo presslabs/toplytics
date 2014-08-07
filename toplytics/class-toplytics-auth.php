@@ -103,9 +103,7 @@ class Toplytics_Auth {
 				$url         = Toplytics_Auth::get_api_url( $start_date );
 				$auth_header = Toplytics_Auth::auth_process( $url );
 
-				if ( defined( TOPLYTICS_DEBUG_MODE ) ) {
-					error_log( 'TOPLYTICS(' . basename( __FILE__ ) . '|' . __LINE__ . ") \$url -> '" . $url . "'\n\n" );
-				}
+				toplytics_log( basename( __FILE__ ) . '|' . __LINE__ . ": \$url -> '" . $url );
 
 				curl_setopt( $ch, CURLOPT_URL, $url );
 				curl_setopt( $ch, CURLOPT_SSL_VERIFYPEER, 0 );
@@ -141,9 +139,7 @@ class Toplytics_Auth {
 			$results = get_transient( 'toplytics.cache' ); // Actual data, cached if possible
 		}
 
-		if ( defined( TOPLYTICS_DEBUG_MODE ) ) {
-			error_log( 'TOPLYTICS(' . basename( __FILE__ ) . '|' . __LINE__ . ') $results -> ' . print_r( $results, true ) . "\n\n" );
-		}
+		toplytics_log( basename( __FILE__ ) . '|' . __LINE__ . ': $results -> ' . print_r( $results, true ) );
 
 		return $results;
 	}

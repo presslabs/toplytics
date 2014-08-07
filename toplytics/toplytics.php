@@ -38,6 +38,12 @@ require_once 'toplytics-widget.php';     // Widget code integration
 require_once 'class-toplytics-auth.php'; // the main class
 $obj = new Toplytics_Auth();
 
+function toplytics_log( $message ) {
+	if ( defined( TOPLYTICS_DEBUG_MODE  )  ) {
+		error_log( $message );
+	}
+}
+
 function toplytics_needs_configuration_message() {
 	$plugin_page = plugin_basename( __FILE__ );
 	$plugin_link = toplytics_return_settings_link();
