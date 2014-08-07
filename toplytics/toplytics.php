@@ -98,17 +98,18 @@ function toplytics_uninstall() {
 add_action( 'uninstall_' . plugin_basename( __FILE__ ), 'toplytics_uninstall' );
 
 function toplytics_init() {
-	load_plugin_textdomain( TOPLYTICS_TEXTDOMAIN, FALSE, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
+	load_plugin_textdomain( TOPLYTICS_TEXTDOMAIN, false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
 }
 add_action( 'plugins_loaded', 'toplytics_init' );
 
 function toplytics_get_admin_url( $path = '' ) {
 	global $wp_version;
 
-	if ( version_compare( $wp_version, '3.0', '>=' ) )
+	if ( version_compare( $wp_version, '3.0', '>=' ) ) {
 		return get_admin_url( null, $path );
-	else
+	} else {
 		return get_bloginfo( 'wpurl' ) . '/wp-admin' . $path;
+	}
 }
 
 /**
@@ -129,16 +130,19 @@ function toplytics_str_between( $start, $end, $content ) {
  */
 function toplytics_get_template_filename( $realtime = 0 ) {
 	$toplytics_template_filename = TOPLYTICS_TEMPLATE_FILENAME;
-	if ( 1 == $realtime )
+	if ( 1 == $realtime ) {
 		$toplytics_template_filename = TOPLYTICS_REALTIME_TEMPLATE_FILENAME;
+	}
 
 	$theme_template = get_stylesheet_directory() . "/$toplytics_template_filename";
-	if ( file_exists( $theme_template ) )
+	if ( file_exists( $theme_template ) ) {
 		return $theme_template;
+	}
 
 	$plugin_template = plugin_dir_path( __FILE__ ) . $toplytics_template_filename;
-	if ( file_exists( $plugin_template ) )
+	if ( file_exists( $plugin_template ) ) {
 		return $plugin_template;
+	}
 
 	return '';
 }
@@ -185,8 +189,9 @@ function toplytics_remove_options() {
 }
 
 function toplytics_widgets_init() {
-	if ( toplytics_has_configuration() )
+	if ( toplytics_has_configuration() ) {
 		register_widget( 'Toplytics_WP_Widget_Most_Visited_Posts' );
+	}
 }
 add_action( 'widgets_init', 'toplytics_widgets_init' );
 
@@ -205,11 +210,13 @@ function toplytics_get_results( $args = '' ) {
 	$args = toplytics_validate_args( $args );
 
 	$results = get_transient( 'toplytics.cache' );
-	if ( ! $results[ $args['period'] ] ) return false;
+	if ( ! $results[ $args['period'] ] ) {
+		return false;
+	}
 
 	$counter = 1;
 	foreach ( $results[ $args['period'] ] as $index => $value ) {
-	if ( $counter > $args['numberposts'] ) break;
+		if ( $counter > $args['numberposts'] ) { break; }
 		$toplytics_new_results[ $index ] = $value;
 		$counter++;
 	}
@@ -219,7 +226,7 @@ function toplytics_get_results( $args = '' ) {
 function toplytics_results( $args = '' ) {
 	$args    = toplytics_validate_args( $args );
 	$results = toplytics_get_results( $args );
-	if ( ! $results ) return '';
+	if ( ! $results ) { return ''; }
 
 	$out = '<ol>';
 	$k   = 0;
