@@ -6,10 +6,6 @@ $dimensions = array( 'ga:pagePath' );
 
 class Toplytics_Auth {
 	function Toplytics_Auth() {
-		$this->__construct();
-	}
-
-	function __construct() {
 		add_action( 'admin_init', array( &$this, 'admin_handle_oauth_login_header' ) );
 	}
 
