@@ -11,10 +11,6 @@ function toplytics_validate_args( $args ) {
 		$args['period'] = 'month';
 	}
 
-	if ( ! in_array( $args['period'], array( 'today', 'week', 'month' ) ) ) {
-		$args['period'] = 'month';
-	}
-
 	if ( ! isset( $args['numberposts'] ) ) { // set default value
 		$args['numberposts'] = TOPLYTICS_DEFAULT_POSTS;
 	}
