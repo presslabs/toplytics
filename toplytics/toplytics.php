@@ -216,7 +216,7 @@ function toplytics_get_results( $args = '' ) {
 	$args = toplytics_validate_args( $args );
 
 	$results = get_transient( 'toplytics.cache' );
-	if ( ! $results[ $args['period'] ] ) {
+	if ( ! isset( $results[ $args['period'] ] ) ) {
 		return false;
 	}
 
