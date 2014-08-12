@@ -57,10 +57,33 @@ class Toplytics_Auth {
 		}
 	}
 
-	function admin_handle_oauth_login_options() {
-		// Step one in the oauth login sequence is to grab an anonymous token
+	function admin_redirect( $error_message, $die = false ) {
+		$info_redirect = toplytics_get_admin_url( '/options-general.php' ) . '?page=' . toplytics_plugin_basename() . '&error_message=' . urlencode( $error_message );
+		header( 'Location: ' . $info_redirect );
+		if ( $die ) {
+			die( $error_message );
+		}
+	}
+
+	function set_token_and_secret( $oauth_token, $oauth_token_secret ) {
+		add_option( 'toplytics_oa_anon_token', $oauth_token );
+		add_option( 'toplytics_oa_anon_secret', $oauth_token_secret );
+	}
+
+	function remove_token_and_secret() {
 		delete_option( 'toplytics_oa_anon_token' );
 		delete_option( 'toplytics_oa_anon_secret' );
+	}
+
+	function curl_error_ch( $ch ) {
+		$error = curl_errno( $ch );
+		if ( $error ) {
+			$this->admin_redirect( $error, true );
+		}
+	}
+
+	function admin_handle_oauth_login_options() {
+		$this->remove_token_and_secret(); // Step one in the oauth login sequence is to grab an anonymous token
 
 		$signature_method = new GADOAuthSignatureMethod_HMAC_SHA1();
 		$params = array();
@@ -81,33 +104,20 @@ class Toplytics_Auth {
 
 		$oa_response = curl_exec( $ch );
 
-		if ( curl_errno( $ch ) ) {
-			$error_message = curl_error( $ch );
-			$info_redirect = toplytics_get_admin_url( '/options-general.php' ) . '?page=' . toplytics_plugin_basename() . '&error_message=' . urlencode( $error_message );
-			header( 'Location: ' . $info_redirect );
-			die();
-		}
+		$this->curl_error_ch( $ch );
 
-		$http_code = curl_getinfo( $ch, CURLINFO_HTTP_CODE );
-
-		if ( 200 == $http_code ) {
+		if ( 200 === curl_getinfo( $ch, CURLINFO_HTTP_CODE ) ) {
 			$access_params = $this->split_params( $oa_response );
-
-			add_option( 'toplytics_oa_anon_token', $access_params['oauth_token'] );
-			add_option( 'toplytics_oa_anon_secret', $access_params['oauth_token_secret'] );
-
+			$this->set_token_and_secret( $access_params['oauth_token'], $access_params['oauth_token_secret'] );
 			header( 'Location: https://www.google.com/accounts/OAuthAuthorizeToken?oauth_token=' . urlencode( $access_params['oauth_token'] ) );
 		} else {
-			$info_redirect = toplytics_get_admin_url( '/options-general.php' ) . '?page=' . toplytics_plugin_basename() . '&error_message=' . urlencode( $oa_response );
-			header( 'Location: ' . $info_redirect );
+			$this->admin_redirect( $oa_response );
 		}
-
 		die();
 	}
 
 	function admin_handle_oauth_complete_redirect( $oa_response, $http_code ) {
-		delete_option( 'toplytics_oa_anon_token' );
-		delete_option( 'toplytics_oa_anon_secret' );
+		$this->remove_token_and_secret();
 
 		if ( 200 == $http_code ) {
 			$access_params = $this->split_params( $oa_response );
@@ -116,17 +126,9 @@ class Toplytics_Auth {
 			update_option( 'toplytics_oauth_secret', $access_params['oauth_token_secret'] );
 			update_option( 'toplytics_auth_token', 'toplytics_see_oauth' );
 
-			$info_redirect = toplytics_get_admin_url( '/options-general.php' )
-				. '?page=' . toplytics_plugin_basename() . '&info_message='
-				. urlencode( 'Authenticated!' );
-
-			header( 'Location: ' . $info_redirect );
+			$this->admin_redirect( 'Authenticated!' );
 		} else {
-			$info_redirect = toplytics_get_admin_url( '/options-general.php' )
-				. '?page=' . toplytics_plugin_basename() . '&error_message='
-				. urlencode( $oa_response );
-
-			header( 'Location: ' . $info_redirect );
+			$this->admin_redirect( $oa_response );
 		}
 		die();
 	}
@@ -155,15 +157,7 @@ class Toplytics_Auth {
 
 		$oa_response = curl_exec( $ch );
 
-		if ( curl_errno( $ch ) ) {
-			$error_message = curl_error( $ch );
-			$info_redirect = toplytics_get_admin_url( '/options-general.php' )
-				. '?page=' . toplytics_plugin_basename() . '&error_message='
-				. urlencode( $error_message );
-
-			header( 'Location: ' . $info_redirect );
-			die();
-		}
+		$this->curl_error_ch( $ch );
 
 		$http_code = curl_getinfo( $ch, CURLINFO_HTTP_CODE );
 		$this->admin_handle_oauth_complete_redirect( $oa_response, $http_code );
