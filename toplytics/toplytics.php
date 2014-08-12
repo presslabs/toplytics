@@ -119,19 +119,6 @@ function toplytics_get_admin_url( $path = '' ) {
 }
 
 /**
- *  Return the string between 'start' and 'end' from 'conent'
- */
-function toplytics_str_between( $start, $end, $content ) {
-	$r = explode( $start, $content );
-
-	if ( isset( $r[1] ) ) {
-		$r = explode( $end, $r[1] );
-		return $r[0];
-	}
-	return '';
-}
-
-/**
  *  Return the template filename and path. First is searched in the theme directory and then in the plugin directory
  */
 function toplytics_get_template_filename( $realtime = 0 ) {
