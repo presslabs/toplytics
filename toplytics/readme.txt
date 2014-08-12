@@ -38,7 +38,6 @@ You need to have Google Analytics active on your site if you want to use this pl
 
 Alternatively go into your WordPress dashboard and click on *Plugins -> Add Plugin* and search for Toplytics. Then click on *Install*, then on *Activate Now*.
 
-
 = Usage =
 Connect your plugin with Google Analytics Account from the Settings page (*Settigns -> Toplytics*);
 Use the *Most Visited Posts* widget from the *Appearance->Widgets* page;
