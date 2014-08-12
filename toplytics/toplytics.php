@@ -33,9 +33,10 @@ $ranges_label = array(
 	'week'   => 'Weekly',
 );
 
-require_once 'toplytics-admin.php';      // interface
-require_once 'toplytics-widget.php';     // Widget code integration
-require_once 'class-toplytics-auth.php'; // the main class
+require_once 'toplytics-admin.php';            // interface
+require_once 'toplytics-widget.php';           // Widget code integration
+require_once 'class-toplytics-auth.php';       // the login logic
+require_once 'class-toplytics-statistics.php'; // the statistics logic
 $obj = new Toplytics_Auth();
 
 function toplytics_log( $message ) {
@@ -109,7 +110,7 @@ if ( toplytics_has_configuration() ) {
 }
 
 function toplytics_do_this_hourly() {
-	Toplytics_Auth::ga_statistics(); // get GA statistics
+	Toplytics_Statistics::get_results(); // get GA statistics
 	toplytics_save_stats_in_json(); // save GA statistics in JSON file
 }
 add_action( 'toplytics_hourly_event', 'toplytics_do_this_hourly' );
