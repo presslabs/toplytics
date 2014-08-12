@@ -25,32 +25,6 @@ class Toplytics_Auth {
 		return array( $oauth_req->to_header() );
 	}
 
-	static function get_result_from_xml( $xml ) {
-		global $dimensions;
-		$return_values = array();
-		foreach ( $xml->entry as $entry ) {
-			if ( '' == $dimensions ) {
-				$dim_name = 'value';
-			} else {
-				$dimension            = $entry->xpath( 'dxp:dimension' );
-				$dimension_attributes = $dimension[0]->attributes();
-				$dim_name             = (string) $dimension_attributes['value'];
-			}
-
-			$metric = $entry->xpath( 'dxp:metric' );
-			if ( 1 < sizeof( $metric ) ) {
-				foreach ( $metric as $single_metric ) {
-					$metric_attributes = $single_metric->attributes();
-					$return_values[ $dim_name ][ (string) $metric_attributes['name'] ] = (string) $metric_attributes['value'];
-				}
-			} else {
-				$metric_attributes = $metric[0]->attributes();
-				$return_values[ $dim_name ] = (string) $metric_attributes['value'];
-			}
-		}
-		return $return_values;
-	}
-
 	static function get_api_url( $start_date ) {
 		global $dimensions;
 
@@ -86,59 +60,6 @@ class Toplytics_Auth {
 				}
 			}
 		}
-	}
-
-	static function ga_statistics() { // Loading all that's required
-		require_once 'lib/gapi.oauth.class.php'; // GAPI code
-
-		global $ranges;
-		$results = array( '_ts' => time() );
-
-		try {
-			foreach ( $ranges as $name => $start_date ) {
-				$ch          = curl_init();
-				$url         = Toplytics_Auth::get_api_url( $start_date );
-				$auth_header = Toplytics_Auth::auth_process( $url );
-
-				toplytics_log( basename( __FILE__ ) . '|' . __LINE__ . ": \$url -> '" . $url );
-
-				curl_setopt( $ch, CURLOPT_URL, $url );
-				curl_setopt( $ch, CURLOPT_SSL_VERIFYPEER, 0 );
-				curl_setopt( $ch, CURLOPT_HTTPHEADER, $auth_header );
-				curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1 );
-
-				$ch_result = curl_exec( $ch );
-
-				if ( curl_errno( $ch ) ) {
-					error_log( 'file:' . __FILE__ . ' line:' . __LINE__ . ' >>> CURL ERROR >>> ' . curl_errno( $ch ) );
-					return ;
-				}
-
-				curl_close( $ch );
-
-				$xml           = simplexml_load_string( $ch_result );
-				$return_values = Toplytics_Auth::get_result_from_xml( $xml );
-				Toplytics_Auth::filter_all_posts( $return_values, $results, $name );
-
-				if ( is_array( $results[ $name ] ) ) {
-					arsort( $results[ $name ] );
-					$results[ $name ] = array_slice( $results[ $name ], 0, TOPLYTICS_MAX_POSTS, true );
-				}
-			} // end foreach ( $ranges as $name...
-		} catch ( Exception $e ) {
-			error_log( 'Exception >>> ' . $e );
-			return $results;
-		}
-
-		if ( 1 < count( $results ) ) {
-			set_transient( 'toplytics.cache', $results );
-		} else {
-			$results = get_transient( 'toplytics.cache' ); // Actual data, cached if possible
-		}
-
-		toplytics_log( basename( __FILE__ ) . '|' . __LINE__ . ': $results -> ' . print_r( $results, true ) );
-
-		return $results;
 	}
 
 	/**
