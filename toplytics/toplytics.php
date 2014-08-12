@@ -44,49 +44,6 @@ function toplytics_log( $message ) {
 	}
 }
 
-function toplytics_needs_configuration_message() {
-	$plugin_page = plugin_basename( __FILE__ );
-	$plugin_link = toplytics_return_settings_link();
-
-	if ( toplytics_needs_configuration() ) {
-		add_action(
-			'admin_notices',
-			create_function(
-				'',
-				"echo '<div class=\"error\"><p>"
-				. sprintf(
-					__( 'Toplytics needs configuration information on its <a href="%s">Settings</a> page.', TOPLYTICS_TEXTDOMAIN ),
-					admin_url( 'options-general.php?page=' . $plugin_page )
-				)
-				. "</p></div>';"
-			)
-		);
-	}
-}
-
-/**
- *  Add settings link on plugin page
- */
-function toplytics_settings_link( $links ) {
-	$settings_link = '<a href="' . toplytics_return_settings_link() . '">' . __( 'Settings' ) . '</a>';
-	array_unshift( $links, $settings_link );
-	return $links;
-}
-add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), 'toplytics_settings_link' );
-
-function toplytics_return_settings_link() {
-	$plugin_page = plugin_basename( __FILE__ );
-	return admin_url( 'options-general.php?page=' . $plugin_page );
-}
-
-/**
- *  Dashboard integration (Settings)
- */
-function toplytics_menu() {
-	add_options_page( 'Toplytics Options Page', 'Toplytics', 'manage_options', __FILE__, 'toplytics_options_page' );
-}
-add_action( 'admin_menu', 'toplytics_menu' );
-
 function toplytics_activate() {
 	add_option( 'toplytics_options', array( null ) );
 	add_option( 'toplytics_services', 'analytics' );
@@ -101,22 +58,12 @@ register_deactivation_hook( __FILE__, 'toplytics_deactivate' );
 function toplytics_uninstall() {
 	toplytics_remove_options();
 }
-add_action( 'uninstall_' . plugin_basename( __FILE__ ), 'toplytics_uninstall' );
+add_action( 'uninstall_' . toplytics_plugin_basename(), 'toplytics_uninstall' );
 
 function toplytics_init() {
-	load_plugin_textdomain( TOPLYTICS_TEXTDOMAIN, false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
+	load_plugin_textdomain( TOPLYTICS_TEXTDOMAIN, false, dirname( toplytics_plugin_basename() ) . '/languages' );
 }
 add_action( 'plugins_loaded', 'toplytics_init' );
-
-function toplytics_get_admin_url( $path = '' ) {
-	global $wp_version;
-
-	if ( version_compare( $wp_version, '3.0', '>=' ) ) {
-		return get_admin_url( null, $path );
-	} else {
-		return get_bloginfo( 'wpurl' ) . '/wp-admin' . $path;
-	}
-}
 
 /**
  *  Return the template filename and path. First is searched in the theme directory and then in the plugin directory
@@ -187,12 +134,6 @@ function toplytics_widgets_init() {
 	}
 }
 add_action( 'widgets_init', 'toplytics_widgets_init' );
-
-function toplytics_admin_init(){
-	toplytics_needs_configuration_message();
-	register_setting( 'toplytics_options', 'toplytics_options', 'toplytics_options_validate' );
-}
-add_action( 'admin_init', 'toplytics_admin_init' );
 
 function toplytics_enqueue_script() {
 	wp_enqueue_script( 'toplytics', plugins_url( 'js/toplytics.js' , __FILE__ ) );
