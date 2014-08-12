@@ -1,5 +1,9 @@
 <?php
 
+function toplytics_plugin_basename() {
+	return 'toplytics/toplytics.php';
+}
+
 function toplytics_validate_args( $args ) {
 	if ( isset( $args['showviews'] ) ) { // showviews (true/false - default=false)
 		$args['showviews'] = true;
@@ -203,4 +207,59 @@ function toplytics_options_page() {
 		toplytics_info_page();
 	}
 	?></div><?php
+}
+
+function toplytics_return_settings_link() {
+	return admin_url( 'options-general.php?page=' . toplytics_plugin_basename() );
+}
+
+/**
+ *  Add settings link on plugin page
+ */
+function toplytics_settings_link( $links ) {
+	$settings_link = '<a href="' . toplytics_return_settings_link() . '">' . __( 'Settings' ) . '</a>';
+	array_unshift( $links, $settings_link );
+	return $links;
+}
+add_filter( 'plugin_action_links_' . toplytics_plugin_basename() , 'toplytics_settings_link' );
+
+/**
+ *  Dashboard integration (Settings)
+ */
+function toplytics_menu() {
+	add_options_page( 'Toplytics Options Page', 'Toplytics', 'manage_options', toplytics_plugin_basename(), 'toplytics_options_page' );
+}
+add_action( 'admin_menu', 'toplytics_menu' );
+
+function toplytics_needs_configuration_message() {
+	if ( toplytics_needs_configuration() ) {
+		add_action(
+			'admin_notices',
+			create_function(
+				'',
+				"echo '<div class=\"error\"><p>"
+				. sprintf(
+					__( 'Toplytics needs configuration information on its <a href="%s">Settings</a> page.', TOPLYTICS_TEXTDOMAIN ),
+					toplytics_return_settings_link()
+				)
+				. "</p></div>';"
+			)
+		);
+	}
+}
+
+function toplytics_admin_init(){
+	toplytics_needs_configuration_message();
+	register_setting( 'toplytics_options', 'toplytics_options', 'toplytics_options_validate' );
+}
+add_action( 'admin_init', 'toplytics_admin_init' );
+
+function toplytics_get_admin_url( $path = '' ) {
+	global $wp_version;
+
+	if ( version_compare( $wp_version, '3.0', '>=' ) ) {
+		return get_admin_url( null, $path );
+	} else {
+		return get_bloginfo( 'wpurl' ) . '/wp-admin' . $path;
+	}
 }
