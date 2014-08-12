@@ -46,22 +46,6 @@ class Toplytics_Auth {
 		return apply_filters( 'toplytics_ga_api_url', $url, $base_url, $args );
 	}
 
-	static function filter_all_posts( $return_values, &$results, $name ) {
-		foreach ( $return_values as $index => $value ) {
-			$link    = home_url() . $index;
-			$post_id = url_to_postid( $link );
-
-			if ( 'post' == get_post_type( $post_id ) ) { // filter all posts
-				$post = get_post( $post_id );
-				if ( TOPLYTICS_ADD_PAGEVIEWS && $post && isset( $results[ $name ][ $post_id ] ) ) {
-					$results[ $name ][ $post_id ] += $value;
-				} else {
-					$results[ $name ][ $post_id ] = $value;
-				}
-			}
-		}
-	}
-
 	/**
 	 *  We have to catch the oauth login data in admin_init so http headers can be added
 	 */
