@@ -20,6 +20,10 @@ function toplytics_validate_args( $args ) {
 	}
 
 	if ( 0 > $args['numberposts'] ) {
+		$args['numberposts'] = TOPLYTICS_DEFAULT_POSTS;
+	}
+
+	if ( TOPLYTICS_MIN_POSTS > $args['numberposts'] ) {
 		$args['numberposts'] = TOPLYTICS_MIN_POSTS;
 	}
 

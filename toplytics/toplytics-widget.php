@@ -11,9 +11,7 @@ class Toplytics_WP_Widget_Most_Visited_Posts extends WP_Widget {
 		$this->alt_option_name = 'toplytics_widget';
 
 		global $ranges;
-		foreach ( $ranges as $key => $value ) {
-			$this->stats_periods[] = $key;
-		}
+		$this->stats_periods = array_keys( $ranges );
 	}
 
 	private function realtime_js_script( $period, $numberposts, $showviews, $widget_id ) {
@@ -137,7 +135,8 @@ class Toplytics_WP_Widget_Most_Visited_Posts extends WP_Widget {
 				<select id="<?php echo $this->get_field_id( 'period' ); ?>" name="<?php echo $this->get_field_name( 'period' ); ?>">
 			<?php
 			global $ranges, $ranges_label;
-			foreach ( $ranges as $key => $item ) {
+			$ranges_keys = array_keys( $ranges );
+			foreach ( $ranges_keys as $key ) {
 				?>
 				<option value="<?php echo $key; ?>"<?php if ( $period == $key ) { echo ' selected="selected"'; } echo '>' . __( $ranges_label[ $key ], TOPLYTICS_TEXTDOMAIN ); ?></option>
 				<?php } ?>
