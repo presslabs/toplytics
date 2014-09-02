@@ -7,12 +7,12 @@ function toplytics_results( args ) {
   }
 
   xmlhttp.onreadystatechange = function() {
+    var html = '';
     if ( xmlhttp.readyState === 4 && xmlhttp.status === 200 ) {
       var toplytics_json_data = JSON.parse(xmlhttp.responseText);
 
       var results = toplytics_json_data[args.period];
       var k = 0;
-      var html = '';
       for ( var index in results ) {
           if ( results.hasOwnProperty( index ) ) {
             var permalink = results[ index ].permalink;
@@ -32,10 +32,13 @@ function toplytics_results( args ) {
             }
           }
       }
-      var element = document.createElement('ol');
-      element.innerHTML = html;
-      document.getElementById( args.widget_id ).appendChild( element );
     }
+    if ( '' === html ) {
+        html = '<li>No data is available!</li>';
+    }
+    var element = document.createElement('ol');
+    element.innerHTML = html;
+    document.getElementById( args.widget_id ).appendChild( element );
   };
   xmlhttp.open("GET", "/wp-content/plugins/toplytics/toplytics.json?ver=" + Math.floor(new Date().getTime() / 1000), true);
   xmlhttp.send();
