@@ -164,7 +164,6 @@ function toplytics_results( $args = '' ) {
 	if ( ! $results ) { return ''; }
 
 	$out = '<ol>';
-	$k   = 0;
 	foreach ( $results as $post_id => $post_views ) {
 		$out .= '<li><a href="' . get_permalink( $post_id )
 			. '" title="' . esc_attr( get_the_title( $post_id ) ) . '">'
