@@ -106,8 +106,7 @@ class Toplytics_WP_Widget_Most_Visited_Posts extends WP_Widget {
 			$widget_numberposts = TOPLYTICS_DEFAULT_POSTS;
 		}
 
-		$period    = isset( $instance['period'] ) ? $instance['period'] : $this->stats_periods[0];
-		$showviews = isset( $instance['showviews']) ? $instance['showviews'] : 0;
+		$period = isset( $instance['period'] ) ? $instance['period'] : $this->stats_periods[0];
 
 		$showviews_checked = '';
 		if ( isset( $instance['showviews'] ) ) {
