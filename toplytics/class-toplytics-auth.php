@@ -75,8 +75,8 @@ class Toplytics_Auth {
 		delete_option( 'toplytics_oa_anon_secret' );
 	}
 
-	function curl_error_ch( $ch ) {
-		$error = curl_errno( $ch );
+	function curl_error_ch( $curl_handler ) {
+		$error = curl_errno( $curl_handler );
 		if ( $error ) {
 			$this->admin_redirect( $error, true );
 		}
@@ -97,16 +97,16 @@ class Toplytics_Auth {
 
 		$req_req->sign_request( $signature_method, $consumer, null );
 
-		$ch = curl_init();
-		curl_setopt( $ch, CURLOPT_URL, $req_req->to_url() );
-		curl_setopt( $ch, CURLOPT_SSL_VERIFYPEER, 0 );
-		curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1 );
+		$curl_handler = curl_init();
+		curl_setopt( $curl_handler, CURLOPT_URL, $req_req->to_url() );
+		curl_setopt( $curl_handler, CURLOPT_SSL_VERIFYPEER, 0 );
+		curl_setopt( $curl_handler, CURLOPT_RETURNTRANSFER, 1 );
 
-		$oa_response = curl_exec( $ch );
+		$oa_response = curl_exec( $curl_handler );
 
-		$this->curl_error_ch( $ch );
+		$this->curl_error_ch( $curl_handler );
 
-		if ( 200 === curl_getinfo( $ch, CURLINFO_HTTP_CODE ) ) {
+		if ( 200 === curl_getinfo( $curl_handler, CURLINFO_HTTP_CODE ) ) {
 			$access_params = $this->split_params( $oa_response );
 			$this->set_token_and_secret( $access_params['oauth_token'], $access_params['oauth_token_secret'] );
 			header( 'Location: https://www.google.com/accounts/OAuthAuthorizeToken?oauth_token=' . urlencode( $access_params['oauth_token'] ) );
@@ -150,16 +150,16 @@ class Toplytics_Auth {
 
 		$acc_req->sign_request( $signature_method, $consumer, $upgrade_token );
 
-		$ch = curl_init();
-		curl_setopt( $ch, CURLOPT_URL, $acc_req->to_url() );
-		curl_setopt( $ch, CURLOPT_SSL_VERIFYPEER, 0 );
-		curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1 );
+		$curl_handler = curl_init();
+		curl_setopt( $curl_handler, CURLOPT_URL, $acc_req->to_url() );
+		curl_setopt( $curl_handler, CURLOPT_SSL_VERIFYPEER, 0 );
+		curl_setopt( $curl_handler, CURLOPT_RETURNTRANSFER, 1 );
 
-		$oa_response = curl_exec( $ch );
+		$oa_response = curl_exec( $curl_handler );
 
-		$this->curl_error_ch( $ch );
+		$this->curl_error_ch( $curl_handler );
 
-		$http_code = curl_getinfo( $ch, CURLINFO_HTTP_CODE );
+		$http_code = curl_getinfo( $curl_handler, CURLINFO_HTTP_CODE );
 		$this->admin_handle_oauth_complete_redirect( $oa_response, $http_code );
 	}
 

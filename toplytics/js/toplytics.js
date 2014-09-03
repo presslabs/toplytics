@@ -3,7 +3,7 @@ function toplytics_results( args ) {
   if ( window.XMLHttpRequest ) {
     xmlhttp = new XMLHttpRequest(); // code for IE7+, Firefox, Chrome, Opera, Safari
   } else {
-    xmlhttp = new ActiveXObject("Microsoft.XMLHTTP"); // code for IE6, IE5
+    xmlhttp = new ActiveXObject('Microsoft.XMLHTTP'); // code for IE6, IE5
   }
 
   xmlhttp.onreadystatechange = function() {
@@ -22,7 +22,7 @@ function toplytics_results( args ) {
             k++;
             if ( k > args.numberposts ) { break; }
 
-            var views_html = "";
+            var views_html = '';
             if ( args.showviews ) {
                 views_html = '<span class="post-views">' + views + ' views</span>';
             }
@@ -40,6 +40,6 @@ function toplytics_results( args ) {
     element.innerHTML = html;
     document.getElementById( args.widget_id ).appendChild( element );
   };
-  xmlhttp.open("GET", "/wp-content/plugins/toplytics/toplytics.json?ver=" + Math.floor(new Date().getTime() / 1000), true);
+  xmlhttp.open('GET', '/wp-content/plugins/toplytics/toplytics.json?ver=' + Math.floor(new Date().getTime() / 1000), true);
   xmlhttp.send();
 }
