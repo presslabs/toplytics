@@ -49,21 +49,21 @@ function toplytics_configuration_page( $info_message = '', $error_message = '' )
 	$url              = $account_base_url . 'accounts/~all/webproperties/~all/profiles';
 
 	$account_hash_args = Toplytics_Auth::auth_process( $url );
-	$ch = curl_init();
+	$curl = curl_init();
 
-	curl_setopt( $ch, CURLOPT_URL, $account_base_url . 'accounts/~all/webproperties/~all/profiles' );
-	curl_setopt( $ch, CURLOPT_SSL_VERIFYPEER, 0 );
-	curl_setopt( $ch, CURLOPT_HTTPHEADER, $account_hash_args );
-	curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1 );
+	curl_setopt( $curl, CURLOPT_URL, $account_base_url . 'accounts/~all/webproperties/~all/profiles' );
+	curl_setopt( $curl, CURLOPT_SSL_VERIFYPEER, 0 );
+	curl_setopt( $curl, CURLOPT_HTTPHEADER, $account_hash_args );
+	curl_setopt( $curl, CURLOPT_RETURNTRANSFER, 1 );
 
-	$return = curl_exec( $ch );
+	$return = curl_exec( $curl );
 
-	if ( curl_errno( $ch ) ) {
-		$error_message = curl_error( $ch );
+	if ( curl_errno( $curl ) ) {
+		$error_message = curl_error( $curl );
 		$account_hash  = false;
 	}
 
-	$http_code = curl_getinfo( $ch, CURLINFO_HTTP_CODE );
+	$http_code = curl_getinfo( $curl, CURLINFO_HTTP_CODE );
 
 	if ( $http_code != 200 ) {
 		$error_message = $return;
@@ -72,7 +72,7 @@ function toplytics_configuration_page( $info_message = '', $error_message = '' )
 		$error_message = '';
 		$xml = new SimpleXMLElement( $return );
 
-		curl_close( $ch );
+		curl_close( $curl );
 
 		$vhash = array();
 		foreach ( $xml->entry as $entry ) {
