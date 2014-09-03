@@ -77,7 +77,7 @@ function toplytics_configuration_page( $info_message = '', $error_message = '' )
 		$vhash = array();
 		foreach ( $xml->entry as $entry ) {
 			$value = (string) $entry->id;
-			list( $part1, $part2 )   = explode( 'profiles/', $value );
+			list( , $part2 )   = explode( 'profiles/', $value );
 			$vhash[ 'ga:' . $part2 ] = (string) $entry->title;
 		}
 		$account_hash = $vhash;
