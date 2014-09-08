@@ -89,8 +89,8 @@ class Test_Toplytics extends Toplytics_UnitTestCase {
 		$this->assertTrue( $assert );
 	}
 
-	function test_toplytics_do_this_hourly() {
-		toplytics_do_this_hourly();
-		$this->assertTrue( true );
+	function test_get_results() {
+		$result = Toplytics_Statistics::get_results();
+		$this->assertEquals( get_transient( 'toplytics.cache' ), $result );
 	}
 }
