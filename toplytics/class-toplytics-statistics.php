@@ -73,9 +73,11 @@ class Toplytics_Statistics {
 
 				curl_close( $curl_handler );
 
-				$xml           = simplexml_load_string( $ch_result );
+				$xml           = simplexml_load_string( $curl_handler_result );
 				$return_values = Toplytics_Statistics::get_result_from_xml( $xml );
 				Toplytics_Statistics::filter_all_posts( $return_values, $results, $name );
+
+				if ( empty( $results[ $name ] ) ) { continue; }
 
 				if ( is_array( $results[ $name ] ) ) {
 					arsort( $results[ $name ] );
