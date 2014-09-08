@@ -53,29 +53,31 @@ class Toplytics_Statistics {
 
 		try {
 			foreach ( $ranges as $name => $start_date ) {
-				$ch          = curl_init();
-				$url         = Toplytics_Auth::get_api_url( $start_date );
-				$auth_header = Toplytics_Auth::auth_process( $url );
+				$curl_handler = curl_init();
+				$url          = Toplytics_Auth::get_api_url( $start_date );
+				$auth_header  = Toplytics_Auth::auth_process( $url );
 
 				toplytics_log( basename( __FILE__ ) . '|' . __LINE__ . ": \$url -> '" . $url );
 
-				curl_setopt( $ch, CURLOPT_URL, $url );
-				curl_setopt( $ch, CURLOPT_SSL_VERIFYPEER, 0 );
-				curl_setopt( $ch, CURLOPT_HTTPHEADER, $auth_header );
-				curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1 );
+				curl_setopt( $curl_handler, CURLOPT_URL, $url );
+				curl_setopt( $curl_handler, CURLOPT_SSL_VERIFYPEER, 0 );
+				curl_setopt( $curl_handler, CURLOPT_HTTPHEADER, $auth_header );
+				curl_setopt( $curl_handler, CURLOPT_RETURNTRANSFER, 1 );
 
-				$ch_result = curl_exec( $ch );
+				$curl_handler_result = curl_exec( $curl_handler );
 
-				if ( curl_errno( $ch ) ) {
-					error_log( 'file:' . __FILE__ . ' line:' . __LINE__ . ' >>> CURL ERROR >>> ' . curl_errno( $ch ) );
+				if ( curl_errno( $curl_handler ) ) {
+					error_log( 'file:' . __FILE__ . ' line:' . __LINE__ . ' >>> CURL ERROR >>> ' . curl_errno( $curl_handler ) );
 					return ;
 				}
 
-				curl_close( $ch );
+				curl_close( $curl_handler );
 
-				$xml           = simplexml_load_string( $ch_result );
+				$xml           = simplexml_load_string( $curl_handler_result );
 				$return_values = Toplytics_Statistics::get_result_from_xml( $xml );
 				Toplytics_Statistics::filter_all_posts( $return_values, $results, $name );
+
+				if ( empty( $results[ $name ] ) ) { continue; }
 
 				if ( is_array( $results[ $name ] ) ) {
 					arsort( $results[ $name ] );

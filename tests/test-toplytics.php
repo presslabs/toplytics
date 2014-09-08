@@ -88,4 +88,9 @@ class Test_Toplytics extends Toplytics_UnitTestCase {
 		$assert = toplytics_get_results( $args ) == array( '166384' => 400, '166369' => 40 );
 		$this->assertTrue( $assert );
 	}
+
+	function test_get_results() {
+		$result = Toplytics_Statistics::get_results();
+		$this->assertEquals( get_transient( 'toplytics.cache' ), $result );
+	}
 }
