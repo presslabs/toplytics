@@ -31,7 +31,7 @@ function toplytics_validate_args( $args ) {
 		$args['numberposts'] = TOPLYTICS_MAX_POSTS;
 	}
 
-	return $args;
+	return ( array ) $args;
 }
 
 /**
