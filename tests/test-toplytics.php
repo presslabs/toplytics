@@ -1,4 +1,5 @@
 <?php
+
 require_once 'toplytics-unittestcase.php';
 
 class Test_Toplytics extends Toplytics_UnitTestCase {
@@ -92,5 +93,40 @@ class Test_Toplytics extends Toplytics_UnitTestCase {
 	function test_get_results() {
 		$result = Toplytics_Statistics::get_results();
 		$this->assertEquals( get_transient( 'toplytics.cache' ), $result );
+	}
+
+	function test_set_token_and_secret() {
+		$auth = new Toplytics_Auth();
+		$auth->set_token_and_secret( 'token','secret' );
+		$this->assertEquals( get_option( 'toplytics_oa_anon_token' ), 'token' );
+		$this->assertEquals( get_option( 'toplytics_oa_anon_secret' ), 'secret' );
+	}
+
+	function test_remove_token_and_secret() {
+		$auth = new Toplytics_Auth();
+
+		$auth->set_token_and_secret( 'token','secret' );
+		$this->assertEquals( get_option( 'toplytics_oa_anon_token' ), 'token' );
+		$this->assertEquals( get_option( 'toplytics_oa_anon_secret' ), 'secret' );
+
+		$auth->remove_token_and_secret();
+		$this->assertEquals( get_option( 'toplytics_oa_anon_token' ), false );
+		$this->assertEquals( get_option( 'toplytics_oa_anon_secret' ), false );
+	}
+
+	function test_split_params() {
+		$auth = new Toplytics_Auth();
+
+		$this->assertEquals(
+			$auth->split_params( 'foo=100&bar=200&goo=http://www.example.com/' ),
+			array( 'foo' => urldecode( 100 ), 'bar' => urldecode( 200 ), 'goo' => urldecode( 'http://www.example.com/' ) )
+		);
+	}
+
+	function test_filter_all_posts() {
+		$results       = array();
+		$return_values = get_transient( 'toplytics.cache' );
+		Toplytics_Statistics::filter_all_posts( $return_values, $results, 'month' );
+		$this->assertEquals( $results, array() );
 	}
 }
