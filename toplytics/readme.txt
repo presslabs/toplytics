@@ -22,7 +22,7 @@ You need to have Google Analytics active on your site if you want to use this pl
 * The widget can display the most viewed articles from the past day, week or month;
 * You can set the number of posts to be displayed between 1 and 20;
 * It can also display the number of views as counted by Google Analytics;
-* i18n support, requests for translations are more than welcomed;
+* i18n support/translation requests are more than welcome;
 * **New:** generate the list of the most viewed posts dynamicaly with JavaScript;
 * **New:** custom template for displaying the widget is now available and should be included in the active theme folder;
 * **New:** you can use some of the plugin's functions if the above are not enough for your customization needs. Check FAQ for details;
@@ -35,7 +35,7 @@ You need to have Google Analytics active on your site if you want to use this pl
 2. Extract the *toplytics.zip* archive into the */wp-content/plugins/* directory;
 3. Activate the plugin through the *Plugins* menu in WordPress.
 
-Alternatively go into your WordPress dashboard and click on *Plugins -> Add Plugin* and search for Toplytics. Then click on *Install*, then on *Activate Now*.
+Alternatively, go into your WordPress dashboard and click on *Plugins -> Add Plugin* and search for Toplytics. Then click on *Install*, then on *Activate Now*.
 
 = Usage =
 Connect your plugin with Google Analytics Account from the Settings page (*Settigns -> Toplytics*);
@@ -44,15 +44,15 @@ Use the *Most Visited Posts* widget from the *Appearance->Widgets* page;
 == Frequently Asked Questions ==
 
 = Why should I use this plugin? =
-You should use this plugin if you want to display the most visited posts of your site in a safe and stable way, with no risk of downtime or slowness, based on data from Google Analytics statistics. The plugin is built for high-traffic sites where counting every visitor's click loads up the DB and can potentially crash the site.
+You should use this plugin if you want to display the most visited posts of your site in a safe and stable manner, with no risk of downtime or slowness, based on data from Google Analytics statistics. The plugin is built for high-traffic sites where counting every visitor's click loads up the DB and can potentially crash the site.
 
 = How often is the data from Google Analytics refreshed? =
-The data from GA is refreshed every hour. During this interval the information is safely stored using transients.
+The data from GA is refreshed every hour. During this interval, the information is safely stored using transients.
 
 = How to use the custom template? =
 To use a custom template you just need to copy the file `toplytics-template.php` from toplytics' plugin folder to your theme folder.
 
-Then you can customize your template. The plugin will first search for the file `toplytics-template.php` in the active theme folder and if that's not found it will search in the plugin folder. The custom template from the theme folder has priority over the one in the plugin folder.
+You can then customize your template. The plugin will first search for the file `toplytics-template.php` in the active theme folder, and, if that's not found, it will search for it in the plugin folder. The custom template from the theme folder has priority over the one in the plugin folder.
 
 = How can I use the shortcode? =
 The shortcode has 3 parameters: period -> default=month (today/week/month), numberposts -> default=5 (min=1/max=20), showviews -> default=false (true/false)
@@ -65,7 +65,7 @@ The shortcode can be used within post/pages and in other widgets from the sideba
 
 = How can I use the plugin functionality outside the sidebar? =
 
-The plugin offers 2 functions that can be used either in the theme or by another plugin. Please find below the complete documentation.
+The plugin offers 2 functions that can be used either in the theme or by another plugin. Please review the complete documentation below.
 
 **1.** `toplytics_results`
 
@@ -84,7 +84,7 @@ args -> This parameter is a list of toplytics options:
 
 **Return Values**
 
-If the toplytics results will be printed, then the function returns TRUE otherwise the return value is FALSE.
+If the toplytics results will be printed, then the function returns TRUE, otherwise the return value is FALSE.
 
 **Example**
 
@@ -107,7 +107,7 @@ Here is a simple example that displays the first 7 most visited posts in the pas
 
 `mixed toplytics_get_results ( [ array $args ] )`
 
-toplytics_get_results() returns the toplytics results into an array; in this case the toplytics results' HTML can be formatted according with your needs.
+toplytics_get_results() returns the toplytics results into an array; in this case, the toplytics results' HTML can be formatted according with your needs.
 
 **Parameters**
 
@@ -152,14 +152,14 @@ The outcome will look like this:
 
 = 2.0 =
 * Implemented OAuth login method.
-* Added `Display posts in real time` option
+* Added `Display posts in real time` option.
 * Fixed some display bugs.
-* Refactored and cleaned-up the entire plugin code and adding some tests.
+* Refactored and cleaned-up the entire plugin code and added some tests.
 * Simplified the template syntax.
-* The plugin settings page stays now under *Settings* and not *Tools*
+* The plugin settings page now resides under *Settings* and not *Tools*.
 * Added i18n support.
 * Added shortcode support.
-* Added more information and documentation into Readme.txt
+* Added more information and documentation into Readme.txt.
 
 = 1.2.2 =
 * Added custom theme templates support.
