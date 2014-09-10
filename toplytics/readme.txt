@@ -23,10 +23,10 @@ You need to have Google Analytics active on your site if you want to use this pl
 * You can set the number of posts to be displayed between 1 and 20;
 * It can also display the number of views as counted by Google Analytics;
 * i18n support/translation requests are more than welcome;
-* **New:** generate the list of the most viewed posts dynamicaly with JavaScript;
-* **New:** custom template for displaying the widget is now available and should be included in the active theme folder;
-* **New:** you can use some of the plugin's functions if the above are not enough for your customization needs. Check FAQ for details;
-* **New:** shortcodes are now supported for easier integration into posts/pages or other widgets. Check FAQ for details;
+* Generate the list of the most viewed posts dynamicaly with JavaScript;
+* custom template for displaying the widget is now available and should be included in the active theme folder;
+* You can use some of the plugin's functions if the above are not enough for your customization needs. Check FAQ for details;
+* Shortcodes are now supported for easier integration into posts/pages or other widgets. Check FAQ for details;
 
 == Installation ==
 
