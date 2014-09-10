@@ -2,8 +2,8 @@
 Contributors: PressLabs, olarmarius
 Donate link: http://www.presslabs.com/
 Tags: presslabs, analytics, posts, top, most visited, most viewed posts, top content, toplytics, popular, google analytics, high traffic, popular posts, oauth, server resources, settings, widget, embed code, javascript, json, json file, simple, post views
-Requires at least: 3.5
-Tested up to: 3.8.1
+Requires at least: 3.9
+Tested up to: 3.9.2
 Stable tag: 2.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -25,7 +25,6 @@ You need to have Google Analytics active on your site if you want to use this pl
 * i18n support, requests for translations are more than welcomed;
 * **New:** generate the list of the most viewed posts dynamicaly with JavaScript;
 * **New:** custom template for displaying the widget is now available and should be included in the active theme folder;
-* **New:** the plugin has a set of filters & hooks to be used from the theme files;
 * **New:** you can use some of the plugin's functions if the above are not enough for your customization needs. Check FAQ for details;
 * **New:** shortcodes are now supported for easier integration into posts/pages or other widgets. Check FAQ for details;
 
@@ -151,29 +150,22 @@ The outcome will look like this:
 
 == Changelog ==
 
-= 1.5 =
+= 2.0 =
+* Implemented OAuth login method.
 * Added `Display posts in real time` option
-* Fixed one shortcode bug.
-
-= 1.4 =
-* Removed multiple templates support. You can use only one custom template placed in your theme folder.
 * Fixed some display bugs.
-* Refactored and cleaned-up the entire plugin code
+* Refactored and cleaned-up the entire plugin code and adding some tests.
 * Simplified the template syntax.
 * The plugin settings page stays now under *Settings* and not *Tools*
-* Added more filters and hooks to be used inside theme/plugins
 * Added i18n support.
 * Added shortcode support.
 * Added more information and documentation into Readme.txt
-
-= 1.3 =
-* Implemented OAuth login method.
 
 = 1.2.2 =
 * Added custom theme templates support.
 
 = 1.2.1 =
-* GA password is used to generate a token, and the token is saved in the database.
+* Add a token to login process.
 
 = 1.2 =
 * Added custom templates.
@@ -183,8 +175,6 @@ The outcome will look like this:
 
 == Upgrade Notice ==
 
-= 1.5 =
+= 2.0 =
 The option `Display posts in real time` will let you get the results from one JSON file with JavaScript code. All HTML code is generated dynamically and as a result, the SEO will be affected.
-
-= 1.4 =
-Major plugin changes & code rewrite. Added theme custom templates, OAuth login, i18n support, shortcode support, filter & hooks.
+Major plugin changes & code rewrite. Added theme custom template, OAuth login, i18n support, shortcode support.
