@@ -118,40 +118,40 @@ class Toplytics_WP_Widget_Most_Visited_Posts extends WP_Widget {
 		$realtime_checked = '';
 		if ( isset( $instance['realtime'] ) ) {
 			$realtime_checked = $instance['realtime'] ? ' checked="checked"' : '';
-			?>
-			<p>
-				<label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e( 'Title' ); ?>:</label>
-				<input class="widefat" id="<?php echo $this->get_field_id( 'title' ); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" type="text" value="<?php echo $widget_title; ?>" />
-			</p>
-
-			<p>
-				<label for="<?php echo $this->get_field_id( 'numberposts' ); ?>"><?php _e( 'Number of posts to show', TOPLYTICS_TEXTDOMAIN ); ?>:</label>
-				<input id="<?php echo $this->get_field_id( 'numberposts' ); ?>" name="<?php echo $this->get_field_name( 'numberposts' ); ?>" type="text" value="<?php echo $widget_numberposts; ?>" size="3" />
-			</p>
-
-			<p>
-				<label for="<?php echo $this->get_field_id( 'period' ); ?>"><?php _e( 'Statistics period', TOPLYTICS_TEXTDOMAIN ); ?>:</label>
-				<select id="<?php echo $this->get_field_id( 'period' ); ?>" name="<?php echo $this->get_field_name( 'period' ); ?>">
-			<?php
-			global $ranges, $ranges_label;
-			$ranges_keys = array_keys( $ranges );
-			foreach ( $ranges_keys as $key ) {
-				?>
-				<option value="<?php echo $key; ?>"<?php if ( $period == $key ) { echo ' selected="selected"'; } echo '>' . __( $ranges_label[ $key ], TOPLYTICS_TEXTDOMAIN ); ?></option>
-				<?php } ?>
-				</select>
-			</p>
-
-			<p>
-				<input class="checkbox" type="checkbox"<?php echo $showviews_checked; ?> id="<?php echo $this->get_field_id( 'showviews' ); ?>" name="<?php echo $this->get_field_name( 'showviews' ); ?>" /> <label for="<?php echo $this->get_field_id( 'showviews' ); ?>"><?php echo __( 'Display post views', TOPLYTICS_TEXTDOMAIN ); ?>?</label>
-			</p>
-
-			<p>
-				<input class="checkbox" type="checkbox"<?php echo $realtime_checked; ?> id="<?php echo $this->get_field_id( 'realtime' ); ?>" name="<?php echo $this->get_field_name( 'realtime' ); ?>" /><label title="<?php echo __( 'If you choose this, the content will be generated dynamically and your SEO will be affected', TOPLYTICS_TEXTDOMAIN ); ?>" for="<?php echo $this->get_field_id( 'realtime' ); ?>"><?php echo __( 'Display posts in real time', TOPLYTICS_TEXTDOMAIN ); ?>?</label>
-			</p>
-
-			<p><?php _e( 'Template' ); ?>:<br /><?php echo toplytics_get_template_filename( $realtime ); ?></p>
-			<?php
 		}
+		?>
+		<p>
+			<label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e( 'Title' ); ?>:</label>
+			<input class="widefat" id="<?php echo $this->get_field_id( 'title' ); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" type="text" value="<?php echo $widget_title; ?>" />
+		</p>
+
+		<p>
+			<label for="<?php echo $this->get_field_id( 'numberposts' ); ?>"><?php _e( 'Number of posts to show', TOPLYTICS_TEXTDOMAIN ); ?>:</label>
+			<input id="<?php echo $this->get_field_id( 'numberposts' ); ?>" name="<?php echo $this->get_field_name( 'numberposts' ); ?>" type="text" value="<?php echo $widget_numberposts; ?>" size="3" />
+		</p>
+
+		<p>
+			<label for="<?php echo $this->get_field_id( 'period' ); ?>"><?php _e( 'Statistics period', TOPLYTICS_TEXTDOMAIN ); ?>:</label>
+			<select id="<?php echo $this->get_field_id( 'period' ); ?>" name="<?php echo $this->get_field_name( 'period' ); ?>">
+		<?php
+		global $ranges, $ranges_label;
+		$ranges_keys = array_keys( $ranges );
+		foreach ( $ranges_keys as $key ) {
+			?>
+			<option value="<?php echo $key; ?>"<?php if ( $period == $key ) { echo ' selected="selected"'; } echo '>' . __( $ranges_label[ $key ], TOPLYTICS_TEXTDOMAIN ); ?></option>
+			<?php } ?>
+			</select>
+		</p>
+
+		<p>
+			<input class="checkbox" type="checkbox"<?php echo $showviews_checked; ?> id="<?php echo $this->get_field_id( 'showviews' ); ?>" name="<?php echo $this->get_field_name( 'showviews' ); ?>" /> <label for="<?php echo $this->get_field_id( 'showviews' ); ?>"><?php echo __( 'Display post views', TOPLYTICS_TEXTDOMAIN ); ?>?</label>
+		</p>
+
+		<p>
+			<input class="checkbox" type="checkbox"<?php echo $realtime_checked; ?> id="<?php echo $this->get_field_id( 'realtime' ); ?>" name="<?php echo $this->get_field_name( 'realtime' ); ?>" /><label title="<?php echo __( 'If you choose this, the content will be generated dynamically and your SEO will be affected', TOPLYTICS_TEXTDOMAIN ); ?>" for="<?php echo $this->get_field_id( 'realtime' ); ?>"><?php echo __( 'Display posts in real time', TOPLYTICS_TEXTDOMAIN ); ?>?</label>
+		</p>
+
+		<p><?php _e( 'Template' ); ?>:<br /><?php echo toplytics_get_template_filename( $realtime ); ?></p>
+		<?php
 	}
 }
