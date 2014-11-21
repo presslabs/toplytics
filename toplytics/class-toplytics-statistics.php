@@ -55,6 +55,7 @@ class Toplytics_Statistics {
 			foreach ( $ranges as $name => $start_date ) {
 				$curl_handler = curl_init();
 				$url          = Toplytics_Auth::get_api_url( $start_date );
+				$url          = apply_filters( "toplytics_ga_api_url_$name", $url );
 				$auth_header  = Toplytics_Auth::auth_process( $url );
 
 				toplytics_log( basename( __FILE__ ) . '|' . __LINE__ . ": \$url -> '" . $url );
@@ -74,7 +75,9 @@ class Toplytics_Statistics {
 				curl_close( $curl_handler );
 
 				$xml           = simplexml_load_string( $curl_handler_result );
+				$xml           = apply_filters( "toplytics_ga_api_result_xml_$name", $xml );
 				$return_values = Toplytics_Statistics::get_result_from_xml( $xml );
+				$return_values = apply_filters( "toplytics_ga_api_result_simplexml_$name", $return_values );
 				Toplytics_Statistics::filter_all_posts( $return_values, $results, $name );
 
 				if ( empty( $results[ $name ] ) ) { continue; }
