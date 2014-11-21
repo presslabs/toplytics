@@ -41,7 +41,15 @@ class Toplytics_Auth {
 		$url .= sizeof( $sort ) > 0 ? '&sort=' . join( $sort, ',' ) : '';
 		$url .= "&start-date={$start_date}&end-date={$end_date}&max-results=$max_results";
 
-		$args = compact( $metrics, $sort, $dimensions, $ids, $start_date, $end_date, $max_results );
+		$args = array(
+			'metrics'     => $metrics,
+			'sort'        => $sort,
+			'dimensions'  => $dimensions,
+			'ids'         => $ids,
+			'start_date'  => $start_date,
+			'end_date'    => $end_date,
+			'max_results' => $max_results,
+		);
 
 		return apply_filters( 'toplytics_ga_api_url', $url, $base_url, $args );
 	}
