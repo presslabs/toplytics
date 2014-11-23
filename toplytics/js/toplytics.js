@@ -33,9 +33,6 @@ function toplytics_results( args ) {
           }
       }
     }
-    if ( '' === html ) {
-        html = '<li>No data is available!</li>';
-    }
     var element = document.createElement('ol');
     element.innerHTML = html;
     document.getElementById( args.widget_id ).appendChild( element );
