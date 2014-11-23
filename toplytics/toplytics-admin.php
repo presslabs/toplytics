@@ -201,6 +201,9 @@ function toplytics_options_page() {
 	<div id="icon-options-general" class="icon32">&nbsp;</div>
 	<h2>Toplytics <?php _e( 'Settings' ); ?></h2>
 	<?php
+	
+	do_action( 'toplytics_options_general_page' );
+	
 	/**
 	 *  if settings are not empty then run the function called every hour (scan the GA statistics)
 	 *  this case is useful when you change the GA account settings
