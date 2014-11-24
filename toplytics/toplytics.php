@@ -39,6 +39,10 @@ require_once 'class-toplytics-auth.php';       // the login logic
 require_once 'class-toplytics-statistics.php'; // the statistics logic
 $obj = new Toplytics_Auth();
 
+if ( defined( 'TOPLYTICS_DEBUG_MODE' ) && TOPLYTICS_DEBUG_MODE ) {
+	require_once 'toplytics-debug.php'; // debug page
+}
+
 function toplytics_log( $message ) {
 	if ( defined( TOPLYTICS_DEBUG_MODE  )  ) {
 		error_log( $message );
