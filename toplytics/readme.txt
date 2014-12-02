@@ -3,8 +3,8 @@ Contributors: PressLabs, olarmarius
 Donate link: http://www.presslabs.com/
 Tags: presslabs, analytics, posts, top, most visited, most viewed posts, top content, toplytics, popular, google analytics, high traffic, popular posts, oauth, server resources, settings, widget, embed code, javascript, json, json file, simple, post views
 Requires at least: 3.9
-Tested up to: 3.9.2
-Stable tag: 2.0
+Tested up to: 4.0.1
+Stable tag: 2.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -27,6 +27,7 @@ You need to have Google Analytics active on your site if you want to use this pl
 * custom template for displaying the widget is now available and should be included in the active theme folder;
 * You can use some of the plugin's functions if the above are not enough for your customization needs. Check FAQ for details;
 * Shortcodes are now supported for easier integration into posts/pages or other widgets. Check FAQ for details;
+* Debug page
 
 == Installation ==
 
@@ -149,6 +150,22 @@ The outcome will look like this:
 
 
 == Changelog ==
+
+= 2.1 =
+
+* add new filters and actions
+filters:
+  toplytics_ga_api_url_$name
+  toplytics_ga_api_result_xml_$name
+  toplytics_ga_api_result_simplexml_$name
+action:
+  action toplytics_options_general_page
+
+* resolve the realtime template
+* add toplytics debug page
+
+where $name is in ['today', '2weeks', 'week', 'month']
+
 
 = 2.0 =
 * Implemented OAuth login method.
