@@ -205,6 +205,7 @@ function toplytics_save_stats_in_json() {
 				}
 			}
 		}
+		$post_data = apply_filters( 'toplytics_save_stats_in_json', $post_data, $filepath );
 		file_put_contents( $filepath, json_encode( $post_data, JSON_FORCE_OBJECT ) );
 	}
 }
