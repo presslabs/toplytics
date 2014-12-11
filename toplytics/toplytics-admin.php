@@ -88,13 +88,16 @@ function toplytics_configuration_page( $info_message = '', $error_message = '' )
 			delete_option( 'toplytics_oauth_token' ); // this is removed so login will happen again
 			return;
 		} else {
+			if ( $error = simplexml_load_string($error_message) ) {
+				$error = $error->error->internalReason . '. Error code is: <code>' . $error->error->code . '</code>';
+			} else {
+				$error = __( 'Unknown error', TOPLYTICS_TEXTDOMAIN );
+			}
+
 			$error_message = __( 'Error gathering analytics data from Google:', TOPLYTICS_TEXTDOMAIN )
-				. strip_tags( $error_message );
-				_e( 'Please try again later.', TOPLYTICS_TEXTDOMAIN );
-			return;
+				. " $error";
 		}
 	}
-	toplytics_do_this_hourly();
 
 	if ( isset( $info_message ) && '' != trim( $info_message ) ) {
 		echo '<div id="message" class="updated fade"><p><strong>' . $info_message . '</strong></p></div>';
@@ -104,13 +107,13 @@ function toplytics_configuration_page( $info_message = '', $error_message = '' )
 		echo '<div id="message" class="error fade"><p><strong>' . $error_message . '</strong></p></div>';
 	}
 
-	if ( 0 != sizeof( $account_hash ) ) {
+	if ( $account_hash ) {
 		$current_account_id = isset( $_POST['ga_account_id'] ) ? $_POST['ga_account_id'] : false !== get_option( 'toplytics_account_id' ) ? get_option( 'toplytics_account_id' ) : '' ;
 
 		if ( ! isset( $current_account_id ) || '' == $current_account_id ) {
 			?>
 			<div class="updated">
-			<p><?php _e( '<b>Note:</b> You will need to select an account and <b>click "Save Changes"</b> before the analytics dashboard will work.', TOPLYTICS_TEXTDOMAIN ); ?></p>
+			<p><?php _e( '<b>Note:</b> You will need to select an account and <b>click "Save Changes"</b> before data will show up in widgets.', TOPLYTICS_TEXTDOMAIN ); ?></p>
 			</div>
 			<?php
 		}
@@ -122,8 +125,8 @@ function toplytics_configuration_page( $info_message = '', $error_message = '' )
 	<th scope="row"><label for="ga_account_id"><?php _e( 'Available Accounts', TOPLYTICS_TEXTDOMAIN ); ?></label></th>
 	<td>
 	<?php
-	if ( 0 == sizeof( $account_hash ) ) {
-		echo '<span id="ga_account_id">' . __( 'No accounts available.', TOPLYTICS_TEXTDOMAIN ) . '</span>';
+	if ( ! $account_hash ) {
+		echo '<span id="ga_account_id">' . __( 'You have no accounts available or there was an error querying Google Analytics.', TOPLYTICS_TEXTDOMAIN ) . '</span>';
 	} else {
 		echo '<select id="ga_account_id" name="ga_account_id">';
 		foreach ( $account_hash as $account_id => $account_name ) {
@@ -137,7 +140,9 @@ function toplytics_configuration_page( $info_message = '', $error_message = '' )
 	</table>
 
 	<p class="submit">
-	<input type="submit" name="SubmitOptions" class="button-primary" value="<?php _e( 'Save Changes', TOPLYTICS_TEXTDOMAIN ); ?>" />&nbsp;&nbsp;
+	<?php if ( $account_hash ) { ?>
+		<input type="submit" name="SubmitOptions" class="button-primary" value="<?php _e( 'Save Changes', TOPLYTICS_TEXTDOMAIN ); ?>" />&nbsp;&nbsp;
+	<?php } ?>
 	<input type="submit" name="SubmitRemoveCredentials" class="button" value="<?php _e( 'Remove Credentials', TOPLYTICS_TEXTDOMAIN ); ?>" />
 	</p>
 
