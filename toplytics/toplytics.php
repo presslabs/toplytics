@@ -7,7 +7,6 @@
  * Version: 2.1
  * Author URI: http://www.presslabs.com/
  */
-define( 'TOPLYTICS_DEBUG_MODE', true );
 define( 'TOPLYTICS_DEFAULT_POSTS', 5 );
 define( 'TOPLYTICS_MIN_POSTS', 1 );
 define( 'TOPLYTICS_MAX_POSTS', 20 );
@@ -39,12 +38,12 @@ require_once 'class-toplytics-auth.php';       // the login logic
 require_once 'class-toplytics-statistics.php'; // the statistics logic
 $obj = new Toplytics_Auth();
 
-if ( defined( 'TOPLYTICS_DEBUG_MODE' ) && TOPLYTICS_DEBUG_MODE ) {
+if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
 	require_once 'toplytics-debug.php'; // debug page
 }
 
 function toplytics_log( $message ) {
-	if ( defined( TOPLYTICS_DEBUG_MODE  )  ) {
+	if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
 		error_log( $message );
 	}
 }
