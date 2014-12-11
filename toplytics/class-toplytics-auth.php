@@ -132,7 +132,6 @@ class Toplytics_Auth {
 
 			update_option( 'toplytics_oauth_token', $access_params['oauth_token'] );
 			update_option( 'toplytics_oauth_secret', $access_params['oauth_token_secret'] );
-			update_option( 'toplytics_auth_token', 'toplytics_see_oauth' );
 
 			$this->admin_redirect( 'Authenticated!' );
 		} else {

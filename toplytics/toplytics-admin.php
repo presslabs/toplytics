@@ -85,8 +85,7 @@ function toplytics_configuration_page( $info_message = '', $error_message = '' )
 
 	if ( 200 != $http_code ) {
 		if ( 401 == $http_code ) {
-			delete_option( 'toplytics_auth_token' ); // this is removed so login will happen again
-			toplytics_options_page();
+			delete_option( 'toplytics_oauth_token' ); // this is removed so login will happen again
 			return;
 		} else {
 			$error_message = __( 'Error gathering analytics data from Google:', TOPLYTICS_TEXTDOMAIN )
