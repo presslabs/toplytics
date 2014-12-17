@@ -16,12 +16,9 @@
 */
 
 class Toplytics_Admin {
-
 	public function __construct() {
-		global $toplytics;
-
 		if ( current_user_can( 'manage_options' ) ) {
-			if ( $toplytics->_get_token() ) {
+			if ( get_option( 'toplytics_oauth_token' ) ) {
 				new Toplytics_Submenu_Settings();
 			} else {
 				new Toplytics_Submenu_Configure();

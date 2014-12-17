@@ -24,8 +24,6 @@ class Toplytics_Submenu_Settings extends Toplytics_Menu {
 		global $toplytics;
 		$this->toplytics = $toplytics;
 
-		$analytics = new Google_Service_Analytics( $this->toplytics->client );
-
 		add_action( 'admin_menu', array( $this, 'admin_menu' ) );
 		add_action( 'admin_init', array( $this, 'remove_credentials' ) );
 	}
@@ -54,13 +52,37 @@ class Toplytics_Submenu_Settings extends Toplytics_Menu {
 		<h2><?php _e( 'Toplytics Settings', 'toplytics' ); ?></h2>
 
 		<form action="" method="POST">
-		<?php wp_nonce_field( 'toplytics-settings' ) ?>
+		<?php
+		wp_nonce_field( 'toplytics-settings' );
+		?>
 
-		access_token:`<?php echo $this->toplytics->_get_token(); ?>`<br />
-		refresh_token:`<?php echo $this->toplytics->_get_refresh_token(); ?>`<br />
+		<table class="form-table">
+		<tr valign="top">
+		<th scope="row"><label for="ga_account_id"><?php _e( 'Available Accounts', 'toplytics' ); ?></label></th>
+		<td>
+		<?php $account_hash = false;
+
+		$results  = $this->toplytics->get_data( 'today' );
+		?><pre><?php print_r( $results ); ?></pre><?php
+
+		/*
+		if ( ! $account_hash ) {
+			echo '<span id="ga_account_id">' . __( 'You have no accounts available or there was an error querying Google Analytics.', TOPLYTICS_TEXTDOMAIN ) . '</span>';
+		} else {
+			echo '<select id="ga_account_id" name="ga_account_id">';
+			foreach ( $account_hash as $account_id => $account_name ) {
+				echo '<option value="' . $account_id . '" ' . ( $current_account_id == $account_id ? 'selected' : '' ) . '>' . $account_name . '</option>';
+			}
+			echo '</select>';
+		}
+		*/
+		?>
+		</td>
+		</tr>
+		</table>
 
 		<p class="submit">
-		<input type="submit" name="ToplyticsSubmitSave" class="button-primary" value="<?php _e( 'Save', 'toplytics' ); ?>" />
+		<input type="submit" name="ToplyticsSubmitSaveChanges" class="button-primary" value="<?php _e( 'Save Changes', 'toplytics' ); ?>" />&nbsp;&nbsp;
 		<input type="submit" name="ToplyticsSubmitRemoveCredentials" class="button" value="<?php _e( 'Remove Credentials', 'toplytics' ); ?>" />
 		</p>
 
