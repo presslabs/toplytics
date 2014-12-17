@@ -18,17 +18,15 @@
 class Toplytics_Admin {
 
 	public function __construct() {
+		global $toplytics;
+
 		if ( current_user_can( 'manage_options' ) ) {
-			if ( $this->has_configuration() ) {
+			if ( $toplytics->_get_token() ) {
 				new Toplytics_Submenu_Settings();
 			} else {
 				new Toplytics_Submenu_Configure();
 			}
 		}
-	}
-
-	public function has_configuration() {
-		return ( false !== get_option( 'toplytics_oauth_token' ) );
 	}
 }
 

@@ -17,18 +17,10 @@
 
 class Toplytics_Menu {
 
-	public $toplytics_menu_slug = 'toplytics/toplytics.php';
-	public $settings_menu_slug  = 'toplytics/toplytics-settings.php';
-
 	public $menu_slug;
-	public $submenu_slug;
 
-	public function __construct( $menu_slug, $submenu_slug ) {
-		global $git;
-		$this->git = $git;
-
-		$this->menu_slug    = $menu_slug;
-		$this->submenu_slug = $submenu_slug;
+	public function __construct() {
+		$this->menu_slug = 'toplytics/toplytics.php';
 	}
 
 	public function redirect( $message, $success = false, $menu_slug = '' ) {

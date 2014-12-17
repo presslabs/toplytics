@@ -16,22 +16,35 @@
 */
 
 class Toplytics_Submenu_Settings extends Toplytics_Menu {
+	private $toplytics;
 
 	public function __construct() {
-		parent::__construct( $this->toplytics_menu_slug, $this->settings_menu_slug );
+		parent::__construct();
+
+		global $toplytics;
+		$this->toplytics = $toplytics;
+
+		$analytics = new Google_Service_Analytics( $this->toplytics->client );
+
 		add_action( 'admin_menu', array( $this, 'admin_menu' ) );
+		add_action( 'admin_init', array( $this, 'remove_credentials' ) );
 	}
 
 	public function admin_menu() {
-		$submenu_hook = add_submenu_page(
-			$this->menu_slug,
-			'Settings',
-			__( 'Settings' ),
+		$submenu_hook = add_management_page(
+			'Toplytics',
+			'Toplytics',
 			'manage_options',
-			$this->submenu_slug,
+			$this->menu_slug,
 			array( $this, 'page' )
 		);
-		new Gitium_Help( $submenu_hook, 'settings' );
+	}
+
+	public function remove_credentials() {
+		if ( isset( $_POST['ToplyticsSubmitRemoveCredentials'] ) ) {
+			delete_option( 'toplytics_oauth_token' );
+			$this->success_redirect();
+		}
 	}
 
 	public function page() {
@@ -43,8 +56,12 @@ class Toplytics_Submenu_Settings extends Toplytics_Menu {
 		<form action="" method="POST">
 		<?php wp_nonce_field( 'toplytics-settings' ) ?>
 
+		access_token:`<?php echo $this->toplytics->_get_token(); ?>`<br />
+		refresh_token:`<?php echo $this->toplytics->_get_refresh_token(); ?>`<br />
+
 		<p class="submit">
 		<input type="submit" name="ToplyticsSubmitSave" class="button-primary" value="<?php _e( 'Save', 'toplytics' ); ?>" />
+		<input type="submit" name="ToplyticsSubmitRemoveCredentials" class="button" value="<?php _e( 'Remove Credentials', 'toplytics' ); ?>" />
 		</p>
 
 		</form>
