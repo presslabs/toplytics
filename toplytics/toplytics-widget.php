@@ -55,7 +55,7 @@ class Toplytics_WP_Widget extends WP_Widget {
 		if ( $results ) {
 			$title = apply_filters(
 				'widget_title',
-				empty( $title ) ? __( 'Most Visited Posts', 'toplytics' ) : $title,
+				$title,
 				$instance,
 				$this->id_base
 			);
