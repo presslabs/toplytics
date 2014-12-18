@@ -52,46 +52,119 @@ class Toplytics {
 		$client->setAccessType( 'offline' );
 		$client->setRedirectUri( 'http://127.0.0.1:8080/wordpress/wp-admin/admin.php?page=toplytics/toplytics.php' );
 
+		if ( get_option( 'toplytics_oauth_token' ) ) { $client->setAccessToken( $this->_get_token() ); }
+
 		$this->client  = $client;
 		$this->service = new Google_Service_Analytics( $this->client );
 	}
-	/*
-	public function get_first_profile_id() {
-		$accounts = $this->service->management_accounts->listManagementAccounts();
 
-		if ( count( $accounts->getItems() ) > 0 ) {
-			$items = $accounts->getItems();
-			$firstAccountId = $items[0]->getId();
+	/**
+	 * Return all profiles of the current user from GA api.
+	 *
+	 * Return result type stored in WP options:
+	 *
+	 * Array(
+	 *  'profile_id' => 'account_name > property_name (Tracking ID) > profile_name',
+	 *  'profile_id' => 'account_name > property_name (Tracking ID) > profile_name',
+	 * )
+	 *
+	 * Note that the `Tracking ID` is the same with the `property_id`.
+	 */
+	public function get_profiles_list() {
+		try {
+			$profiles_list = [];
+			$profiles = $this->_get_profiles();
+			foreach ( $profiles as $profile_id => $profile_data ) {
+				$profiles_list[ $profile_id ] = $profile_data['account_name'] . ' > ' . $profile_data['property_name'] . ' (' . $profile_data['property_id'] . ') > ' . $profile_data['profile_name'];
+			}
+			return $profiles_list;
+		} catch ( Exception $e ) {
+			echo 'Caught exception: ',  $e->getMessage(), "\n";
+		}
+	}
 
-			$webproperties = $this->service->management_webproperties->listManagementWebproperties( $firstAccountId );
-
-			if ( count( $webproperties->getItems() ) > 0 ) {
-				$items = $webproperties->getItems();
-				$firstWebpropertyId = $items[0]->getId();
-
-				$profiles = $this->service->management_profiles->listManagementProfiles( $firstAccountId, $firstWebpropertyId );
-
-				if ( count( $profiles->getItems() ) > 0 ) {
-					$items = $profiles->getItems();
-					return $items[0]->getId();
+	private function _get_profiles() {
+		$profiles = [];
+		$accounts = $this->_get_accounts();
+		foreach ( $accounts as $account_id => $account_name ) {
+			$webproperties = $this->_get_webproperties( $account_id );
+			foreach ( $webproperties as $web_prop_id => $web_prop_name ) {
+				$man_profiles = $this->service->management_profiles->listManagementProfiles( $account_id, $web_prop_id );
+				if ( 0 < count( $man_profiles->getItems() ) ) {
+					foreach ( $man_profiles->getItems() as $item ) {
+						$profiles[ $item->getId() ]['profile_name']  = $item->getName();
+						$profiles[ $item->getId() ]['account_id']    = $account_id;
+						$profiles[ $item->getId() ]['account_name']  = $account_name;
+						$profiles[ $item->getId() ]['property_id']   = $web_prop_id;
+						$profiles[ $item->getId() ]['property_name'] = $web_prop_name;
+					}
 				} else {
 					throw new Exception( 'No views (profiles) found for this user.' );
 				}
-			} else {
-				throw new Exception( 'No webproperties found for this user.' );
 			}
+		}
+		return $profiles;
+	}
+
+	private function _get_webproperties( $account_id ) {
+		$man_webproperties = $this->service->management_webproperties->listManagementWebproperties( $account_id );
+		if ( 0 < count( $man_webproperties->getItems() ) ) {
+			$webproperties = [];
+			foreach ( $man_webproperties->getItems() as $item ) {
+				$webproperties[ $item->getId() ] = $item->getName();
+			}
+			return $webproperties;
+		} else {
+			throw new Exception( 'No webproperties found for this user.' );
+		}
+	}
+
+	private function _get_accounts() {
+		$man_accounts = $this->service->management_accounts->listManagementAccounts();
+		if ( 0 < count( $man_accounts->getItems() ) ) {
+			$accounts = [];
+			foreach ( $man_accounts->getItems() as $item ) {
+				$accounts[ $item->getId() ] = $item->getName();
+			}
+			return $accounts;
 		} else {
 			throw new Exception( 'No accounts found for this user.' );
 		}
 	}
-	*/
-	public function get_accounts(){
-		$man_accounts = $this->service->management_accounts->listManagementAccounts();
-		$accounts = [];
-		foreach ( $man_accounts['items'] as $account ) {
-			$accounts[] = [ 'id' => $account['id'], 'name' => $account['name'] ];
+
+	public function update_profile_data( $profile_id, $profile_info ) {
+		$profile_data = array(
+			'profile_id'   => $profile_id,
+			'profile_info' => $profile_info,
+		);
+		update_option( 'toplytics_profile_data', json_encode( $profile_data ) );
+	}
+
+	public function get_profile_data() {
+		return get_option( 'toplytics_profile_data' );
+	}
+
+	public function get_profile_info() {
+		$profile_data = $this->get_profile_data();
+		if ( false === $profile_data ) {
+			return false;
 		}
-		return $accounts;
+		$profile_data = json_decode( $profile_data, true );
+		return $profile_data['profile_info'];
+	}
+
+	public function remove_credentials() {
+		delete_option( 'toplytics_oauth_token' );
+		delete_option( 'toplytics_profile_data' );
+	}
+
+	private function _get_profile_id() {
+		$profile_data = $this->get_profile_data();
+		if ( false === $profile_data ) {
+			Throw new Exception( 'There is no profile data in DB.' );
+		}
+		$profile_data = json_decode( $profile_data, true );
+		return $profile_data['profile_id'];
 	}
 
 	private function _get_token() {
@@ -103,7 +176,6 @@ class Toplytics {
 	}
 
 	private function _get_analytics_data() {
-		$this->client->setAccessToken( $this->_get_token() );
 		$range = array(
 			'month'  => date( 'Y-m-d', strtotime( '-30 days'  ) ),
 			'today'  => date( 'Y-m-d', strtotime( 'yesterday' ) ),
@@ -134,7 +206,7 @@ class Toplytics {
 	public function update_analytics_data() {
 		try {
 			$data = $this->_get_analytics_data();
-		} catch(Exception $e) {
+		} catch ( Exception $e ) {
 			echo 'Caught exception: ',  $e->getMessage(), "\n";
 		}
 		$results = $this->_convert_data_to_posts( $data );

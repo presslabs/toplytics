@@ -25,6 +25,7 @@ class Toplytics_Submenu_Settings extends Toplytics_Menu {
 		$this->toplytics = $toplytics;
 
 		add_action( 'admin_menu', array( $this, 'admin_menu' ) );
+		add_action( 'admin_init', array( $this, 'save_changes' ) );
 		add_action( 'admin_init', array( $this, 'remove_credentials' ) );
 	}
 
@@ -38,11 +39,53 @@ class Toplytics_Submenu_Settings extends Toplytics_Menu {
 		);
 	}
 
-	public function remove_credentials() {
-		if ( isset( $_POST['ToplyticsSubmitRemoveCredentials'] ) ) {
-			delete_option( 'toplytics_oauth_token' );
+	public function save_changes() {
+		if ( isset( $_POST['ToplyticsSubmitSaveChanges'] ) && isset( $_POST['profile_id'] ) ) {
+			foreach ( $this->toplytics->get_profiles_list() as $profile_id => $profile_info ) {
+				if ( $_POST['profile_id'] == $profile_id ) {
+					$this->toplytics->update_profile_data( $profile_id, $profile_info );
+					break;
+				}
+			}
 			$this->success_redirect();
 		}
+	}
+
+	public function remove_credentials() {
+		if ( isset( $_POST['ToplyticsSubmitRemoveCredentials'] ) ) {
+			$this->toplytics->remove_credentials();
+			$this->success_redirect();
+		}
+	}
+
+	private function _available_accounts_selector() {
+		?>
+		<table class="form-table">
+		<tr valign="top">
+		<th scope="row"><label for="profile_id"><?php _e( 'Available Accounts', 'toplytics' ); ?></label></th>
+		<td>
+		<select id="profile_id" name="profile_id">
+		<?php
+		foreach ( $this->toplytics->get_profiles_list() as $profile_id => $profile_info ) {
+			echo '<option value="' . $profile_id . '">' . $profile_info . '</option>';
+		}
+		?>
+		</select>
+		</td>
+		</tr>
+		</table>
+		<?php
+	}
+
+	private function _show_connection_info() {
+		?>
+		<table class="form-table">
+		<tr valign="top">
+		<th scope="row"><label for="profile_id"><?php _e( 'Connected to: ', 'toplytics' ); ?></label></th>
+		<td><?php echo $this->toplytics->get_profile_info(); ?></td>
+		</tr>
+		</table>
+		<?php
 	}
 
 	public function page() {
@@ -54,35 +97,17 @@ class Toplytics_Submenu_Settings extends Toplytics_Menu {
 		<form action="" method="POST">
 		<?php
 		wp_nonce_field( 'toplytics-settings' );
-		?>
 
-		<table class="form-table">
-		<tr valign="top">
-		<th scope="row"><label for="ga_account_id"><?php _e( 'Available Accounts', 'toplytics' ); ?></label></th>
-		<td>
-		<?php $account_hash = false;
-
-		$results  = $this->toplytics->get_data( 'today' );
-		?><pre><?php print_r( $results ); ?></pre><?php
-
-		/*
-		if ( ! $account_hash ) {
-			echo '<span id="ga_account_id">' . __( 'You have no accounts available or there was an error querying Google Analytics.', TOPLYTICS_TEXTDOMAIN ) . '</span>';
+		if ( ! $this->toplytics->get_profile_data() ) {
+			$this->_available_accounts_selector();
 		} else {
-			echo '<select id="ga_account_id" name="ga_account_id">';
-			foreach ( $account_hash as $account_id => $account_name ) {
-				echo '<option value="' . $account_id . '" ' . ( $current_account_id == $account_id ? 'selected' : '' ) . '>' . $account_name . '</option>';
-			}
-			echo '</select>';
+			$this->_show_connection_info();
 		}
-		*/
 		?>
-		</td>
-		</tr>
-		</table>
-
 		<p class="submit">
+		<?php if ( ! $this->toplytics->get_profile_data()  ) { ?>
 		<input type="submit" name="ToplyticsSubmitSaveChanges" class="button-primary" value="<?php _e( 'Save Changes', 'toplytics' ); ?>" />&nbsp;&nbsp;
+		<?php } ?>
 		<input type="submit" name="ToplyticsSubmitRemoveCredentials" class="button" value="<?php _e( 'Remove Credentials', 'toplytics' ); ?>" />
 		</p>
 
