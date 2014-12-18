@@ -1,13 +1,29 @@
 <?php
-class Toplytics_WP_Widget_Most_Visited_Posts extends WP_Widget {
+/*  Copyright 2014 PressLabs SRL <ping@presslabs.com>
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License, version 2, as
+    published by the Free Software Foundation.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+*/
+
+class Toplytics_WP_Widget extends WP_Widget {
 	private $stats_periods;
 
-	function Toplytics_WP_Widget_Most_Visited_Posts() {
+	public function __construct() {
 		$widget_ops = array(
 			'classname'   => 'toplytics_widget',
-			'description' => __( 'The most visited posts on your site from Google Analytics', TOPLYTICS_TEXTDOMAIN ),
+			'description' => __( 'The most visited posts on your site from Google Analytics', 'toplytics' ),
 		);
-		$this->WP_Widget( 'toplytics-widget', __( 'Toplytics', TOPLYTICS_TEXTDOMAIN ), $widget_ops );
+		$this->WP_Widget( 'toplytics-widget', __( 'Toplytics', 'toplytics' ), $widget_ops );
 		$this->alt_option_name = 'toplytics_widget';
 
 		global $ranges;
@@ -39,7 +55,7 @@ class Toplytics_WP_Widget_Most_Visited_Posts extends WP_Widget {
 		if ( $results ) {
 			$title = apply_filters(
 				'widget_title',
-				empty( $title ) ? __( 'Most Visited Posts', TOPLYTICS_TEXTDOMAIN ) : $title,
+				empty( $title ) ? __( 'Most Visited Posts', 'toplytics' ) : $title,
 				$instance,
 				$this->id_base
 			);
@@ -126,29 +142,29 @@ class Toplytics_WP_Widget_Most_Visited_Posts extends WP_Widget {
 		</p>
 
 		<p>
-			<label for="<?php echo $this->get_field_id( 'numberposts' ); ?>"><?php _e( 'Number of posts to show', TOPLYTICS_TEXTDOMAIN ); ?>:</label>
+			<label for="<?php echo $this->get_field_id( 'numberposts' ); ?>"><?php _e( 'Number of posts to show', 'toplytics' ); ?>:</label>
 			<input id="<?php echo $this->get_field_id( 'numberposts' ); ?>" name="<?php echo $this->get_field_name( 'numberposts' ); ?>" type="text" value="<?php echo $widget_numberposts; ?>" size="3" />
 		</p>
 
 		<p>
-			<label for="<?php echo $this->get_field_id( 'period' ); ?>"><?php _e( 'Statistics period', TOPLYTICS_TEXTDOMAIN ); ?>:</label>
+			<label for="<?php echo $this->get_field_id( 'period' ); ?>"><?php _e( 'Statistics period', 'toplytics' ); ?>:</label>
 			<select id="<?php echo $this->get_field_id( 'period' ); ?>" name="<?php echo $this->get_field_name( 'period' ); ?>">
 		<?php
 		global $ranges, $ranges_label;
 		$ranges_keys = array_keys( $ranges );
 		foreach ( $ranges_keys as $key ) {
 			?>
-			<option value="<?php echo $key; ?>"<?php if ( $period == $key ) { echo ' selected="selected"'; } echo '>' . __( $ranges_label[ $key ], TOPLYTICS_TEXTDOMAIN ); ?></option>
+			<option value="<?php echo $key; ?>"<?php if ( $period == $key ) { echo ' selected="selected"'; } echo '>' . __( $ranges_label[ $key ], 'toplytics' ); ?></option>
 			<?php } ?>
 			</select>
 		</p>
 
 		<p>
-			<input class="checkbox" type="checkbox"<?php echo $showviews_checked; ?> id="<?php echo $this->get_field_id( 'showviews' ); ?>" name="<?php echo $this->get_field_name( 'showviews' ); ?>" /> <label for="<?php echo $this->get_field_id( 'showviews' ); ?>"><?php echo __( 'Display post views', TOPLYTICS_TEXTDOMAIN ); ?>?</label>
+			<input class="checkbox" type="checkbox"<?php echo $showviews_checked; ?> id="<?php echo $this->get_field_id( 'showviews' ); ?>" name="<?php echo $this->get_field_name( 'showviews' ); ?>" /> <label for="<?php echo $this->get_field_id( 'showviews' ); ?>"><?php echo __( 'Display post views', 'toplytics' ); ?>?</label>
 		</p>
 
 		<p>
-			<input class="checkbox" type="checkbox"<?php echo $realtime_checked; ?> id="<?php echo $this->get_field_id( 'realtime' ); ?>" name="<?php echo $this->get_field_name( 'realtime' ); ?>" /><label title="<?php echo __( 'If you choose this, the content will be generated dynamically and your SEO will be affected', TOPLYTICS_TEXTDOMAIN ); ?>" for="<?php echo $this->get_field_id( 'realtime' ); ?>"><?php echo __( 'Display posts in real time', TOPLYTICS_TEXTDOMAIN ); ?>?</label>
+			<input class="checkbox" type="checkbox"<?php echo $realtime_checked; ?> id="<?php echo $this->get_field_id( 'realtime' ); ?>" name="<?php echo $this->get_field_name( 'realtime' ); ?>" /><label title="<?php echo __( 'If you choose this, the content will be generated dynamically and your SEO will be affected', 'toplytics' ); ?>" for="<?php echo $this->get_field_id( 'realtime' ); ?>"><?php echo __( 'Display posts in real time', 'toplytics' ); ?>?</label>
 		</p>
 
 		<p><?php _e( 'Template' ); ?>:<br /><?php echo toplytics_get_template_filename( $realtime ); ?></p>
