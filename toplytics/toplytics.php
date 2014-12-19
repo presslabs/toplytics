@@ -48,6 +48,7 @@ class Toplytics {
 
 	public function __construct() {
 		add_filter( 'plugin_action_links_' . $this->_plugin_basename() , array( $this, '_settings_link' ) );
+		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_script' ) );
 
 		$client = new Google_Client();
 		$client->setAuthConfigFile( __DIR__ . DIRECTORY_SEPARATOR . 'client.json' );
@@ -66,6 +67,10 @@ class Toplytics {
 			'week'   => date( 'Y-m-d', strtotime( '-7 days'   ) ),
 			'today'  => date( 'Y-m-d', strtotime( 'yesterday' ) ),
 		);
+	}
+
+	public function enqueue_script() {
+		wp_enqueue_script( 'toplytics', plugins_url( 'js/toplytics.js' , __FILE__ ) );
 	}
 
 	public function get_template_filename( $realtime ) {
