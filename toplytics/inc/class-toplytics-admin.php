@@ -16,15 +16,36 @@
 */
 
 class Toplytics_Admin {
+	private $toplytics;
+
 	public function __construct() {
+		global $toplytics;
+		$this->toplytics = $toplytics;
+
 		if ( current_user_can( 'manage_options' ) ) {
 			if ( get_option( 'toplytics_oauth_token' ) ) {
 				new Toplytics_Submenu_Settings();
 				new Toplytics_WP_Widget();
 			} else {
 				new Toplytics_Submenu_Configure();
+				add_action( 'admin_init', array( $this, 'admin_notices' ) );
 			}
 		}
+	}
+
+	public function admin_notices() {
+		add_action(
+			'admin_notices',
+			create_function(
+				'',
+				"echo '<div class=\"error\"><p>"
+				. sprintf(
+					__( 'Toplytics needs configuration information on its <a href="%s">Settings</a> page.', 'toplytics' ),
+					$this->toplytics->return_settings_link()
+				)
+				. "</p></div>';"
+			)
+		);
 	}
 }
 

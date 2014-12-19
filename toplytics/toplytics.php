@@ -71,7 +71,7 @@ class Toplytics {
 		return 'toplytics/toplytics.php';
 	}
 
-	private function _return_settings_link() {
+	public function return_settings_link() {
 		return admin_url( 'tools.php?page=' . $this->_plugin_basename() );
 	}
 
@@ -79,7 +79,7 @@ class Toplytics {
 	 *  Add settings link on plugin page
 	 */
 	public function _settings_link( $links ) {
-		$settings_link = '<a href="' . $this->_return_settings_link() . '">' . __( 'Settings' ) . '</a>';
+		$settings_link = '<a href="' . $this->return_settings_link() . '">' . __( 'Settings' ) . '</a>';
 		array_unshift( $links, $settings_link );
 		return $links;
 	}
