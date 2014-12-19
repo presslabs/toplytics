@@ -209,32 +209,53 @@ class Toplytics {
 			'max-results' => $this::MAX_RESULTS,
 		);
 		$result = array();
-		foreach ( $range as $when => $date ) {
-			$rows = $this->service->data_ga->get( 'ga:94200457', $range[ $when ], date( 'Y-m-d' ), $metrics, $optParams )->rows;
-			foreach ( $rows as $item ) {
-				$result[ $when ][ $item[0] ] = $item[1];
+		foreach ( $toplytics->ranges as $when => $start_date ) {
+			$rows = $this->service->data_ga->get( 'ga:' . $this->_get_profile_id(), $start_date, date( 'Y-m-d' ), $metrics, $optParams )->rows;
+			$result[ $when ] = array();
+			if ( $rows ) {
+				foreach ( $rows as $item ) {
+					$result[ $when ][ $item[0] ] = $item[1];
+				}
 			}
 		}
 		return $result;
 	}
 
 	private function _convert_data_to_posts( $data ) {
-		return $data;
+		$new_data = array();
+		foreach ( $data as $when => $stats ) {
+			$new_data[ $when ] = array();
+			foreach ( $stats as $rel_path => $pageviews ) {
+				$link    = home_url() . $rel_path;
+				$post_id = url_to_postid( $link );
+				if ( 'post' == get_post_type( $post_id ) ) {
+					$post = get_post( $post_id );
+					if ( $post && isset( $new_data[ $when ][ $post_id ] ) ) {
+						$new_data[ $when ][ $post_id ] += $pageviews;
+					} else {
+						$new_data[ $when ][ $post_id ] = $pageviews;
+					}
+				}
+			}
+		}
+		return $new_data;
 	}
 
 	public function update_analytics_data() {
 		try {
 			$data = $this->_get_analytics_data();
 		} catch ( Exception $e ) {
-			echo 'Caught exception: ',  $e->getMessage(), "\n";
+			trigger_error( 'Cannot update Google Analytics data: '. $e->getMessage(), E_USER_ERROR );
+			return false;
 		}
 		$results = $this->_convert_data_to_posts( $data );
 		$results['_ts'] = time();
 		set_transient( 'toplytics_cached_results', $results );
+		return $results;
 	}
 
 	public function get_data( $when = 'today' ) {
-		$cached_results = get_transient( 'toplytics_cached_results', false );
+		$cached_results = get_transient( 'toplytics_cached_results' );
 		if ( false !== $cached_results and time() - $cached_results['_ts'] < Toplytics::CACHE_TTL ) {
 			return $cached_results[ $when ];
 		}
@@ -244,6 +265,7 @@ class Toplytics {
 		}
 
 		if ( $results === false ) {
+			return false;
 		} else {
 			return $results[ $when ];
 		}

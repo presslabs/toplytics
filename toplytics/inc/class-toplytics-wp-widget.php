@@ -23,11 +23,11 @@ class Toplytics_WP_Widget extends WP_Widget {
 			'classname'   => 'toplytics_widget',
 			'description' => __( 'The most visited posts on your site from Google Analytics', 'toplytics' ),
 		);
-		$this->WP_Widget( 'toplytics-widget', __( 'Toplytics', 'toplytics' ), $widget_ops );
+		$this->WP_Widget( 'toplytics-widget', 'Toplytics', $widget_ops );
 		$this->alt_option_name = 'toplytics_widget';
 
-		global $ranges;
-		$this->stats_periods = array_keys( $ranges );
+		global $toplytics;
+		$this->stats_periods = array_keys( $toplytics->ranges );
 	}
 
 	private function realtime_js_script( $period, $numberposts, $showviews, $widget_id ) {
@@ -50,7 +50,7 @@ class Toplytics_WP_Widget extends WP_Widget {
 		extract( $instance );
 
 		// Get the info from transient
-		$results = get_transient( 'toplytics.cache' );
+		$results = get_transient( 'toplytics_cached_results' );
 
 		if ( $results ) {
 			$title = apply_filters(

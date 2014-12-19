@@ -20,6 +20,7 @@ class Toplytics_Admin {
 		if ( current_user_can( 'manage_options' ) ) {
 			if ( get_option( 'toplytics_oauth_token' ) ) {
 				new Toplytics_Submenu_Settings();
+				new Toplytics_WP_Widget();
 			} else {
 				new Toplytics_Submenu_Configure();
 			}
