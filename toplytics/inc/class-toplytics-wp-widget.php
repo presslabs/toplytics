@@ -16,9 +16,9 @@
 */
 
 class Toplytics_WP_Widget extends WP_Widget {
-	private $stats_periods;
+	private $toplytics;
 
-	public function __construct() {
+	public function Toplytics_WP_Widget() {
 		$widget_ops = array(
 			'classname'   => 'toplytics_widget',
 			'description' => __( 'The most visited posts on your site from Google Analytics', 'toplytics' ),
@@ -27,7 +27,7 @@ class Toplytics_WP_Widget extends WP_Widget {
 		$this->alt_option_name = 'toplytics_widget';
 
 		global $toplytics;
-		$this->stats_periods = array_keys( $toplytics->ranges );
+		$this->toplytics = $toplytics;
 	}
 
 	private function realtime_js_script( $period, $numberposts, $showviews, $widget_id ) {
@@ -60,15 +60,16 @@ class Toplytics_WP_Widget extends WP_Widget {
 				$this->id_base
 			);
 
-			if ( ! in_array( $period, $this->stats_periods ) ) {
-				$period = $this->stats_periods[0];
+			$stats_periods = array_keys( $this->toplytics->ranges );
+			if ( ! in_array( $period, $stats_periods ) ) {
+				$period = $stats_periods[0];
 			}
 
 			$showviews = $showviews ? 1 : 0;
 			$realtime  = $realtime ? 1 : 0; // real time update
 
 			echo $before_widget;
-			$template_filename = toplytics_get_template_filename();
+			$template_filename = $this->toplytics->get_template_filename();
 
 			if ( '' != $template_filename ) {
 				if ( $title ) {
@@ -84,7 +85,7 @@ class Toplytics_WP_Widget extends WP_Widget {
 			}
 			echo $after_widget;
 			if ( $realtime ) {
-				include toplytics_get_template_filename( $realtime );
+				include $this->toplytics->get_template_filename( $realtime );
 			}
 		}
 		ob_get_flush();
@@ -95,11 +96,11 @@ class Toplytics_WP_Widget extends WP_Widget {
 		$instance['title'] = strip_tags( $new_instance['title'] );
 
 		if ( ! $widget_numberposts = (int) $new_instance['numberposts'] ) {
-			$widget_numberposts = TOPLYTICS_DEFAULT_POSTS;
-		} else if ( $widget_numberposts < TOPLYTICS_MIN_POSTS ) {
-			$widget_numberposts = TOPLYTICS_MIN_POSTS;
-		} else if ( $widget_numberposts > TOPLYTICS_MAX_POSTS ) {
-			$widget_numberposts = TOPLYTICS_MAX_POSTS;
+			$widget_numberposts = Toplytics::DEFAULT_POSTS;
+		} else if ( $widget_numberposts < Toplytics::MIN_POSTS ) {
+			$widget_numberposts = Toplytics::MIN_POSTS;
+		} else if ( $widget_numberposts > Toplytics::MAX_POSTS ) {
+			$widget_numberposts = Toplytics::MAX_POSTS;
 		}
 
 		$instance['numberposts'] = $widget_numberposts;
@@ -119,10 +120,11 @@ class Toplytics_WP_Widget extends WP_Widget {
 		$widget_title = isset( $instance['title'] ) ? esc_attr( $instance['title'] ) : '';
 
 		if ( ! isset( $instance['numberposts'] ) || ! $widget_numberposts = (int) $instance['numberposts'] ) {
-			$widget_numberposts = TOPLYTICS_DEFAULT_POSTS;
+			$widget_numberposts = Toplytics::DEFAULT_POSTS;
 		}
 
-		$period = isset( $instance['period'] ) ? $instance['period'] : $this->stats_periods[0];
+		$stats_periods = array_keys( $this->toplytics->ranges );
+		$period = isset( $instance['period'] ) ? $instance['period'] : $stats_periods[0];
 
 		$showviews_checked = '';
 		if ( isset( $instance['showviews'] ) ) {
@@ -167,7 +169,14 @@ class Toplytics_WP_Widget extends WP_Widget {
 			<input class="checkbox" type="checkbox"<?php echo $realtime_checked; ?> id="<?php echo $this->get_field_id( 'realtime' ); ?>" name="<?php echo $this->get_field_name( 'realtime' ); ?>" /><label title="<?php echo __( 'If you choose this, the content will be generated dynamically and your SEO will be affected', 'toplytics' ); ?>" for="<?php echo $this->get_field_id( 'realtime' ); ?>"><?php echo __( 'Display posts in real time', 'toplytics' ); ?>?</label>
 		</p>
 
-		<p><?php _e( 'Template' ); ?>:<br /><?php echo toplytics_get_template_filename( $realtime ); ?></p>
+		<p><?php _e( 'Template' ); ?>:<br /><?php echo $this->toplytics->get_template_filename( $realtime ); ?></p>
 		<?php
 	}
+}
+
+if ( is_admin() && get_option( 'toplytics_oauth_token' ) ) {
+	function toplytics_widget() {
+		register_widget( 'Toplytics_WP_Widget' );
+	}
+	add_action( 'widgets_init', 'toplytics_widget' );
 }

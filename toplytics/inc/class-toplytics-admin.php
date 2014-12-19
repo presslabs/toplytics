@@ -15,6 +15,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+
 class Toplytics_Admin {
 	private $toplytics;
 
@@ -25,7 +26,6 @@ class Toplytics_Admin {
 		if ( current_user_can( 'manage_options' ) ) {
 			if ( get_option( 'toplytics_oauth_token' ) ) {
 				new Toplytics_Submenu_Settings();
-				new Toplytics_WP_Widget();
 			} else {
 				new Toplytics_Submenu_Configure();
 				add_action( 'admin_init', array( $this, 'admin_notices' ) );
@@ -50,8 +50,8 @@ class Toplytics_Admin {
 }
 
 if ( is_admin() ) {
-	add_action( 'init', 'toplytics_admin_page' );
 	function toplytics_admin_page() {
 		new Toplytics_Admin();
 	}
+	add_action( 'init', 'toplytics_admin_page' );
 }

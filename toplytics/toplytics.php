@@ -37,6 +37,7 @@ require_once __DIR__ . '/inc/class-toplytics-wp-widget.php';
 class Toplytics {
 	const DEFAULT_POSTS = 5;
 	const MIN_POSTS     = 1;
+	const MAX_POSTS     = 100;
 	const MAX_RESULTS   = 1000;
 	const TEMPLATE      = 'toplytics-template.php';
 	const CACHE_TTL     = 300;
@@ -65,6 +66,10 @@ class Toplytics {
 			'week'   => date( 'Y-m-d', strtotime( '-7 days'   ) ),
 			'today'  => date( 'Y-m-d', strtotime( 'yesterday' ) ),
 		);
+	}
+
+	public function get_template_filename( $realtime ) {
+		return '';
 	}
 
 	private function _plugin_basename() {
