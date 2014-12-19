@@ -32,32 +32,57 @@ require_once __DIR__ . '/inc/class-toplytics-admin.php';
 require_once __DIR__ . '/inc/class-toplytics-menu.php';
 require_once __DIR__ . '/inc/class-toplytics-submenu-configure.php';
 require_once __DIR__ . '/inc/class-toplytics-submenu-settings.php';
+require_once __DIR__ . '/inc/class-toplytics-wp-widget.php';
 
 class Toplytics {
 	const DEFAULT_POSTS = 5;
 	const MIN_POSTS     = 1;
-	const MAX_POSTS     = 25;
 	const MAX_RESULTS   = 1000;
-	const TEXTDOMAIN    = 'toplytics';
 	const TEMPLATE      = 'toplytics-template.php';
 	const CACHE_TTL     = 300;
 
 	public $client;
 	public $service;
+	public $ranges;
 
 	public function __construct() {
+		add_filter( 'plugin_action_links_' . $this->_plugin_basename() , array( $this, '_settings_link' ) );
+
 		$client = new Google_Client();
 		$client->setAuthConfigFile( __DIR__ . DIRECTORY_SEPARATOR . 'client.json' );
 		$client->addScope( Google_Service_Analytics::ANALYTICS_READONLY );
 		$client->setAccessType( 'offline' );
-		$client->setRedirectUri( 'http://127.0.0.1:8080/wordpress/wp-admin/admin.php?page=toplytics/toplytics.php' );
+		$client->setRedirectUri( site_url() . '/wp-admin/admin.php?page=toplytics/toplytics.php' );
 
 		if ( get_option( 'toplytics_oauth_token' ) ) { $client->setAccessToken( $this->_get_token() ); }
 
 		$this->client  = $client;
 		$this->service = new Google_Service_Analytics( $this->client );
+
+		$this->ranges = array(
+			'month'  => date( 'Y-m-d', strtotime( '-30 days'  ) ),
+			'2weeks' => date( 'Y-m-d', strtotime( '-14 days'  ) ),
+			'week'   => date( 'Y-m-d', strtotime( '-7 days'   ) ),
+			'today'  => date( 'Y-m-d', strtotime( 'yesterday' ) ),
+		);
 	}
 
+	private function _plugin_basename() {
+		return 'toplytics/toplytics.php';
+	}
+
+	private function _return_settings_link() {
+		return admin_url( 'tools.php?page=' . $this->_plugin_basename() );
+	}
+
+	/**
+	 *  Add settings link on plugin page
+	 */
+	public function _settings_link( $links ) {
+		$settings_link = '<a href="' . $this->_return_settings_link() . '">' . __( 'Settings' ) . '</a>';
+		array_unshift( $links, $settings_link );
+		return $links;
+	}
 	/**
 	 * Return all profiles of the current user from GA api.
 	 *
@@ -176,12 +201,6 @@ class Toplytics {
 	}
 
 	private function _get_analytics_data() {
-		$range = array(
-			'month'  => date( 'Y-m-d', strtotime( '-30 days'  ) ),
-			'today'  => date( 'Y-m-d', strtotime( 'yesterday' ) ),
-			'2weeks' => date( 'Y-m-d', strtotime( '-14 days'  ) ),
-			'week'   => date( 'Y-m-d', strtotime( '-7 days'   ) ),
-		);
 		$metrics  = 'ga:pageviews';
 		$optParams = array(
 			'quotaUser'   => md5( home_url() ),
