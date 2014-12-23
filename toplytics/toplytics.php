@@ -49,7 +49,7 @@ class Toplytics {
 
 	public function __construct() {
 		add_filter( 'toplytics_rel_path', array( $this, 'filter_rel_path' ) );
-		add_filter( 'plugin_action_links_' . $this->_plugin_basename() , array( $this, '_settings_link' ) );
+		add_filter( 'plugin_action_links_' . $this->plugin_basename() , array( $this, '_settings_link' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_script' ) );
 		add_action( 'wp_ajax_toplytics_data', array( $this, 'ajax_data' ) );
 		add_action( 'wp_ajax_nopriv_toplytics_data', array( $this, 'ajax_data' ) );
@@ -97,12 +97,12 @@ class Toplytics {
 		return '';
 	}
 
-	private function _plugin_basename() {
+	public function plugin_basename() {
 		return 'toplytics/toplytics.php';
 	}
 
 	public function return_settings_link() {
-		return admin_url( 'tools.php?page=' . $this->_plugin_basename() );
+		return admin_url( 'tools.php?page=' . $this->plugin_basename() );
 	}
 
 	/**
