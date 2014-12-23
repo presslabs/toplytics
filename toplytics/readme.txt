@@ -4,7 +4,7 @@ Donate link: http://www.presslabs.com/
 Tags: presslabs, analytics, posts, top, most visited, most viewed posts, top content, toplytics, popular, google analytics, high traffic, popular posts, oauth, server resources, settings, widget, embed code, javascript, json, json file, simple, post views
 Requires at least: 3.9
 Tested up to: 4.0.1
-Stable tag: 2.1.1
+Stable tag: 3.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -151,6 +151,19 @@ The outcome will look like this:
 
 == Changelog ==
 
+= 3.0 =
+* use Google Analytics API v3.0
+* refactoring the code
+* remove filters and actions
+filters:
+  toplytics_ga_api_url_$name
+  toplytics_ga_api_result_xml_$name
+  toplytics_ga_api_result_simplexml_$name
+action:
+  action toplytics_options_general_page
+* rename the ranges ['today', '2weeks', 'week', 'month'] in ['monthly', '2weeks', 'weekly', 'daily']
+
+
 = 2.1.1 =
 
 * fix possible infinite loop
@@ -197,6 +210,10 @@ where $name is in ['today', '2weeks', 'week', 'month']
 * First version on WP.
 
 == Upgrade Notice ==
+
+= 3.0 =
+With this version, Toplytics uses Google Analytics API v3.0. The following filters and actions are no longer used: toplytics_ga_api_url_$name, toplytics_ga_api_result_xml_$name, toplytics_ga_api_result_simplexml_$name, action toplytics_options_general_page.
+The ranges ['today', '2weeks', 'week', 'month'] are renamed as ['monthly', '2weeks', 'weekly', 'daily'].
 
 = 2.0 =
 The option `Display posts in real time` will let you get the results from one JSON file with JavaScript code. All HTML code is generated dynamically and as a result, the SEO will be affected.
