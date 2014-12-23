@@ -321,9 +321,9 @@ class Toplytics {
 		return $results;
 	}
 
-	public function get_data( $when = 'today' ) {
+	public function get_data( $when = 'daily' ) {
 		$cached_results = get_transient( 'toplytics_cached_results' );
-		if ( false !== $cached_results and time() - $cached_results['_ts'] < Toplytics::CACHE_TTL ) {
+		if ( isset( $cached_results[ $when ] ) and ( ( time() - $cached_results['_ts'] ) < Toplytics::CACHE_TTL ) ) {
 			return $cached_results[ $when ];
 		}
 		$results = $this->update_analytics_data();
