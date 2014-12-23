@@ -42,30 +42,46 @@ class Toplytics_Submenu_Configure extends Toplytics_Menu {
 		);
 	}
 
-	public function request_token() { // User login & consent
-		if ( empty( $_POST['ToplyticsSubmitLoginProcess'] ) ) {
+	public function get_authorization_key() { // User login & consent
+		if ( empty( $_POST['ToplyticsSubmitGetAuthorizationKey'] ) ) {
 			return;
 		}
 		check_admin_referer( 'toplytics-admin' );
-
 		$auth_url = $this->toplytics->client->createAuthUrl();
 		wp_redirect( filter_var( $auth_url, FILTER_SANITIZE_URL ) );
+	}
+
+	public function request_token() { // get user token
+		if ( empty( $_POST['ToplyticsSubmitGetAnalyticsProfiles'] ) || empty( $_POST['toplytics_authorization_key'] ) ) {
+			return;
+		}
+		check_admin_referer( 'toplytics-admin' );
+		wp_redirect( filter_var( $this->toplytics->return_settings_link() . '&code=' . $_POST['toplytics_authorization_key'], FILTER_SANITIZE_URL ) );
 	}
 
 	public function exchange_code_for_token( $hook ) { // Get token
 		if ( ( 'tools_page_toplytics/toplytics' != $hook ) || empty( $_GET['code'] ) ) {
 			return ;
 		}
-		$auth_secret = $_GET['code'];
-		$this->toplytics->client->authenticate( $auth_secret );
+		try {
+			$auth_secret = $_GET['code'];
+			$this->toplytics->client->authenticate( $auth_secret );
 
-		$access_token = $this->toplytics->client->getAccessToken();
-		update_option( 'toplytics_oauth_token', $access_token );
+			$access_token = $this->toplytics->client->getAccessToken();
+			update_option( 'toplytics_oauth_token', $access_token );
 
-		$refresh_token = $this->toplytics->client->getRefreshToken();
-		update_option( 'toplytics_oauth_refresh_token', $refresh_token );
+			$refresh_token = $this->toplytics->client->getRefreshToken();
+			update_option( 'toplytics_oauth_refresh_token', $refresh_token );
 
-		$this->success_redirect();
+			$this->success_redirect( 'Google Analytics token was saved in DB successfully!' );
+		} catch ( Exception $e ) {
+			if ( 400 === $e->getCode() ) { // 'invalid_grant: Code was already redeemed.'
+				$this->redirect( 'Invalid Authorization Key: ' . $_GET['code'] );
+			} else {
+				trigger_error( 'Exception: ' . $e->getCode() . ' -> '. $e->getMessage(), E_USER_ERROR );
+				return false;
+			}
+		}
 	}
 
 	public function page() {

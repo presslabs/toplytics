@@ -1,17 +1,10 @@
 <?php
-$toplytics_args = array(
-	'period'      => $period,
-	'numberposts' => $numberposts,
-	'showviews'   => $showviews,
-);
-
-$toplytics_results = false;
-if ( function_exists( 'toplytics_get_results' ) ) {
-	$toplytics_results = toplytics_get_results( $toplytics_args );
-}
-
-if ( false === $toplytics_results ) {
-	?><p><?php _e( 'No data is available!', TOPLYTICS_TEXTDOMAIN ); ?></p><?php
+/**
+ * $toplytics_results - all results as array with post_id as key and pageviews as value
+ * $showviews         - true/false, show/hide the post pageviews
+ */
+if ( empty( $toplytics_results ) ) {
+	?><p><?php _e( 'No data is available!', 'toplytics' ); ?></p><?php
 } else {
 	?>
 	<ol>
@@ -22,8 +15,8 @@ if ( false === $toplytics_results ) {
 	</a>
 	<?php
 		if ( $showviews ) {
-			echo '<span class="post-views">';
-			printf( __( '%d Views', TOPLYTICS_TEXTDOMAIN ), $post_views );
+			echo '<span class="post-views">&nbsp;';
+			printf( __( '%d Views', 'toplytics' ), $post_views );
 			echo '</span>';
 		}
 	?>

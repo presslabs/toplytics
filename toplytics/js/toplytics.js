@@ -37,6 +37,6 @@ function toplytics_results( args ) {
     element.innerHTML = html;
     document.getElementById( args.widget_id ).appendChild( element );
   };
-  xmlhttp.open('GET', '/wp-content/plugins/toplytics/toplytics.json?ver=' + Math.floor(new Date().getTime() / 1000), true);
+  xmlhttp.open('GET', toplytics.ajax_url + '?action=toplytics_data&ver=' + Math.floor(new Date().getTime() / 1000), true);
   xmlhttp.send();
 }

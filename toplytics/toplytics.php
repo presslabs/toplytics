@@ -285,6 +285,29 @@ class Toplytics {
 		return $new_data;
 	}
 
+	public function ajax_data() {
+		header( 'Content-Type: application/json' );
+		$post_data = array();
+		foreach ( array_keys( $this->ranges ) as $when ) {
+			$result = $this->get_data( $when );
+			if ( ! empty( $result ) ) {
+				foreach ( $result as $post_id => $pageviews ) {
+					$data = array();
+
+					$data['permalink'] = get_permalink( $post_id );
+					$data['title']     = get_the_title( $post_id );
+					$data['post_id']   = $post_id;
+					$data['views']     = $pageviews;
+
+					$post_data[ $when ][] = apply_filters( 'toplytics_json_data', $data, $post_id );
+				}
+			}
+		}
+		$json_data = apply_filters( 'toplytics_json_all_data', $post_data );
+		echo json_encode( $json_data, JSON_FORCE_OBJECT );
+		die();
+	}
+
 	public function update_analytics_data() {
 		try {
 			$data = $this->_get_analytics_data();
