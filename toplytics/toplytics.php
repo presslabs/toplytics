@@ -4,207 +4,339 @@
  * Plugin URI: http://wordpress.org/extend/plugins/toplytics/
  * Description: Plugin for displaying most viewed content using data from a Google Analytics account. Relieves the DB from writing every click.
  * Author: PressLabs
- * Version: 2.1.1
+ * Version: 3.0
  * Author URI: http://www.presslabs.com/
+ * License: GPL2
+ * Text Domain: toplytics
+ * Domain Path: /languages/
  */
-define( 'TOPLYTICS_DEFAULT_POSTS', 5 );
-define( 'TOPLYTICS_MIN_POSTS', 1 );
-define( 'TOPLYTICS_MAX_POSTS', 20 );
-define( 'TOPLYTICS_GET_MAX_RESULTS', 1000 );
-define( 'TOPLYTICS_ADD_PAGEVIEWS', true );
-define( 'TOPLYTICS_TEXTDOMAIN', 'toplytics-text-domain' );
-define( 'TOPLYTICS_TEMPLATE_FILENAME', 'toplytics-template.php' );
-define( 'TOPLYTICS_REALTIME_TEMPLATE_FILENAME', 'toplytics-template-realtime.php' );
 
-global $ranges, $ranges_label;
+/*  Copyright 2014 PressLabs SRL <ping@presslabs.com>
 
-$ranges = array(
-	'month'  => date( 'Y-m-d', strtotime( '-30 days'  ) ),
-	'today'  => date( 'Y-m-d', strtotime( 'yesterday' ) ),
-	'2weeks' => date( 'Y-m-d', strtotime( '-14 days'  ) ),
-	'week'   => date( 'Y-m-d', strtotime( '-7 days'   ) ),
-);
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License, version 2, as
+    published by the Free Software Foundation.
 
-$ranges_label = array(
-	'month'  => 'Monthly',
-	'today'  => 'Daily',
-	'2weeks' => '2 Weeks',
-	'week'   => 'Weekly',
-);
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-require_once 'toplytics-admin.php';            // interface
-require_once 'toplytics-widget.php';           // Widget code integration
-require_once 'class-toplytics-auth.php';       // the login logic
-require_once 'class-toplytics-statistics.php'; // the statistics logic
-$obj = new Toplytics_Auth();
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+*/
 
-if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-	require_once 'toplytics-debug.php'; // debug page
-}
+require_once __DIR__ . '/lib/google-api/autoload.php';
+require_once __DIR__ . '/inc/class-toplytics-admin.php';
+require_once __DIR__ . '/inc/class-toplytics-menu.php';
+require_once __DIR__ . '/inc/class-toplytics-submenu-configure.php';
+require_once __DIR__ . '/inc/class-toplytics-submenu-settings.php';
+require_once __DIR__ . '/inc/class-toplytics-wp-widget.php';
 
-function toplytics_log( $message ) {
-	if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-		error_log( $message );
-	}
-}
+class Toplytics {
+	const DEFAULT_POSTS     = 5;
+	const MIN_POSTS         = 1;
+	const MAX_RESULTS       = 1000;
+	const MAX_POSTS         = Toplytics::MAX_RESULTS;
+	const TEMPLATE          = 'toplytics-template.php';
+	const TEMPLATE_REALTIME = 'toplytics-template-realtime.php';
+	const CACHE_TTL         = 300;
 
-function toplytics_activate() {
-	add_option( 'toplytics_options', array( null ) );
-	add_option( 'toplytics_services', 'analytics' );
-}
-register_activation_hook( __FILE__, 'toplytics_activate' );
+	public $client;
+	public $service;
+	public $ranges;
 
-function toplytics_deactivate() {
-	wp_clear_scheduled_hook( 'toplytics_hourly_event' );
-}
-register_deactivation_hook( __FILE__, 'toplytics_deactivate' );
+	public function __construct() {
+		add_filter( 'toplytics_rel_path', array( $this, 'filter_rel_path' ) );
+		add_filter( 'plugin_action_links_' . $this->plugin_basename() , array( $this, '_settings_link' ) );
+		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_script' ) );
+		add_action( 'wp_ajax_toplytics_data', array( $this, 'ajax_data' ) );
+		add_action( 'wp_ajax_nopriv_toplytics_data', array( $this, 'ajax_data' ) );
 
-function toplytics_uninstall() {
-	toplytics_remove_options();
-}
-add_action( 'uninstall_' . toplytics_plugin_basename(), 'toplytics_uninstall' );
+		$client = new Google_Client();
+		$client->setAuthConfigFile( __DIR__ . DIRECTORY_SEPARATOR . 'client.json' );
+		$client->addScope( Google_Service_Analytics::ANALYTICS_READONLY );
+		$client->setAccessType( 'offline' );
 
-function toplytics_init() {
-	load_plugin_textdomain( TOPLYTICS_TEXTDOMAIN, false, dirname( toplytics_plugin_basename() ) . '/languages' );
-}
-add_action( 'plugins_loaded', 'toplytics_init' );
+		if ( get_option( 'toplytics_oauth_token' ) ) { $client->setAccessToken( $this->_get_token() ); }
 
-/**
- *  Return the template filename and path. First is searched in the theme directory and then in the plugin directory
- */
-function toplytics_get_template_filename( $realtime = 0 ) {
-	$toplytics_template_filename = TOPLYTICS_TEMPLATE_FILENAME;
-	if ( 1 == $realtime ) {
-		$toplytics_template_filename = TOPLYTICS_REALTIME_TEMPLATE_FILENAME;
+		$this->client  = $client;
+		$this->service = new Google_Service_Analytics( $this->client );
+
+		$this->ranges = array(
+			'monthly' => date( 'Y-m-d', strtotime( '-30 days'  ) ),
+			'2weeks'  => date( 'Y-m-d', strtotime( '-14 days'  ) ),
+			'weekly'  => date( 'Y-m-d', strtotime( '-7 days'   ) ),
+			'daily'   => date( 'Y-m-d', strtotime( 'yesterday' ) ),
+		);
 	}
 
-	$theme_template = get_stylesheet_directory() . "/$toplytics_template_filename";
-	if ( file_exists( $theme_template ) ) {
-		return $theme_template;
+	public function enqueue_script() {
+		wp_register_script( 'toplytics', plugins_url( 'js/toplytics.js' , __FILE__ ) );
+		wp_localize_script( 'toplytics', 'toplytics', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
+		wp_enqueue_script( 'toplytics' );
 	}
 
-	$plugin_template = plugin_dir_path( __FILE__ ) . $toplytics_template_filename;
-	if ( file_exists( $plugin_template ) ) {
-		return $plugin_template;
-	}
-
-	return '';
-}
-
-function toplytics_needs_configuration() {
-	$toplytics_oauth_token = get_option( 'toplytics_oauth_token', '' );
-	return empty( $toplytics_oauth_token );
-}
-
-function toplytics_has_configuration() {
-	return ! toplytics_needs_configuration();
-}
-
-/**
- *  Add cron job if all options are set
- *  Scan Google Analytics statistics every hour
- */
-if ( toplytics_has_configuration() ) {
-	if ( ! wp_next_scheduled( 'toplytics_hourly_event' ) ) {
-		wp_schedule_event( time(), 'hourly', 'toplytics_hourly_event' );
-	}
-} else {
-	wp_clear_scheduled_hook( 'toplytics_hourly_event' );
-}
-
-function toplytics_do_this_hourly() {
-	Toplytics_Statistics::get_results(); // get GA statistics
-	toplytics_save_stats_in_json(); // save GA statistics in JSON file
-}
-add_action( 'toplytics_hourly_event', 'toplytics_do_this_hourly' );
-
-function toplytics_remove_credentials() {
-	delete_option( 'toplytics_oauth_token' );
-	delete_option( 'toplytics_oauth_secret' );
-	delete_option( 'toplytics_auth_token' );
-	delete_option( 'toplytics_account_id' );
-	delete_option( 'toplytics_cache_timeout' );
-}
-
-function toplytics_remove_options() {
-	delete_option( 'toplytics_options' );
-	delete_option( 'toplytics_services' );
-	delete_transient( 'toplytics.cache' );
-}
-
-function toplytics_widgets_init() {
-	if ( toplytics_has_configuration() ) {
-		register_widget( 'Toplytics_WP_Widget_Most_Visited_Posts' );
-	}
-}
-add_action( 'widgets_init', 'toplytics_widgets_init' );
-
-function toplytics_enqueue_script() {
-	wp_enqueue_script( 'toplytics', plugins_url( 'js/toplytics.js' , __FILE__ ) );
-}
-add_action( 'wp_enqueue_scripts', 'toplytics_enqueue_script' );
-
-function toplytics_get_results( $args = '' ) {
-	$args = toplytics_validate_args( $args );
-
-	$results = get_transient( 'toplytics.cache' );
-	if ( ! isset( $results[ $args['period'] ] ) ) {
-		return false;
-	}
-
-	$counter = 1;
-	foreach ( $results[ $args['period'] ] as $index => $value ) {
-		if ( $counter > $args['numberposts'] ) { break; }
-		$toplytics_new_results[ $index ] = $value;
-		$counter++;
-	}
-	return $toplytics_new_results;
-}
-
-function toplytics_results( $args = '' ) {
-	$args    = toplytics_validate_args( $args );
-	$results = toplytics_get_results( $args );
-	if ( ! $results ) { return ''; }
-
-	$out = '<ol>';
-	foreach ( $results as $post_id => $post_views ) {
-		$out .= '<li><a href="' . get_permalink( $post_id )
-			. '" title="' . esc_attr( get_the_title( $post_id ) ) . '">'
-			. get_the_title( $post_id ) . '</a>';
-
-		if ( $args['showviews'] ) {
-			$out .= '<span class="post-views">'
-				. sprintf( __( '%d Views', TOPLYTICS_TEXTDOMAIN ), $post_views )
-				. '</span>';
+	public function get_template_filename( $realtime = false ) {
+		$toplytics_template_filename = Toplytics::TEMPLATE;
+		if ( 1 == $realtime ) {
+			$toplytics_template_filename = Toplytics::TEMPLATE_REALTIME;
 		}
-		$out .= '</li>';
+
+		$theme_template = get_stylesheet_directory() . "/$toplytics_template_filename";
+		if ( file_exists( $theme_template ) ) {
+			return $theme_template;
+		}
+
+		$plugin_template = plugin_dir_path( __FILE__ ) . $toplytics_template_filename;
+		if ( file_exists( $plugin_template ) ) {
+			return $plugin_template;
+		}
+
+		return '';
 	}
-	$out .= '</ol>';
 
-	return $out;
-}
-add_shortcode( 'toplytics', 'toplytics_results' );
+	public function plugin_basename() {
+		return 'toplytics/toplytics.php';
+	}
 
-function toplytics_save_stats_in_json() {
-	$filename = 'toplytics.json';
-	$filepath = dirname( __FILE__ ) . "/$filename";
-	$toplytics_results = get_transient( 'toplytics.cache' );
-	if ( false != $toplytics_results ) {
-		// post data: id, permalink, title, views
-		$post_data = '';
-		foreach ( $toplytics_results as $period => $result ) {
-			if ( '_ts' != $period ) {
-				foreach ( $result as $post_id => $views ) {
-					$data['permalink'] = get_permalink( $post_id );
-					$data['title']     = get_the_title( $post_id );
-					$data['post_id']   = $post_id;
-					$data['views']     = $views;
+	public function return_settings_link() {
+		return admin_url( 'tools.php?page=' . $this->plugin_basename() );
+	}
 
-					$post_data[ $period ][] = $data;
+	/**
+	 *  Add settings link on plugin page
+	 */
+	public function _settings_link( $links ) {
+		$settings_link = '<a href="' . $this->return_settings_link() . '">' . __( 'Settings' ) . '</a>';
+		array_unshift( $links, $settings_link );
+		return $links;
+	}
+	/**
+	 * Return all profiles of the current user from GA api.
+	 *
+	 * Return result type stored in WP options:
+	 *
+	 * Array(
+	 *  'profile_id' => 'account_name > property_name (Tracking ID) > profile_name',
+	 *  'profile_id' => 'account_name > property_name (Tracking ID) > profile_name',
+	 * )
+	 *
+	 * Note that the `Tracking ID` is the same with the `property_id`.
+	 */
+	public function get_profiles_list() {
+		try {
+			$profiles_list = [];
+			$profiles = $this->_get_profiles();
+			foreach ( $profiles as $profile_id => $profile_data ) {
+				$profiles_list[ $profile_id ] = $profile_data['account_name'] . ' > ' . $profile_data['property_name'] . ' (' . $profile_data['property_id'] . ') > ' . $profile_data['profile_name'];
+			}
+			return $profiles_list;
+		} catch ( Exception $e ) {
+			echo 'Caught exception: ',  $e->getMessage(), "\n";
+		}
+	}
+
+	private function _get_profiles() {
+		$profiles = [];
+		$accounts = $this->_get_accounts();
+		foreach ( $accounts as $account_id => $account_name ) {
+			$webproperties = $this->_get_webproperties( $account_id );
+			foreach ( $webproperties as $web_prop_id => $web_prop_name ) {
+				$man_profiles = $this->service->management_profiles->listManagementProfiles( $account_id, $web_prop_id );
+				if ( 0 < count( $man_profiles->getItems() ) ) {
+					foreach ( $man_profiles->getItems() as $item ) {
+						$profiles[ $item->getId() ]['profile_name']  = $item->getName();
+						$profiles[ $item->getId() ]['account_id']    = $account_id;
+						$profiles[ $item->getId() ]['account_name']  = $account_name;
+						$profiles[ $item->getId() ]['property_id']   = $web_prop_id;
+						$profiles[ $item->getId() ]['property_name'] = $web_prop_name;
+					}
+				} else {
+					throw new Exception( 'No views (profiles) found for this user.' );
 				}
 			}
 		}
-		$post_data = apply_filters( 'toplytics_save_stats_in_json', $post_data, $filepath );
-		file_put_contents( $filepath, json_encode( $post_data, JSON_FORCE_OBJECT ) );
+		return $profiles;
+	}
+
+	private function _get_webproperties( $account_id ) {
+		$man_webproperties = $this->service->management_webproperties->listManagementWebproperties( $account_id );
+		if ( 0 < count( $man_webproperties->getItems() ) ) {
+			$webproperties = [];
+			foreach ( $man_webproperties->getItems() as $item ) {
+				$webproperties[ $item->getId() ] = $item->getName();
+			}
+			return $webproperties;
+		} else {
+			throw new Exception( 'No webproperties found for this user.' );
+		}
+	}
+
+	private function _get_accounts() {
+		$man_accounts = $this->service->management_accounts->listManagementAccounts();
+		if ( 0 < count( $man_accounts->getItems() ) ) {
+			$accounts = [];
+			foreach ( $man_accounts->getItems() as $item ) {
+				$accounts[ $item->getId() ] = $item->getName();
+			}
+			return $accounts;
+		} else {
+			throw new Exception( 'No accounts found for this user.' );
+		}
+	}
+
+	public function update_profile_data( $profile_id, $profile_info ) {
+		$profile_data = array(
+			'profile_id'   => $profile_id,
+			'profile_info' => $profile_info,
+		);
+		update_option( 'toplytics_profile_data', json_encode( $profile_data ) );
+	}
+
+	public function get_profile_data() {
+		return get_option( 'toplytics_profile_data' );
+	}
+
+	public function get_profile_info() {
+		$profile_data = $this->get_profile_data();
+		if ( false === $profile_data ) {
+			return false;
+		}
+		$profile_data = json_decode( $profile_data, true );
+		return $profile_data['profile_info'];
+	}
+
+	public function disconnect() {
+		delete_option( 'toplytics_oauth_token' );
+		delete_option( 'toplytics_profile_data' );
+		delete_transient( 'toplytics_cached_results' );
+	}
+
+	private function _get_profile_id() {
+		$profile_data = $this->get_profile_data();
+		if ( false === $profile_data ) {
+			Throw new Exception( 'There is no profile data in DB.' );
+		}
+		$profile_data = json_decode( $profile_data, true );
+		return $profile_data['profile_id'];
+	}
+
+	private function _get_token() {
+		return get_option( 'toplytics_oauth_token' );
+	}
+
+	private function _get_refresh_token() {
+		return get_option( 'toplytics_oauth_refresh_token' );
+	}
+
+	private function _get_analytics_data() {
+		$metrics  = 'ga:pageviews';
+		$optParams = array(
+			'quotaUser'   => md5( home_url() ),
+			'dimensions'  => 'ga:pagePath',
+			'sort'        => '-ga:pageviews',
+			'max-results' => $this::MAX_RESULTS,
+		);
+		$result = array();
+		foreach ( $this->ranges as $when => $start_date ) {
+			$rows = $this->service->data_ga->get( 'ga:' . $this->_get_profile_id(), $start_date, date( 'Y-m-d' ), $metrics, $optParams )->rows;
+			$result[ $when ] = array();
+			if ( $rows ) {
+				foreach ( $rows as $item ) {
+					$result[ $when ][ $item[0] ] = $item[1];
+				}
+			}
+		}
+		return $result;
+	}
+
+	/**
+	 * Remove rel_path with `preview=true` parameter
+	 */
+	public function filter_rel_path( $rel_path ) {
+		if ( false === strpos( $rel_path, '&preview=true' ) ) {
+			return $rel_path;
+		}
+		return '';
+	}
+
+	private function _convert_data_to_posts( $data ) {
+		$new_data = array();
+		foreach ( $data as $when => $stats ) {
+			$new_data[ $when ] = array();
+			foreach ( $stats as $rel_path => $pageviews ) {
+				$rel_path = apply_filters( 'toplytics_rel_path', $rel_path );
+				$url      = home_url() . $rel_path;
+				$post_id  = url_to_postid( $url );
+				if ( ( 0 < $post_id ) && ( 'post' == get_post_type( $post_id ) ) ) {
+					$post = get_post( $post_id );
+					if ( is_object( $post ) ) {
+						if ( isset( $new_data[ $when ][ $post_id ] ) ) {
+							$new_data[ $when ][ $post_id ] += $pageviews;
+						} else {
+							$new_data[ $when ][ $post_id ] = $pageviews;
+						}
+					}
+				}
+			}
+		}
+		return $new_data;
+	}
+
+	public function ajax_data() {
+		header( 'Content-Type: application/json' );
+		$post_data = array();
+		foreach ( array_keys( $this->ranges ) as $when ) {
+			$result = $this->get_data( $when );
+			if ( ! empty( $result ) ) {
+				foreach ( $result as $post_id => $pageviews ) {
+					$data = array();
+
+					$data['permalink'] = get_permalink( $post_id );
+					$data['title']     = get_the_title( $post_id );
+					$data['post_id']   = $post_id;
+					$data['views']     = $pageviews;
+
+					$post_data[ $when ][] = apply_filters( 'toplytics_json_data', $data, $post_id );
+				}
+			}
+		}
+		$json_data = apply_filters( 'toplytics_json_all_data', $post_data );
+		echo json_encode( $json_data, JSON_FORCE_OBJECT );
+		die();
+	}
+
+	public function update_analytics_data() {
+		try {
+			$data = $this->_get_analytics_data();
+		} catch ( Exception $e ) {
+			trigger_error( 'Cannot update Google Analytics data: '. $e->getMessage(), E_USER_ERROR );
+			return false;
+		}
+		$results = $this->_convert_data_to_posts( $data );
+		$results['_ts'] = time();
+		set_transient( 'toplytics_cached_results', $results );
+		return $results;
+	}
+
+	public function get_data( $when = 'daily' ) {
+		$cached_results = get_transient( 'toplytics_cached_results' );
+		if ( isset( $cached_results[ $when ] ) and ( ( time() - $cached_results['_ts'] ) < Toplytics::CACHE_TTL ) ) {
+			return $cached_results[ $when ];
+		}
+		$results = $this->update_analytics_data();
+		if ( $results === false && ! empty( $cached_results ) ) {
+			return $cached_results[ $when ];
+		}
+
+		if ( $results === false ) {
+			return false;
+		} else {
+			return $results[ $when ];
+		}
 	}
 }
+global $toplytics;
+$toplytics = new Toplytics();
