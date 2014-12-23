@@ -28,11 +28,6 @@
 */
 
 require_once __DIR__ . '/lib/google-api/autoload.php';
-require_once __DIR__ . '/inc/class-toplytics-admin.php';
-require_once __DIR__ . '/inc/class-toplytics-menu.php';
-require_once __DIR__ . '/inc/class-toplytics-submenu-configure.php';
-require_once __DIR__ . '/inc/class-toplytics-submenu-settings.php';
-require_once __DIR__ . '/inc/class-toplytics-wp-widget.php';
 
 class Toplytics {
 	const DEFAULT_POSTS     = 5;
@@ -340,3 +335,10 @@ class Toplytics {
 }
 global $toplytics;
 $toplytics = new Toplytics();
+
+require_once __DIR__ . '/inc/class-toplytics-admin.php';
+require_once __DIR__ . '/inc/class-toplytics-menu.php';
+require_once __DIR__ . '/inc/class-toplytics-submenu-configure.php';
+require_once __DIR__ . '/inc/class-toplytics-submenu-settings.php';
+require_once __DIR__ . '/inc/class-toplytics-wp-widget.php';
+require_once __DIR__ . '/inc/class-toplytics-shortcode.php';
