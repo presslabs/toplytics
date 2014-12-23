@@ -49,39 +49,33 @@ class Toplytics_WP_Widget extends WP_Widget {
 		extract( $args );
 		extract( $instance );
 
-		// Get the info from transient
-		$results = get_transient( 'toplytics_cached_results' );
+		$title = apply_filters(
+			'widget_title',
+			$title,
+			$instance,
+			$this->id_base
+		);
 
-		if ( $results ) {
-			$title = apply_filters(
-				'widget_title',
-				$title,
-				$instance,
-				$this->id_base
-			);
+		$stats_periods = array_keys( $this->toplytics->ranges );
+		if ( ! in_array( $period, $stats_periods ) ) {
+			$period = $stats_periods[0];
+		}
+		$toplytics_results = $this->toplytics->get_data( $period );
+		$toplytics_results = array_slice( $toplytics_results, 0, $numberposts, true );
 
-			$stats_periods = array_keys( $this->toplytics->ranges );
-			if ( ! in_array( $period, $stats_periods ) ) {
-				$period = $stats_periods[0];
+		echo $before_widget;
+		$template_filename = $this->toplytics->get_template_filename();
+
+		if ( '' != $template_filename ) {
+			if ( $title ) {
+				echo $before_title . $title . $after_title;
 			}
 
-			$showviews = $showviews ? 1 : 0;
-			$realtime  = $realtime ? 1 : 0; // real time update
-
-			echo $before_widget;
-			$template_filename = $this->toplytics->get_template_filename();
-
-			if ( '' != $template_filename ) {
-				if ( $title ) {
-					echo $before_title . $title . $after_title;
-				}
-
-				if ( $realtime ) {
-					$this->realtime_js_script( $period, $numberposts, $showviews, $widget_id );
-					echo "<div id='$widget_id'></div>";
-				} else {
-					include $template_filename;
-				}
+			if ( $realtime ) {
+				$this->realtime_js_script( $period, $numberposts, $showviews, $widget_id );
+				echo "<div id='$widget_id'></div>";
+			} else {
+				include $template_filename;
 			}
 			echo $after_widget;
 			if ( $realtime ) {
@@ -89,7 +83,7 @@ class Toplytics_WP_Widget extends WP_Widget {
 			}
 		}
 		ob_get_flush();
-		}
+	}
 
 	function update( $new_instance, $old_instance ) {
 		$instance          = $old_instance;
@@ -106,12 +100,13 @@ class Toplytics_WP_Widget extends WP_Widget {
 		$instance['numberposts'] = $widget_numberposts;
 
 		$instance['period'] = $new_instance['period'];
-		if ( ! in_array( $instance['period'], $this->stats_periods ) ) {
-			$instance['period'] = $this->stats_periods[0];
+		$stats_periods = array_keys( $this->toplytics->ranges );
+		if ( ! in_array( $instance['period'], $stats_periods ) ) {
+			$instance['period'] = $stats_periods[0];
 		}
 
-		$instance['showviews'] = $new_instance['showviews'] ? 1 : 0;
-		$instance['realtime']  = $new_instance['realtime'] ? 1 : 0;
+		$instance['showviews'] = isset( $new_instance['showviews'] ) ? 1 : 0;
+		$instance['realtime']  = isset( $new_instance['realtime'] ) ? 1 : 0;
 
 		return $instance;
 	}
@@ -152,11 +147,9 @@ class Toplytics_WP_Widget extends WP_Widget {
 			<label for="<?php echo $this->get_field_id( 'period' ); ?>"><?php _e( 'Statistics period', 'toplytics' ); ?>:</label>
 			<select id="<?php echo $this->get_field_id( 'period' ); ?>" name="<?php echo $this->get_field_name( 'period' ); ?>">
 		<?php
-		global $ranges, $ranges_label;
-		$ranges_keys = array_keys( $ranges );
-		foreach ( $ranges_keys as $key ) {
+		foreach ( array_keys( $this->toplytics->ranges ) as $key ) {
 			?>
-			<option value="<?php echo $key; ?>"<?php if ( $period == $key ) { echo ' selected="selected"'; } echo '>' . __( $ranges_label[ $key ], 'toplytics' ); ?></option>
+			<option value="<?php echo $key; ?>"<?php if ( $period == $key ) { echo ' selected="selected"'; } echo '>' . __( $key, 'toplytics' ); ?></option>
 			<?php } ?>
 			</select>
 		</p>
@@ -174,9 +167,7 @@ class Toplytics_WP_Widget extends WP_Widget {
 	}
 }
 
-if ( is_admin() && get_option( 'toplytics_oauth_token' ) ) {
-	function toplytics_widget() {
-		register_widget( 'Toplytics_WP_Widget' );
-	}
-	add_action( 'widgets_init', 'toplytics_widget' );
+function toplytics_widget() {
+	register_widget( 'Toplytics_WP_Widget' );
 }
+add_action( 'widgets_init', 'toplytics_widget' );
