@@ -35,26 +35,29 @@ require_once __DIR__ . '/inc/class-toplytics-submenu-settings.php';
 require_once __DIR__ . '/inc/class-toplytics-wp-widget.php';
 
 class Toplytics {
-	const DEFAULT_POSTS = 5;
-	const MIN_POSTS     = 1;
-	const MAX_POSTS     = 100;
-	const MAX_RESULTS   = 1000;
-	const TEMPLATE      = 'toplytics-template.php';
-	const CACHE_TTL     = 300;
+	const DEFAULT_POSTS     = 5;
+	const MIN_POSTS         = 1;
+	const MAX_RESULTS       = 1000;
+	const MAX_POSTS         = Toplytics::MAX_RESULTS;
+	const TEMPLATE          = 'toplytics-template.php';
+	const TEMPLATE_REALTIME = 'toplytics-template-realtime.php';
+	const CACHE_TTL         = 300;
 
 	public $client;
 	public $service;
 	public $ranges;
 
 	public function __construct() {
+		add_filter( 'toplytics_rel_path', array( $this, 'filter_rel_path' ) );
 		add_filter( 'plugin_action_links_' . $this->_plugin_basename() , array( $this, '_settings_link' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_script' ) );
+		add_action( 'wp_ajax_toplytics_data', array( $this, 'ajax_data' ) );
+		add_action( 'wp_ajax_nopriv_toplytics_data', array( $this, 'ajax_data' ) );
 
 		$client = new Google_Client();
 		$client->setAuthConfigFile( __DIR__ . DIRECTORY_SEPARATOR . 'client.json' );
 		$client->addScope( Google_Service_Analytics::ANALYTICS_READONLY );
 		$client->setAccessType( 'offline' );
-		$client->setRedirectUri( site_url() . '/wp-admin/admin.php?page=toplytics/toplytics.php' );
 
 		if ( get_option( 'toplytics_oauth_token' ) ) { $client->setAccessToken( $this->_get_token() ); }
 
@@ -62,18 +65,35 @@ class Toplytics {
 		$this->service = new Google_Service_Analytics( $this->client );
 
 		$this->ranges = array(
-			'month'  => date( 'Y-m-d', strtotime( '-30 days'  ) ),
-			'2weeks' => date( 'Y-m-d', strtotime( '-14 days'  ) ),
-			'week'   => date( 'Y-m-d', strtotime( '-7 days'   ) ),
-			'today'  => date( 'Y-m-d', strtotime( 'yesterday' ) ),
+			'monthly' => date( 'Y-m-d', strtotime( '-30 days'  ) ),
+			'2weeks'  => date( 'Y-m-d', strtotime( '-14 days'  ) ),
+			'weekly'  => date( 'Y-m-d', strtotime( '-7 days'   ) ),
+			'daily'   => date( 'Y-m-d', strtotime( 'yesterday' ) ),
 		);
 	}
 
 	public function enqueue_script() {
-		wp_enqueue_script( 'toplytics', plugins_url( 'js/toplytics.js' , __FILE__ ) );
+		wp_register_script( 'toplytics', plugins_url( 'js/toplytics.js' , __FILE__ ) );
+		wp_localize_script( 'toplytics', 'toplytics', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
+		wp_enqueue_script( 'toplytics' );
 	}
 
-	public function get_template_filename( $realtime ) {
+	public function get_template_filename( $realtime = false ) {
+		$toplytics_template_filename = Toplytics::TEMPLATE;
+		if ( 1 == $realtime ) {
+			$toplytics_template_filename = Toplytics::TEMPLATE_REALTIME;
+		}
+
+		$theme_template = get_stylesheet_directory() . "/$toplytics_template_filename";
+		if ( file_exists( $theme_template ) ) {
+			return $theme_template;
+		}
+
+		$plugin_template = plugin_dir_path( __FILE__ ) . $toplytics_template_filename;
+		if ( file_exists( $plugin_template ) ) {
+			return $plugin_template;
+		}
+
 		return '';
 	}
 
@@ -188,9 +208,10 @@ class Toplytics {
 		return $profile_data['profile_info'];
 	}
 
-	public function remove_credentials() {
+	public function disconnect() {
 		delete_option( 'toplytics_oauth_token' );
 		delete_option( 'toplytics_profile_data' );
+		delete_transient( 'toplytics_cached_results' );
 	}
 
 	private function _get_profile_id() {
@@ -219,7 +240,7 @@ class Toplytics {
 			'max-results' => $this::MAX_RESULTS,
 		);
 		$result = array();
-		foreach ( $toplytics->ranges as $when => $start_date ) {
+		foreach ( $this->ranges as $when => $start_date ) {
 			$rows = $this->service->data_ga->get( 'ga:' . $this->_get_profile_id(), $start_date, date( 'Y-m-d' ), $metrics, $optParams )->rows;
 			$result[ $when ] = array();
 			if ( $rows ) {
@@ -231,19 +252,32 @@ class Toplytics {
 		return $result;
 	}
 
+	/**
+	 * Remove rel_path with `preview=true` parameter
+	 */
+	public function filter_rel_path( $rel_path ) {
+		if ( false === strpos( $rel_path, '&preview=true' ) ) {
+			return $rel_path;
+		}
+		return '';
+	}
+
 	private function _convert_data_to_posts( $data ) {
 		$new_data = array();
 		foreach ( $data as $when => $stats ) {
 			$new_data[ $when ] = array();
 			foreach ( $stats as $rel_path => $pageviews ) {
-				$link    = home_url() . $rel_path;
-				$post_id = url_to_postid( $link );
-				if ( 'post' == get_post_type( $post_id ) ) {
+				$rel_path = apply_filters( 'toplytics_rel_path', $rel_path );
+				$url      = home_url() . $rel_path;
+				$post_id  = url_to_postid( $url );
+				if ( ( 0 < $post_id ) && ( 'post' == get_post_type( $post_id ) ) ) {
 					$post = get_post( $post_id );
-					if ( $post && isset( $new_data[ $when ][ $post_id ] ) ) {
-						$new_data[ $when ][ $post_id ] += $pageviews;
-					} else {
-						$new_data[ $when ][ $post_id ] = $pageviews;
+					if ( is_object( $post ) ) {
+						if ( isset( $new_data[ $when ][ $post_id ] ) ) {
+							$new_data[ $when ][ $post_id ] += $pageviews;
+						} else {
+							$new_data[ $when ][ $post_id ] = $pageviews;
+						}
 					}
 				}
 			}

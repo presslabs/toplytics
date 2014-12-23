@@ -19,7 +19,6 @@ class Toplytics_Submenu_Configure extends Toplytics_Menu {
 	private $toplytics;
 
 	public function __construct() {
-
 		parent::__construct();
 
 		global $toplytics;
@@ -27,6 +26,7 @@ class Toplytics_Submenu_Configure extends Toplytics_Menu {
 
 		if ( current_user_can( 'manage_options' ) ) {
 			add_action( 'admin_menu', array( $this, 'admin_menu' ) );
+			add_action( 'admin_init', array( $this, 'get_authorization_key' ) );
 			add_action( 'admin_init', array( $this, 'request_token' ) );
 			add_action( 'admin_enqueue_scripts', array( $this, 'exchange_code_for_token' ) );
 		}
@@ -77,17 +77,22 @@ class Toplytics_Submenu_Configure extends Toplytics_Menu {
 				<?php wp_nonce_field( 'toplytics-admin' ); ?>
 			<table class="form-table">
 				<tr valign="top">
-				<th><?php _e( "Please configure your Google Analytics Account to be used for this site:<br /><br />Login using Google's OAuth system.", 'toplytics' ); ?></th>
+				<th>
+					<?php _e( "Please configure your Google Analytics Account. Login using Google's OAuth system.", 'toplytics' ); ?><br />
+					<?php _e( "This is the prefered method of attaching your Google account. Clicking the 'Get Authorization Key' button will redirect you to a login page at google.com.<br/> After accepting the login there you will get a key. This key must be puted in `Authorization Key` field, then push the button `Get Analytics Profiles`", 'toplytics' ); ?>
 				</tr>
 
 				<tr valign="top">
-				<th><?php _e( "This is the prefered method of attaching your Google account.<br/> Clicking the 'Start the Login Process' button will redirect you to a login page at google.com.<br/> After accepting the login there you will be returned here.", 'toplytics' ); ?></th>
+				<td>
+					<?php _e( 'Authorization Key', 'toplytics' ); ?>:&nbsp;<input type="text" name="toplytics_authorization_key" value="" />
+				</td>
 				</tr>
 
 				<tr valign="top">
 				<td>
 				<p class="submit">
-					<input type="submit" name="ToplyticsSubmitLoginProcess" class="button-primary" value="<?php _e( 'Start the Login Process', 'toplytics' ); ?>&nbsp;&raquo;" />
+					<input type="submit" name="ToplyticsSubmitGetAnalyticsProfiles" class="button-primary" value="<?php _e( 'Get Analytics Profiles', 'toplytics' ); ?>" />
+					<input type="submit" name="ToplyticsSubmitGetAuthorizationKey" class="button" value="<?php _e( 'Get Authorization Key', 'toplytics' ); ?>" />
 				</p>
 				</td>
 				</tr>

@@ -25,8 +25,8 @@ class Toplytics_Submenu_Settings extends Toplytics_Menu {
 		$this->toplytics = $toplytics;
 
 		add_action( 'admin_menu', array( $this, 'admin_menu' ) );
-		add_action( 'admin_init', array( $this, 'save_changes' ) );
-		add_action( 'admin_init', array( $this, 'remove_credentials' ) );
+		add_action( 'admin_init', array( $this, 'connect' ) );
+		add_action( 'admin_init', array( $this, 'disconnect' ) );
 	}
 
 	public function admin_menu() {
@@ -39,30 +39,30 @@ class Toplytics_Submenu_Settings extends Toplytics_Menu {
 		);
 	}
 
-	public function save_changes() {
-		if ( isset( $_POST['ToplyticsSubmitSaveChanges'] ) && isset( $_POST['profile_id'] ) ) {
+	public function connect() {
+		if ( isset( $_POST['ToplyticsSubmitConnect'] ) && isset( $_POST['profile_id'] ) ) {
 			foreach ( $this->toplytics->get_profiles_list() as $profile_id => $profile_info ) {
 				if ( $_POST['profile_id'] == $profile_id ) {
 					$this->toplytics->update_profile_data( $profile_id, $profile_info );
 					break;
 				}
 			}
-			$this->success_redirect();
+			$this->success_redirect( 'Toplytics connected successfully!' );
 		}
 	}
 
-	public function remove_credentials() {
-		if ( isset( $_POST['ToplyticsSubmitRemoveCredentials'] ) ) {
-			$this->toplytics->remove_credentials();
-			$this->success_redirect();
+	public function disconnect() {
+		if ( isset( $_POST['ToplyticsSubmitDisconnect'] ) ) {
+			$this->toplytics->disconnect();
+			$this->success_redirect( 'Toplytics disconnected successfully!' );
 		}
 	}
 
-	private function _available_accounts_selector() {
+	private function _analytics_profiles_selector() {
 		?>
 		<table class="form-table">
 		<tr valign="top">
-		<th scope="row"><label for="profile_id"><?php _e( 'Available Accounts', 'toplytics' ); ?></label></th>
+		<th scope="row"><label for="profile_id"><?php _e( 'Analytics Profiles', 'toplytics' ); ?></label></th>
 		<td>
 		<select id="profile_id" name="profile_id">
 		<?php
@@ -99,16 +99,16 @@ class Toplytics_Submenu_Settings extends Toplytics_Menu {
 		wp_nonce_field( 'toplytics-settings' );
 
 		if ( ! $this->toplytics->get_profile_data() ) {
-			$this->_available_accounts_selector();
+			$this->_analytics_profiles_selector();
 		} else {
 			$this->_show_connection_info();
 		}
 		?>
 		<p class="submit">
 		<?php if ( ! $this->toplytics->get_profile_data()  ) { ?>
-		<input type="submit" name="ToplyticsSubmitSaveChanges" class="button-primary" value="<?php _e( 'Save Changes', 'toplytics' ); ?>" />&nbsp;&nbsp;
+		<input type="submit" name="ToplyticsSubmitConnect" class="button-primary" value="<?php _e( 'Connect', 'toplytics' ); ?>" />&nbsp;&nbsp;
 		<?php } ?>
-		<input type="submit" name="ToplyticsSubmitRemoveCredentials" class="button" value="<?php _e( 'Remove Credentials', 'toplytics' ); ?>" />
+		<input type="submit" name="ToplyticsSubmitDisconnect" class="button" value="<?php _e( 'Disconnect', 'toplytics' ); ?>" />
 		</p>
 
 		</form>
