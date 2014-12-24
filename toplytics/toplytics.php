@@ -49,13 +49,17 @@ class Toplytics {
 		add_action( 'wp_ajax_toplytics_data', array( $this, 'ajax_data' ) );
 		add_action( 'wp_ajax_nopriv_toplytics_data', array( $this, 'ajax_data' ) );
 
+		register_activation_hook( __FILE__, array( $this, 'remove_old_credentials' ) );
+
 		$client = new Google_Client();
 		$client->setAuthConfigFile( __DIR__ . DIRECTORY_SEPARATOR . 'client.json' );
 		$client->addScope( Google_Service_Analytics::ANALYTICS_READONLY );
 		$client->setAccessType( 'offline' );
 
-		if ( get_option( 'toplytics_oauth_token' ) ) { $client->setAccessToken( $this->_get_token() ); }
-
+		$token = $this->get_token();
+		if ( $token ) {
+			$client->setAccessToken( $token );
+		}
 		$this->client  = $client;
 		$this->service = new Google_Service_Analytics( $this->client );
 
@@ -65,6 +69,14 @@ class Toplytics {
 			'weekly'  => date( 'Y-m-d', strtotime( '-7 days'   ) ),
 			'daily'   => date( 'Y-m-d', strtotime( 'yesterday' ) ),
 		);
+	}
+
+	public function remove_old_credentials() {
+		delete_option( 'toplytics_oauth_token' );
+		delete_option( 'toplytics_oauth_secret' );
+		delete_option( 'toplytics_auth_token' );
+		delete_option( 'toplytics_account_id' );
+		delete_option( 'toplytics_cache_timeout' );
 	}
 
 	public function enqueue_script() {
@@ -182,18 +194,6 @@ class Toplytics {
 		}
 	}
 
-	public function update_profile_data( $profile_id, $profile_info ) {
-		$profile_data = array(
-			'profile_id'   => $profile_id,
-			'profile_info' => $profile_info,
-		);
-		update_option( 'toplytics_profile_data', json_encode( $profile_data ) );
-	}
-
-	public function get_profile_data() {
-		return get_option( 'toplytics_profile_data' );
-	}
-
 	public function get_profile_info() {
 		$profile_data = $this->get_profile_data();
 		if ( false === $profile_data ) {
@@ -204,8 +204,9 @@ class Toplytics {
 	}
 
 	public function disconnect() {
-		delete_option( 'toplytics_oauth_token' );
-		delete_option( 'toplytics_profile_data' );
+		$this->remove_token();
+		$this->remove_refresh_token();
+		$this->remove_profile_data();
 		delete_transient( 'toplytics_cached_results' );
 	}
 
@@ -218,12 +219,44 @@ class Toplytics {
 		return $profile_data['profile_id'];
 	}
 
-	private function _get_token() {
-		return get_option( 'toplytics_oauth_token' );
+	public function get_profile_data() {
+		return get_option( 'toplytics_profile_data' );
 	}
 
-	private function _get_refresh_token() {
-		return get_option( 'toplytics_oauth_refresh_token' );
+	public function remove_profile_data() {
+		return remove_option( 'toplytics_profile_data' );
+	}
+
+	public function update_profile_data( $profile_id, $profile_info ) {
+		$profile_data = array(
+			'profile_id'   => $profile_id,
+			'profile_info' => $profile_info,
+		);
+		update_option( 'toplytics_profile_data', json_encode( $profile_data ) );
+	}
+
+	public function get_token() {
+		return get_option( 'toplytics_oauth2_token' );
+	}
+
+	public function remove_token() {
+		return remove_option( 'toplytics_oauth2_token' );
+	}
+
+	public function update_token( $value ) {
+		return update_option( 'toplytics_oauth2_token', $value );
+	}
+
+	public function get_refresh_token() {
+		return get_option( 'toplytics_oauth2_refresh_token' );
+	}
+
+	public function remove_refresh_token() {
+		return remove_option( 'toplytics_oauth2_refresh_token' );
+	}
+
+	public function update_refresh_token( $value ) {
+		return update_option( 'toplytics_oauth2_refresh_token', $value );
 	}
 
 	private function _get_analytics_data() {
@@ -307,6 +340,7 @@ class Toplytics {
 		try {
 			$data = $this->_get_analytics_data();
 		} catch ( Exception $e ) {
+			// handle and use the refresh token
 			trigger_error( 'Cannot update Google Analytics data: '. $e->getMessage(), E_USER_ERROR );
 			return false;
 		}

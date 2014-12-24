@@ -68,10 +68,10 @@ class Toplytics_Submenu_Configure extends Toplytics_Menu {
 			$this->toplytics->client->authenticate( $auth_secret );
 
 			$access_token = $this->toplytics->client->getAccessToken();
-			update_option( 'toplytics_oauth_token', $access_token );
+			$this->toplytics->update_token( $access_token );
 
 			$refresh_token = $this->toplytics->client->getRefreshToken();
-			update_option( 'toplytics_oauth_refresh_token', $refresh_token );
+			$this->toplytics->update_refresh_token( $refresh_token );
 
 			$this->success_redirect( 'Google Analytics token was saved in DB successfully!' );
 		} catch ( Exception $e ) {

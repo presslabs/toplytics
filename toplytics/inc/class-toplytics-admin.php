@@ -24,7 +24,7 @@ class Toplytics_Admin {
 		$this->toplytics = $toplytics;
 
 		if ( current_user_can( 'manage_options' ) ) {
-			if ( get_option( 'toplytics_oauth_token' ) ) {
+			if ( $this->toplytics->get_token() ) {
 				new Toplytics_Submenu_Settings();
 			} else {
 				new Toplytics_Submenu_Configure();
