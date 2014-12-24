@@ -224,7 +224,7 @@ class Toplytics {
 	}
 
 	public function remove_profile_data() {
-		return remove_option( 'toplytics_profile_data' );
+		return delete_option( 'toplytics_profile_data' );
 	}
 
 	public function update_profile_data( $profile_id, $profile_info ) {
@@ -240,7 +240,7 @@ class Toplytics {
 	}
 
 	public function remove_token() {
-		return remove_option( 'toplytics_oauth2_token' );
+		return delete_option( 'toplytics_oauth2_token' );
 	}
 
 	public function update_token( $value ) {
@@ -252,7 +252,7 @@ class Toplytics {
 	}
 
 	public function remove_refresh_token() {
-		return remove_option( 'toplytics_oauth2_refresh_token' );
+		return delete_option( 'toplytics_oauth2_refresh_token' );
 	}
 
 	public function update_refresh_token( $value ) {
