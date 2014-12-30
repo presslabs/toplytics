@@ -64,6 +64,10 @@ class Toplytics {
 		if ( $token ) {
 			$client->setAccessToken( $token );
 		}
+		$refresh_token = $this->get_refresh_token();
+		if ( $refresh_token ) {
+			$client->refreshToken( $refresh_token );
+		}
 		$this->client  = $client;
 		$this->service = new Google_Service_Analytics( $this->client );
 
