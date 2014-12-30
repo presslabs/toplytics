@@ -55,22 +55,26 @@ class Toplytics {
 
 		register_activation_hook( __FILE__, array( $this, 'remove_old_credentials' ) );
 
-		$client = new Google_Client();
-		$client->setAuthConfigFile( __DIR__ . DIRECTORY_SEPARATOR . 'client.json' );
-		$client->addScope( Google_Service_Analytics::ANALYTICS_READONLY );
-		$client->setAccessType( 'offline' );
+		try {
+			$client = new Google_Client();
+			$client->setAuthConfigFile( __DIR__ . DIRECTORY_SEPARATOR . 'client.json' );
+			$client->addScope( Google_Service_Analytics::ANALYTICS_READONLY );
+			$client->setAccessType( 'offline' );
 
-		$token = $this->get_token();
-		if ( $token ) {
-			$client->setAccessToken( $token );
+			$token = $this->get_token();
+			if ( $token ) {
+				$client->setAccessToken( $token );
+			}
+			$refresh_token = $this->get_refresh_token();
+			if ( $refresh_token ) {
+				$client->refreshToken( $refresh_token );
+			}
+			$this->client  = $client;
+			$this->service = new Google_Service_Analytics( $this->client );
+		} catch ( Exception $e ) {
+			trigger_error( 'Google Analytics Error: '. $e->getMessage(), E_USER_ERROR );
+			return;
 		}
-		$refresh_token = $this->get_refresh_token();
-		if ( $refresh_token ) {
-			$client->refreshToken( $refresh_token );
-		}
-		$this->client  = $client;
-		$this->service = new Google_Service_Analytics( $this->client );
-
 		$this->ranges = array(
 			'monthly' => date( 'Y-m-d', strtotime( '-30 days'  ) ),
 			'2weeks'  => date( 'Y-m-d', strtotime( '-14 days'  ) ),
