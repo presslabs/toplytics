@@ -42,7 +42,11 @@ class Toplytics {
 	public $service;
 	public $ranges;
 
+	private $client_json_file;
+
 	public function __construct() {
+		$this->client_json_file = __DIR__ . DIRECTORY_SEPARATOR . 'client.json';
+
 		add_filter( 'toplytics_rel_path', array( $this, 'filter_rel_path' ) );
 		add_filter( 'plugin_action_links_' . $this->plugin_basename() , array( $this, '_settings_link' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_script' ) );
