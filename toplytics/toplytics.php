@@ -57,7 +57,7 @@ class Toplytics {
 
 		try {
 			$client = new Google_Client();
-			$client->setAuthConfigFile( __DIR__ . DIRECTORY_SEPARATOR . 'client.json' );
+			$client->setAuthConfigFile( $this->client_json_file );
 			$client->addScope( Google_Service_Analytics::ANALYTICS_READONLY );
 			$client->setAccessType( 'offline' );
 
@@ -352,7 +352,6 @@ class Toplytics {
 		try {
 			$data = $this->_get_analytics_data();
 		} catch ( Exception $e ) {
-			// handle and use the refresh token
 			trigger_error( 'Cannot update Google Analytics data: '. $e->getMessage(), E_USER_ERROR );
 			return false;
 		}
