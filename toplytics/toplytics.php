@@ -371,8 +371,8 @@ class Toplytics {
 			return $cached_results[ $when ];
 		}
 
-		if ( $results === false ) {
-			return false;
+		if ( empty( $results[ $when ] ) ) {
+			return array();
 		} else {
 			return $results[ $when ];
 		}
