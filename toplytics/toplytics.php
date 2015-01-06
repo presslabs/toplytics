@@ -76,10 +76,10 @@ class Toplytics {
 			return;
 		}
 		$this->ranges = array(
-			'monthly' => date( 'Y-m-d', strtotime( '-30 days'  ) ),
-			'2weeks'  => date( 'Y-m-d', strtotime( '-14 days'  ) ),
-			'weekly'  => date( 'Y-m-d', strtotime( '-7 days'   ) ),
-			'daily'   => date( 'Y-m-d', strtotime( 'yesterday' ) ),
+			'month'  => date( 'Y-m-d', strtotime( '-30 days'  ) ),
+			'2weeks' => date( 'Y-m-d', strtotime( '-14 days'  ) ),
+			'week'   => date( 'Y-m-d', strtotime( '-7 days'   ) ),
+			'today'  => date( 'Y-m-d', strtotime( 'yesterday' ) ),
 		);
 	}
 
@@ -361,7 +361,7 @@ class Toplytics {
 		return $results;
 	}
 
-	public function get_data( $when = 'daily' ) {
+	public function get_data( $when = 'today' ) {
 		$cached_results = get_transient( 'toplytics_cached_results' );
 		if ( isset( $cached_results[ $when ] ) and ( ( time() - $cached_results['_ts'] ) < Toplytics::CACHE_TTL ) ) {
 			return $cached_results[ $when ];
