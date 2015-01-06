@@ -132,8 +132,8 @@ If the toplytics results contains at least one element, the function will return
 		if ( $toplytics_results ) {
 			$k = 0;
 			foreach ( $toplytics_results as $post_id => $post_views ) {
-				echo (++$k) . ') <a href="' . get_permalink( $post_id ) 
-					. '" title="' . esc_attr( get_the_title( $post_id ) ) . '">' 
+				echo (++$k) . ') <a href="' . get_permalink( $post_id )
+					. '" title="' . esc_attr( get_the_title( $post_id ) ) . '">'
 					. get_the_title( $post_id ) . '</a> - ' . $post_views . ' Views<br />';
 			}
 		}
