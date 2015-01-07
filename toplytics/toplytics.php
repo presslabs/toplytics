@@ -381,6 +381,7 @@ class Toplytics {
 global $toplytics;
 $toplytics = new Toplytics();
 
+require_once __DIR__ . '/backward-compatibility.php';
 require_once __DIR__ . '/inc/class-toplytics-admin.php';
 require_once __DIR__ . '/inc/class-toplytics-menu.php';
 require_once __DIR__ . '/inc/class-toplytics-submenu-configure.php';
