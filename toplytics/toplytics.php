@@ -65,14 +65,21 @@ class Toplytics {
 			if ( $token ) {
 				$client->setAccessToken( $token );
 			}
-			$refresh_token = $this->get_refresh_token();
-			if ( $refresh_token ) {
-				$client->refreshToken( $refresh_token );
+
+			if ( $client->isAccessTokenExpired() ) {
+				$refresh_token = $this->get_refresh_token();
+				if ( $refresh_token ) {
+					$client->refreshToken( $refresh_token );
+					$this->update_token( $client->getAccessToken() );
+				}
 			}
+
 			$this->client  = $client;
 			$this->service = new Google_Service_Analytics( $this->client );
 		} catch ( Exception $e ) {
-			trigger_error( 'Google Analytics Error: '. $e->getMessage(), E_USER_ERROR );
+			$message = 'Google Analytics Error[' . $e->getCode() . ']: '. $e->getMessage();
+			$this->disconnect( $message );
+			error_log( $message, E_USER_ERROR );
 			return;
 		}
 		$this->ranges = array(
@@ -215,7 +222,7 @@ class Toplytics {
 		return $profile_data['profile_info'];
 	}
 
-	public function disconnect() {
+	public function disconnect( $message ) {
 		$this->remove_token();
 		$this->remove_refresh_token();
 		$this->remove_profile_data();
@@ -352,7 +359,10 @@ class Toplytics {
 		try {
 			$data = $this->_get_analytics_data();
 		} catch ( Exception $e ) {
-			trigger_error( 'Cannot update Google Analytics data: '. $e->getMessage(), E_USER_ERROR );
+			if ( 401 == $e->getCode() ) { // Invalid Credentials
+				$this->disconnect( 'Invalid Credentials' );
+			}
+			error_log( 'Cannot update Google Analytics data[' . $e->getCode() . ']: '. $e->getMessage(), E_USER_ERROR );
 			return false;
 		}
 		$results = $this->_convert_data_to_posts( $data );

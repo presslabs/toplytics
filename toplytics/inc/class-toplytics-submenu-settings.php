@@ -53,7 +53,7 @@ class Toplytics_Submenu_Settings extends Toplytics_Menu {
 
 	public function disconnect() {
 		if ( isset( $_POST['ToplyticsSubmitDisconnect'] ) ) {
-			$this->toplytics->disconnect();
+			$this->toplytics->disconnect( 'Manually Disconnected' );
 			$this->success_redirect( 'Toplytics disconnected successfully!' );
 		}
 	}
