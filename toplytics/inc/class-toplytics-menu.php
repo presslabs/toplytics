@@ -30,7 +30,7 @@ class Toplytics_Menu {
 			set_transient( 'message_' . $message_id, $message, 900 );
 		}
 		if ( '' === $menu_slug ) { $menu_slug = $this->menu_slug; }
-		$url = admin_url( 'tools.php?page=' . $menu_slug );
+		$url = admin_url( 'options-general.php?page=' . $menu_slug );
 		$url = add_query_arg(
 			array(
 				'message' => $message_id,

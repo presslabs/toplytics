@@ -128,7 +128,7 @@ class Toplytics {
 	}
 
 	public function return_settings_link() {
-		return admin_url( 'tools.php?page=' . $this->plugin_basename() );
+		return admin_url( 'options-general.php?page=' . $this->plugin_basename() );
 	}
 
 	/**

@@ -33,7 +33,7 @@ class Toplytics_Submenu_Configure extends Toplytics_Menu {
 	}
 
 	public function admin_menu() {
-		$submenu_hook = add_management_page(
+		$submenu_hook = add_options_page(
 			'Toplytics',
 			'Toplytics',
 			'manage_options',
@@ -60,7 +60,7 @@ class Toplytics_Submenu_Configure extends Toplytics_Menu {
 	}
 
 	public function exchange_code_for_token( $hook ) { // Get token
-		if ( ( 'tools_page_toplytics/toplytics' != $hook ) || empty( $_GET['code'] ) ) {
+		if ( ( 'settings_page_toplytics/toplytics' != $hook ) || empty( $_GET['code'] ) ) {
 			return ;
 		}
 		try {
