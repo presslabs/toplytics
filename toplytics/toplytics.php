@@ -223,6 +223,7 @@ class Toplytics {
 	}
 
 	public function disconnect( $message ) {
+		update_option( 'toplytics_disconnect_message', $message );
 		$this->remove_token();
 		$this->remove_refresh_token();
 		$this->remove_profile_data();
