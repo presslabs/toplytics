@@ -132,8 +132,8 @@ If the toplytics results contains at least one element, the function will return
 		if ( $toplytics_results ) {
 			$k = 0;
 			foreach ( $toplytics_results as $post_id => $post_views ) {
-				echo (++$k) . ') <a href="' . get_permalink( $post_id ) 
-					. '" title="' . esc_attr( get_the_title( $post_id ) ) . '">' 
+				echo (++$k) . ') <a href="' . get_permalink( $post_id )
+					. '" title="' . esc_attr( get_the_title( $post_id ) ) . '">'
 					. get_the_title( $post_id ) . '</a> - ' . $post_views . ' Views<br />';
 			}
 		}
@@ -161,7 +161,6 @@ filters:
   toplytics_ga_api_result_simplexml_$name
 action:
   action toplytics_options_general_page
-* rename the ranges ['today', '2weeks', 'week', 'month'] in ['monthly', '2weeks', 'weekly', 'daily']
 
 
 = 2.1.1 =
@@ -213,7 +212,6 @@ where $name is in ['today', '2weeks', 'week', 'month']
 
 = 3.0 =
 With this version, Toplytics uses Google Analytics API v3.0. The following filters and actions are no longer used: toplytics_ga_api_url_$name, toplytics_ga_api_result_xml_$name, toplytics_ga_api_result_simplexml_$name, action toplytics_options_general_page.
-The ranges ['today', '2weeks', 'week', 'month'] are renamed as ['monthly', '2weeks', 'weekly', 'daily'].
 
 = 2.0 =
 The option `Display posts in real time` will let you get the results from one JSON file with JavaScript code. All HTML code is generated dynamically and as a result, the SEO will be affected.

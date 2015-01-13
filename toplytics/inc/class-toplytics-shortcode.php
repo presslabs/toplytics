@@ -27,7 +27,7 @@ class Toplytics_Shortcode {
 
 	public function shortcode( $atts ) {
 		$atts = shortcode_atts( array(
-			'period'      => 'daily',
+			'period'      => 'today',
 			'numberposts' => '15',
 			'showviews'   => false,
 		), $atts );
@@ -41,7 +41,7 @@ class Toplytics_Shortcode {
 			$args['showviews'] = false;
 		}
 		if ( ! isset( $args['period'] ) ) { // set default value
-			$args['period'] = 'monthly';
+			$args['period'] = 'month';
 		}
 		if ( ! isset( $args['numberposts'] ) ) { // set default value
 			$args['numberposts'] = Toplytics::DEFAULT_POSTS;

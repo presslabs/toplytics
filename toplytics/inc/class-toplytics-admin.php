@@ -26,9 +26,14 @@ class Toplytics_Admin {
 		if ( current_user_can( 'manage_options' ) ) {
 			if ( $this->toplytics->get_token() ) {
 				new Toplytics_Submenu_Settings();
+				delete_option( 'toplytics_disconnect_message' );
 			} else {
 				new Toplytics_Submenu_Configure();
 				add_action( 'admin_init', array( $this, 'admin_notices' ) );
+			}
+			if ( get_option( 'toplytics_disconnect_message' ) ) {
+				add_action( 'admin_init', array( $this, 'admin_disconnect_notice' ) );
+				add_action( 'admin_init', array( $this, 'dismiss' ) );
 			}
 		}
 	}
@@ -46,6 +51,35 @@ class Toplytics_Admin {
 				. "</p></div>';"
 			)
 		);
+	}
+
+	public function admin_disconnect_notice() {
+		add_action(
+			'admin_notices',
+			create_function(
+				'',
+				"echo '<div class=\"error\"><p>"
+				. sprintf(
+					__( 'Toplytics plugin was disconnected! Possible reason: %s!', 'toplytics' ),
+					get_option( 'toplytics_disconnect_message' )
+				)
+				. ' '
+				. sprintf(
+					__( '<a href="%s">Dismiss</a>', 'toplytics' ),
+					$this->toplytics->return_settings_link()
+					. '&ToplyticsDismiss=true'
+				)
+				. "</p></div>';"
+			)
+		);
+	}
+
+	public function dismiss() {
+		if ( empty( $_GET['ToplyticsDismiss'] ) ) {
+			return;
+		}
+		delete_option( 'toplytics_disconnect_message' );
+		wp_redirect( filter_var( $this->toplytics->return_settings_link(), FILTER_SANITIZE_URL ) );
 	}
 }
 

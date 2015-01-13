@@ -33,7 +33,7 @@ class Toplytics_Submenu_Configure extends Toplytics_Menu {
 	}
 
 	public function admin_menu() {
-		$submenu_hook = add_management_page(
+		$submenu_hook = add_options_page(
 			'Toplytics',
 			'Toplytics',
 			'manage_options',
@@ -60,7 +60,7 @@ class Toplytics_Submenu_Configure extends Toplytics_Menu {
 	}
 
 	public function exchange_code_for_token( $hook ) { // Get token
-		if ( ( 'tools_page_toplytics/toplytics' != $hook ) || empty( $_GET['code'] ) ) {
+		if ( ( 'settings_page_toplytics/toplytics' != $hook ) || empty( $_GET['code'] ) ) {
 			return ;
 		}
 		try {
@@ -94,8 +94,13 @@ class Toplytics_Submenu_Configure extends Toplytics_Menu {
 			<table class="form-table">
 				<tr valign="top">
 				<th>
-					<?php _e( "Please configure your Google Analytics Account. Login using Google's OAuth system.", 'toplytics' ); ?><br />
-					<?php _e( "This is the prefered method of attaching your Google account. Clicking the 'Get Authorization Key' button will redirect you to a login page at google.com.<br/> After accepting the login there you will get a key. This key must be puted in `Authorization Key` field, then push the button `Get Analytics Profiles`", 'toplytics' ); ?>
+					<?php _e( 'Please connect to your Google Analytics Account.', 'toplytics' ); ?><br /><br />
+					<ol>
+					<li><?php _e( "Click the 'Get Authorization Key' button and you will be redirected to google.com", 'toplytics' ); ?></li>
+					<li><?php _e( 'After logging in you will receive a key', 'toplytics' ); ?></li>
+					<li><?php _e( "Use the key in the 'Authorization Key' field, then come back to this page and click 'Get Analytics Profiles'", 'toplytics' ); ?></li>
+					</ol>
+				</th>
 				</tr>
 
 				<tr valign="top">

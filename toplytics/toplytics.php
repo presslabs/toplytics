@@ -42,7 +42,11 @@ class Toplytics {
 	public $service;
 	public $ranges;
 
+	private $client_json_file;
+
 	public function __construct() {
+		$this->client_json_file = __DIR__ . DIRECTORY_SEPARATOR . 'client.json';
+
 		add_filter( 'toplytics_rel_path', array( $this, 'filter_rel_path' ) );
 		add_filter( 'plugin_action_links_' . $this->plugin_basename() , array( $this, '_settings_link' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_script' ) );
@@ -51,23 +55,38 @@ class Toplytics {
 
 		register_activation_hook( __FILE__, array( $this, 'remove_old_credentials' ) );
 
-		$client = new Google_Client();
-		$client->setAuthConfigFile( __DIR__ . DIRECTORY_SEPARATOR . 'client.json' );
-		$client->addScope( Google_Service_Analytics::ANALYTICS_READONLY );
-		$client->setAccessType( 'offline' );
+		try {
+			$client = new Google_Client();
+			$client->setAuthConfigFile( $this->client_json_file );
+			$client->addScope( Google_Service_Analytics::ANALYTICS_READONLY );
+			$client->setAccessType( 'offline' );
 
-		$token = $this->get_token();
-		if ( $token ) {
-			$client->setAccessToken( $token );
+			$token = $this->get_token();
+			if ( $token ) {
+				$client->setAccessToken( $token );
+			}
+
+			if ( $client->isAccessTokenExpired() ) {
+				$refresh_token = $this->get_refresh_token();
+				if ( $refresh_token ) {
+					$client->refreshToken( $refresh_token );
+					$this->update_token( $client->getAccessToken() );
+				}
+			}
+
+			$this->client  = $client;
+			$this->service = new Google_Service_Analytics( $this->client );
+		} catch ( Exception $e ) {
+			$message = 'Google Analytics Error[' . $e->getCode() . ']: '. $e->getMessage();
+			$this->disconnect( $message );
+			error_log( $message, E_USER_ERROR );
+			return;
 		}
-		$this->client  = $client;
-		$this->service = new Google_Service_Analytics( $this->client );
-
 		$this->ranges = array(
-			'monthly' => date( 'Y-m-d', strtotime( '-30 days'  ) ),
-			'2weeks'  => date( 'Y-m-d', strtotime( '-14 days'  ) ),
-			'weekly'  => date( 'Y-m-d', strtotime( '-7 days'   ) ),
-			'daily'   => date( 'Y-m-d', strtotime( 'yesterday' ) ),
+			'month'  => date( 'Y-m-d', strtotime( '-30 days'  ) ),
+			'2weeks' => date( 'Y-m-d', strtotime( '-14 days'  ) ),
+			'week'   => date( 'Y-m-d', strtotime( '-7 days'   ) ),
+			'today'  => date( 'Y-m-d', strtotime( 'yesterday' ) ),
 		);
 	}
 
@@ -109,7 +128,7 @@ class Toplytics {
 	}
 
 	public function return_settings_link() {
-		return admin_url( 'tools.php?page=' . $this->plugin_basename() );
+		return admin_url( 'options-general.php?page=' . $this->plugin_basename() );
 	}
 
 	/**
@@ -203,7 +222,8 @@ class Toplytics {
 		return $profile_data['profile_info'];
 	}
 
-	public function disconnect() {
+	public function disconnect( $message ) {
+		update_option( 'toplytics_disconnect_message', apply_filters( 'toplytics_disconnect_message', $message ) );
 		$this->remove_token();
 		$this->remove_refresh_token();
 		$this->remove_profile_data();
@@ -269,15 +289,19 @@ class Toplytics {
 		);
 		$result = array();
 		foreach ( $this->ranges as $when => $start_date ) {
-			$rows = $this->service->data_ga->get( 'ga:' . $this->_get_profile_id(), $start_date, date( 'Y-m-d' ), $metrics, $optParams )->rows;
+			$data = $this->service->data_ga->get( 'ga:' . $this->_get_profile_id(), $start_date, date( 'Y-m-d' ), $metrics, $optParams );
+			apply_filters( 'toplytics_analytics_data', $when, $data->selfLink, $data->modelData['query'], $data->modelData['profileId'] );
 			$result[ $when ] = array();
-			if ( $rows ) {
-				foreach ( $rows as $item ) {
-					$result[ $when ][ $item[0] ] = $item[1];
+			if ( $data->rows ) {
+				foreach ( $data->rows as $item ) {
+					$pagepath  = $item[0];
+					$pageviews = $item[1];
+					$result[ $when ][ $pagepath ] = $pageviews;
 				}
 			}
+			apply_filters( 'toplytics_analytics_data_result', $result[ $when ], $when );
 		}
-		return $result;
+		return apply_filters( 'toplytics_analytics_data_allresults', $result );
 	}
 
 	/**
@@ -295,9 +319,10 @@ class Toplytics {
 		foreach ( $data as $when => $stats ) {
 			$new_data[ $when ] = array();
 			foreach ( $stats as $rel_path => $pageviews ) {
-				$rel_path = apply_filters( 'toplytics_rel_path', $rel_path );
+				$rel_path = apply_filters( 'toplytics_rel_path', $rel_path, $when );
 				$url      = home_url() . $rel_path;
 				$post_id  = url_to_postid( $url );
+				$url      = apply_filters( 'toplytics_convert_data_url', $url, $when, $post_id, $rel_path, $pageviews );
 				if ( ( 0 < $post_id ) && ( 'post' == get_post_type( $post_id ) ) ) {
 					$post = get_post( $post_id );
 					if ( is_object( $post ) ) {
@@ -310,7 +335,7 @@ class Toplytics {
 				}
 			}
 		}
-		return $new_data;
+		return apply_filters( 'toplytics_convert_data_to_posts', $new_data, $data );
 	}
 
 	public function ajax_data() {
@@ -327,11 +352,11 @@ class Toplytics {
 					$data['post_id']   = $post_id;
 					$data['views']     = $pageviews;
 
-					$post_data[ $when ][] = apply_filters( 'toplytics_json_data', $data, $post_id );
+					$post_data[ $when ][] = apply_filters( 'toplytics_json_data', $data, $post_id, $when );
 				}
 			}
 		}
-		$json_data = apply_filters( 'toplytics_json_all_data', $post_data );
+		$json_data = apply_filters( 'toplytics_json_all_data', $post_data, $when );
 		echo json_encode( $json_data, JSON_FORCE_OBJECT );
 		die();
 	}
@@ -340,8 +365,10 @@ class Toplytics {
 		try {
 			$data = $this->_get_analytics_data();
 		} catch ( Exception $e ) {
-			// handle and use the refresh token
-			trigger_error( 'Cannot update Google Analytics data: '. $e->getMessage(), E_USER_ERROR );
+			if ( 401 == $e->getCode() ) {
+				$this->disconnect( 'Invalid Credentials' );
+			}
+			error_log( 'Cannot update Google Analytics data[' . $e->getCode() . ']: '. $e->getMessage(), E_USER_ERROR );
 			return false;
 		}
 		$results = $this->_convert_data_to_posts( $data );
@@ -350,7 +377,7 @@ class Toplytics {
 		return $results;
 	}
 
-	public function get_data( $when = 'daily' ) {
+	public function get_data( $when = 'today' ) {
 		$cached_results = get_transient( 'toplytics_cached_results' );
 		if ( isset( $cached_results[ $when ] ) and ( ( time() - $cached_results['_ts'] ) < Toplytics::CACHE_TTL ) ) {
 			return $cached_results[ $when ];
@@ -360,8 +387,8 @@ class Toplytics {
 			return $cached_results[ $when ];
 		}
 
-		if ( $results === false ) {
-			return false;
+		if ( empty( $results[ $when ] ) ) {
+			return array();
 		} else {
 			return $results[ $when ];
 		}
@@ -370,6 +397,7 @@ class Toplytics {
 global $toplytics;
 $toplytics = new Toplytics();
 
+require_once __DIR__ . '/backward-compatibility.php';
 require_once __DIR__ . '/inc/class-toplytics-admin.php';
 require_once __DIR__ . '/inc/class-toplytics-menu.php';
 require_once __DIR__ . '/inc/class-toplytics-submenu-configure.php';
