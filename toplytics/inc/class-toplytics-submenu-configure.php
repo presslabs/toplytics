@@ -98,7 +98,7 @@ class Toplytics_Submenu_Configure extends Toplytics_Menu {
 					<ol>
 					<li><?php _e( "Click the 'Get Authorization Key' button and you will be redirected to google.com", 'toplytics' ); ?></li>
 					<li><?php _e( 'After logging in you will receive a key', 'toplytics' ); ?></li>
-					<li><?php _e( "Use the key in the 'Authorization Key' field, then come back to this page and click 'Get Analytics Profiles'", 'toplytics' ); ?></li>
+					<li><?php _e( "Then come back to this page and use the key in the 'Authorization Key' field, and then click 'Get Analytics Profiles' button", 'toplytics' ); ?></li>
 					</ol>
 				</th>
 				</tr>

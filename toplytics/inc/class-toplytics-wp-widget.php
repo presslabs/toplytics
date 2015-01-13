@@ -63,6 +63,11 @@ class Toplytics_WP_Widget extends WP_Widget {
 		$toplytics_results = $this->toplytics->get_data( $period );
 		$toplytics_results = array_slice( $toplytics_results, 0, $numberposts, true );
 
+		// variables for backward compatibilty
+		$widget_period      = $period;
+		$widget_numberposts = $numberposts;
+		$widget_showviews   = $showviews;
+
 		echo $before_widget;
 		$template_filename = $this->toplytics->get_template_filename();
 

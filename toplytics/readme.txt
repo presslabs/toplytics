@@ -3,7 +3,7 @@ Contributors: PressLabs, olarmarius
 Donate link: http://www.presslabs.com/
 Tags: presslabs, analytics, posts, top, most visited, most viewed posts, top content, toplytics, popular, google analytics, high traffic, popular posts, oauth, server resources, settings, widget, embed code, javascript, json, json file, simple, post views
 Requires at least: 3.9
-Tested up to: 4.0.1
+Tested up to: 4.1
 Stable tag: 3.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -17,17 +17,16 @@ This plugin displays the most visited posts as a widget using data extracted fro
 You need to have Google Analytics active on your site if you want to use this plugin!
 
 = Features: =
-* Connection with Google Analytics Account using OAuth method; the plugin doesn't store any passwords or account details;
-* Widget displaying most visited posts as simple links (*Most Visited Posts*);
-* The widget can display the most viewed articles from the past day, week or month;
-* You can set the number of posts to be displayed between 1 and 20;
+* Connection with Google Analytics Account using OAuth method;
+* Widget displaying most visited posts as simple links;
+* The widget can display the most viewed articles from the past day, week, two weeks or month;
+* You can set the number of posts to be displayed between 1 and 1000;
 * It can also display the number of views as counted by Google Analytics;
 * i18n support/translation requests are more than welcome;
 * Generate the list of the most viewed posts dynamicaly with JavaScript;
 * custom template for displaying the widget is now available and should be included in the active theme folder;
 * You can use some of the plugin's functions if the above are not enough for your customization needs. Check FAQ for details;
 * Shortcodes are now supported for easier integration into posts/pages or other widgets. Check FAQ for details;
-* Debug page
 
 == Installation ==
 
@@ -40,7 +39,7 @@ Alternatively, go into your WordPress dashboard and click on *Plugins -> Add Plu
 
 = Usage =
 Connect your plugin with Google Analytics Account from the Settings page (*Settigns -> Toplytics*);
-Use the *Most Visited Posts* widget from the *Appearance->Widgets* page;
+Use the *Toplytics* widget from the *Appearance->Widgets* page;
 
 == Frequently Asked Questions ==
 
@@ -56,7 +55,7 @@ To use a custom template you just need to copy the file `toplytics-template.php`
 You can then customize your template. The plugin will first search for the file `toplytics-template.php` in the active theme folder, and, if that's not found, it will search for it in the plugin folder. The custom template from the theme folder has priority over the one in the plugin folder.
 
 = How can I use the shortcode? =
-The shortcode has 3 parameters: period -> default=month (today/week/month), numberposts -> default=5 (min=1/max=20), showviews -> default=false (true/false)
+The shortcode has 3 parameters: period -> default=month (today/week/2weeks/month), numberposts -> default=5 (min=1/max=1000), showviews -> default=false (true/false)
 
 Shortcode example:
 
@@ -91,10 +90,10 @@ If the toplytics results will be printed, then the function returns TRUE, otherw
 
 Here is a simple example that displays the first 7 most visited posts in the past month, toghether with the number of views:
 
-`<?php 
+`<?php
 	$toplytics_args = array(
-		'period' => 'month',  // default=month (today/week/month)
-		'numberposts' => 7,   // default=5 (min=1/max=20)
+		'period' => 'month',  // default=month (today/week/2weeks/month)
+		'numberposts' => 7,   // default=5 (min=1/max=1000)
 		'showviews' => true   // default=false (true/false)
 	);
 	if ( function_exists( 'toplytics_results' ) )
@@ -113,8 +112,8 @@ toplytics_get_results() returns the toplytics results into an array; in this cas
 **Parameters**
 
 args -> This parameter is a list of toplytics options:
-		period      - represents the statistics period, default=month (today/week/month);
-		numberposts - represents the number of posts to be displayed, default=5 (min=1/max=20);
+		period      - represents the statistics period, default=month (today/week/2weeks/month);
+		numberposts - represents the number of posts to be displayed, default=5 (min=1/max=1000);
 
 **Return Values**
 
@@ -125,8 +124,8 @@ If the toplytics results contains at least one element, the function will return
 `<?php
 	if ( function_exists( 'toplytics_get_results' ) ) {
 		$toplytics_args = array(
-			'period' => 'month',  // default=month (today/week/month)
-			'numberposts' => 3    // default=5 (min=1/max=20)
+			'period' => 'month',  // default=month (today/week/2weeks/month)
+			'numberposts' => 3    // default=5 (min=1/max=1000)
 		);
 		$toplytics_results = toplytics_get_results( $toplytics_args );
 		if ( $toplytics_results ) {
@@ -152,15 +151,30 @@ The outcome will look like this:
 == Changelog ==
 
 = 3.0 =
+
+This is a major update and you need to re-authenticate with Google Analytics for the plugin to work!
+
 * use Google Analytics API v3.0
-* refactoring the code
+* major refactoring
 * remove filters and actions
 filters:
-  toplytics_ga_api_url_$name
-  toplytics_ga_api_result_xml_$name
-  toplytics_ga_api_result_simplexml_$name
+    toplytics_ga_api_url_$name
+    toplytics_ga_api_result_xml_$name
+    toplytics_ga_api_result_simplexml_$name
 action:
-  action toplytics_options_general_page
+    action toplytics_options_general_page
+* remomve debug page
+* add new filters in order to get more information about how plugin work
+    toplytics_disconnect_message
+    toplytics_analytics_data
+    toplytics_analytics_data_result
+    toplytics_analytics_data_allresults
+    toplytics_rel_path
+    toplytics_convert_data_url
+    toplytics_convert_data_to_posts
+    toplytics_json_data
+    toplytics_json_all_data
+* remove romanian translation
 
 
 = 2.1.1 =
@@ -211,7 +225,7 @@ where $name is in ['today', '2weeks', 'week', 'month']
 == Upgrade Notice ==
 
 = 3.0 =
-With this version, Toplytics uses Google Analytics API v3.0. The following filters and actions are no longer used: toplytics_ga_api_url_$name, toplytics_ga_api_result_xml_$name, toplytics_ga_api_result_simplexml_$name, action toplytics_options_general_page.
+With this version, Toplytics uses Google Analytics API v3.0. This is a major update and you need to re-authenticate with Google Analytics for the plugin to work!
 
 = 2.0 =
 The option `Display posts in real time` will let you get the results from one JSON file with JavaScript code. All HTML code is generated dynamically and as a result, the SEO will be affected.
