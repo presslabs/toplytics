@@ -115,7 +115,7 @@ class Toplytics_Debug {
 		<div class="wrap">
 			<h2>Toplytics Debug</h2>
 
-			<p><strong>Time & date:</strong> <?php echo date( 'd-m-Y h:i:s' ); ?></p>
+			<p><strong>Date & time:</strong> <?php echo date( 'd-m-Y h:i:s' ); ?></p>
 			<p><strong>Connected to:</strong> <?php echo $this->toplytics->get_profile_info(); ?></p>
 
 			<input type='button' value='Print This Result' onclick='printDiv("wpbody");'/>
