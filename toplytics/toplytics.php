@@ -223,7 +223,7 @@ class Toplytics {
 	}
 
 	public function disconnect( $message ) {
-		update_option( 'toplytics_disconnect_message', $message );
+		update_option( 'toplytics_disconnect_message', apply_filters( 'toplytics_disconnect_message', $message ) );
 		$this->remove_token();
 		$this->remove_refresh_token();
 		$this->remove_profile_data();
@@ -289,15 +289,19 @@ class Toplytics {
 		);
 		$result = array();
 		foreach ( $this->ranges as $when => $start_date ) {
-			$rows = $this->service->data_ga->get( 'ga:' . $this->_get_profile_id(), $start_date, date( 'Y-m-d' ), $metrics, $optParams )->rows;
+			$data = $this->service->data_ga->get( 'ga:' . $this->_get_profile_id(), $start_date, date( 'Y-m-d' ), $metrics, $optParams );
+			apply_filters( 'toplytics_analytics_data', $when, $data->selfLink, $data->modelData['query'], $data->modelData['profileId'] );
 			$result[ $when ] = array();
-			if ( $rows ) {
-				foreach ( $rows as $item ) {
-					$result[ $when ][ $item[0] ] = $item[1];
+			if ( $data->rows ) {
+				foreach ( $data->rows as $item ) {
+					$pagepath  = $item[0];
+					$pageviews = $item[1];
+					$result[ $when ][ $pagepath ] = $pageviews;
 				}
 			}
+			apply_filters( 'toplytics_analytics_data_result', $result[ $when ], $when );
 		}
-		return $result;
+		return apply_filters( 'toplytics_analytics_data_allresults', $result );
 	}
 
 	/**
@@ -315,9 +319,10 @@ class Toplytics {
 		foreach ( $data as $when => $stats ) {
 			$new_data[ $when ] = array();
 			foreach ( $stats as $rel_path => $pageviews ) {
-				$rel_path = apply_filters( 'toplytics_rel_path', $rel_path );
+				$rel_path = apply_filters( 'toplytics_rel_path', $rel_path, $when );
 				$url      = home_url() . $rel_path;
 				$post_id  = url_to_postid( $url );
+				$url      = apply_filters( 'toplytics_convert_data_url', $url, $when, $post_id, $rel_path, $pageviews );
 				if ( ( 0 < $post_id ) && ( 'post' == get_post_type( $post_id ) ) ) {
 					$post = get_post( $post_id );
 					if ( is_object( $post ) ) {
@@ -330,7 +335,7 @@ class Toplytics {
 				}
 			}
 		}
-		return $new_data;
+		return apply_filters( 'toplytics_convert_data_to_posts', $new_data, $data );
 	}
 
 	public function ajax_data() {
@@ -347,11 +352,11 @@ class Toplytics {
 					$data['post_id']   = $post_id;
 					$data['views']     = $pageviews;
 
-					$post_data[ $when ][] = apply_filters( 'toplytics_json_data', $data, $post_id );
+					$post_data[ $when ][] = apply_filters( 'toplytics_json_data', $data, $post_id, $when );
 				}
 			}
 		}
-		$json_data = apply_filters( 'toplytics_json_all_data', $post_data );
+		$json_data = apply_filters( 'toplytics_json_all_data', $post_data, $when );
 		echo json_encode( $json_data, JSON_FORCE_OBJECT );
 		die();
 	}
@@ -360,7 +365,7 @@ class Toplytics {
 		try {
 			$data = $this->_get_analytics_data();
 		} catch ( Exception $e ) {
-			if ( 401 == $e->getCode() ) { // Invalid Credentials
+			if ( 401 == $e->getCode() ) {
 				$this->disconnect( 'Invalid Credentials' );
 			}
 			error_log( 'Cannot update Google Analytics data[' . $e->getCode() . ']: '. $e->getMessage(), E_USER_ERROR );
