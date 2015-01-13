@@ -404,3 +404,4 @@ require_once __DIR__ . '/inc/class-toplytics-submenu-configure.php';
 require_once __DIR__ . '/inc/class-toplytics-submenu-settings.php';
 require_once __DIR__ . '/inc/class-toplytics-wp-widget.php';
 require_once __DIR__ . '/inc/class-toplytics-shortcode.php';
+require_once __DIR__ . '/inc/class-toplytics-debug.php';
