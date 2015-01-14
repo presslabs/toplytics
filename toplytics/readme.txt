@@ -168,7 +168,7 @@ filters:
     toplytics_ga_api_result_simplexml_$name
 action:
     action toplytics_options_general_page
-* remomve debug page
+* update debug page
 * add new filters in order to get more information about how plugin work
     toplytics_disconnect_message
     toplytics_analytics_data
