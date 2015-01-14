@@ -57,6 +57,11 @@ You can then customize your template. The plugin will first search for the file 
 = How can I use the shortcode? =
 The shortcode has 3 parameters: period -> default=month (today/week/2weeks/month), numberposts -> default=5 (min=1/max=1000), showviews -> default=false (true/false)
 
+= How to use the debug page? =
+1.First you must be sure to set the WP_DEBUG constant to `true`.
+2.Then go to the plugins list `Plugins->Installed plugins` and click to the `Debug` link founded at Toplytics plugin.
+3.View the information in order to find some bugs.
+
 Shortcode example:
 
 `[toplytics period="week" numberposts="3" showviews="true"]`
