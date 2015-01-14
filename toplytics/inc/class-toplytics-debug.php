@@ -142,7 +142,7 @@ class Toplytics_Debug {
 
 }
 
-if ( defined( 'WP_DEBUG' ) ) {
+if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
 	function toplytics_debug_page() {
 		new Toplytics_Debug();
 	}
