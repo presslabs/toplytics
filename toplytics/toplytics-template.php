@@ -3,9 +3,7 @@
  * $toplytics_results - all results as array with post_id as key and pageviews as value
  * $showviews         - true/false, show/hide the post pageviews
  */
-if ( empty( $toplytics_results ) ) {
-	?><p><?php _e( 'No data is available!', 'toplytics' ); ?></p><?php
-} else {
+if ( ! empty( $toplytics_results ) ) {
 	?>
 	<ol>
 	<?php foreach ( $toplytics_results as $post_id => $post_views ) : ?>
@@ -21,7 +19,7 @@ if ( empty( $toplytics_results ) ) {
 		}
 	?>
 	</li>
-	<?php endforeach;
+	<?php endforeach; ?>
+	</ol>
+	<?php
 }
-?>
-</ol>
