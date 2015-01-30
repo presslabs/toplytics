@@ -349,8 +349,8 @@ class Toplytics {
 
 					$data['permalink'] = get_permalink( $post_id );
 					$data['title']     = get_the_title( $post_id );
-					$data['post_id']   = $post_id;
-					$data['views']     = $pageviews;
+					$data['post_id']   = (int) $post_id;
+					$data['views']     = (int) $pageviews;
 
 					$post_data[ $when ][] = apply_filters( 'toplytics_json_data', $data, $post_id, $when );
 				}
