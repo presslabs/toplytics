@@ -329,7 +329,7 @@ class Toplytics {
 						if ( isset( $new_data[ $when ][ $post_id ] ) ) {
 							$new_data[ $when ][ $post_id ] += $pageviews;
 						} else {
-							$new_data[ $when ][ $post_id ] = $pageviews;
+							$new_data[ $when ][ $post_id ] = (int) $pageviews;
 						}
 					}
 				}
