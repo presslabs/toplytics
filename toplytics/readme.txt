@@ -8,7 +8,7 @@ Stable tag: 3.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Displays the most visited posts as a widget using data from Google Analytics. Designed to be used under high-traffic or low server resources.
+Displays the most visited posts as a widget using data from Google Analytics. Designed to be used under high-traffic or low server resources in a cache friendly manner.
 
 == Description ==
 This plugin displays the most visited posts as a widget using data extracted from Google Analytics. It is designed to work with high-traffic sites and all types of caching.
@@ -18,13 +18,14 @@ You need to have Google Analytics active on your site if you want to use this pl
 
 = Features: =
 * Connection with Google Analytics Account using OAuth method;
+* Starting with the plugin version 3.0 we have switched to GA API v3
 * Widget displaying most visited posts as simple links;
 * The widget can display the most viewed articles from the past day, week, two weeks or month;
 * You can set the number of posts to be displayed between 1 and 1000;
 * It can also display the number of views as counted by Google Analytics;
 * i18n support/translation requests are more than welcome;
 * Generate the list of the most viewed posts dynamicaly with JavaScript;
-* custom template for displaying the widget is now available and should be included in the active theme folder;
+* custom template for displaying the widget is available and should be included in the active theme folder;
 * You can use some of the plugin's functions if the above are not enough for your customization needs. Check FAQ for details;
 * Shortcodes are now supported for easier integration into posts/pages or other widgets. Check FAQ for details;
 
@@ -50,17 +51,12 @@ You should use this plugin if you want to display the most visited posts of your
 The data from GA is refreshed every hour. During this interval, the information is safely stored using transients.
 
 = How to use the custom template? =
-To use a custom template you just need to copy the file `toplytics-template.php` from toplytics' plugin folder to your theme folder.
+To use a custom template you just need to copy the file `toplytics-template.php` or `toplytics-template-realtime.php` from toplytics' plugin folder to your theme folder.
 
-You can then customize your template. The plugin will first search for the file `toplytics-template.php` in the active theme folder, and, if that's not found, it will search for it in the plugin folder. The custom template from the theme folder has priority over the one in the plugin folder.
+You can then customize your template. The plugin will first search for the file `toplytics-template.php`, respectively `toplytics-template-realtime.php` in the active theme folder, and, if that's not found, it will search for it in the plugin folder. The custom template from the theme folder has priority over the one in the plugin folder.
 
 = How can I use the shortcode? =
 The shortcode has 3 parameters: period -> default=month (today/week/2weeks/month), numberposts -> default=5 (min=1/max=1000), showviews -> default=false (true/false)
-
-= How to use the debug page? =
-1.First you must be sure to set the WP_DEBUG constant to `true`.
-2.Then go to the plugins list `Plugins->Installed plugins` and click to the `Debug` link founded at Toplytics plugin.
-3.View the information in order to find some bugs.
 
 Shortcode example:
 
@@ -153,23 +149,28 @@ The outcome will look like this:
 3.) This is the third most visited post - 12 Views
 
 
+= How to use the debug page? =
+1.First you must be sure to set the WP_DEBUG constant to `true`.
+2.Then go to the plugins list `Plugins->Installed plugins` and click to the `Debug` link founded at Toplytics plugin.
+3.View the information for debugging.
+
 == Changelog ==
 
 = 3.0 =
 
 This is a major update and you need to re-authenticate with Google Analytics for the plugin to work!
 
-* use Google Analytics API v3.0
+* Google Analytics API v3.0 is being used from now on
 * major refactoring
-* remove filters and actions
+* removed filters and actions
 filters:
     toplytics_ga_api_url_$name
     toplytics_ga_api_result_xml_$name
     toplytics_ga_api_result_simplexml_$name
 action:
     action toplytics_options_general_page
-* update debug page
-* add new filters in order to get more information about how plugin work
+* updated debug page
+* added new filters in order to get more information about how the plugin works
     toplytics_disconnect_message
     toplytics_analytics_data
     toplytics_analytics_data_result
@@ -179,32 +180,31 @@ action:
     toplytics_convert_data_to_posts
     toplytics_json_data
     toplytics_json_all_data
-* remove romanian translation
+* removed Romanian translation
 
 
 = 2.1.1 =
 
-* fix possible infinite loop
+* fixed a possible infinite loop
 * `WP_DEBUG` enables toplytics debug mode
 
 
 = 2.1 =
 
-* add new filters and actions
+* added new filters and actions
 filters:
-  toplytics_ga_api_url_$name
-  toplytics_ga_api_result_xml_$name
-  toplytics_ga_api_result_simplexml_$name
+  `toplytics_ga_api_url_$name`
+  `toplytics_ga_api_result_xml_$name`
+  `toplytics_ga_api_result_simplexml_$name`
 action:
-  action toplytics_options_general_page
-
-* resolve the realtime template
-* add toplytics debug page
-
-where $name is in ['today', '2weeks', 'week', 'month']
+  `action toplytics_options_general_page`
+* resolved the realtime template issues
+* added toplytics debug page
+* added `2weeks` in the data range.
 
 
 = 2.0 =
+
 * Implemented OAuth login method.
 * Added `Display posts in real time` option.
 * Fixed some display bugs.
@@ -230,7 +230,7 @@ where $name is in ['today', '2weeks', 'week', 'month']
 == Upgrade Notice ==
 
 = 3.0 =
-With this version, Toplytics uses Google Analytics API v3.0. This is a major update and you need to re-authenticate with Google Analytics for the plugin to work!
+Starting this version, Toplytics uses Google Analytics API v3.0. This is a major update and you need to re-authenticate with Google Analytics for the plugin to work!
 
 = 2.0 =
 The option `Display posts in real time` will let you get the results from one JSON file with JavaScript code. All HTML code is generated dynamically and as a result, the SEO will be affected.
