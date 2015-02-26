@@ -48,12 +48,12 @@ Use the *Toplytics* widget from the *Appearance->Widgets* page;
 You should use this plugin if you want to display the most visited posts of your site in a safe and stable manner, with no risk of downtime or slowness, based on data from Google Analytics statistics. The plugin is built for high-traffic sites where counting every visitor's click loads up the DB and can potentially crash the site.
 
 = How often is the data from Google Analytics refreshed? =
-The data from GA is refreshed every hour. During this interval, the information is safely stored using transients.
+The data from GA is refreshed every hour. During this interval, the information is safely stored using transients and options.
 
 = How to use the custom template? =
-To use a custom template you just need to copy the file `toplytics-template.php` or `toplytics-template-realtime.php` from toplytics' plugin folder to your theme folder.
+To use a custom template you just need to copy the file `toplytics-template.php` from toplytics' plugin folder to your theme folder.
 
-You can then customize your template. The plugin will first search for the file `toplytics-template.php`, respectively `toplytics-template-realtime.php` in the active theme folder, and, if that's not found, it will search for it in the plugin folder. The custom template from the theme folder has priority over the one in the plugin folder.
+You can then customize your template. The plugin will first search for the file `toplytics-template.php` in the active theme folder, and, if that's not found, it will search for it in the plugin folder. The custom template from the theme folder has priority over the one in the plugin folder.
 
 = How can I use the shortcode? =
 The shortcode has 3 parameters: period -> default=month (today/week/2weeks/month), numberposts -> default=5 (min=1/max=1000), showviews -> default=false (true/false)
@@ -63,6 +63,14 @@ Shortcode example:
 `[toplytics period="week" numberposts="3" showviews="true"]`
 
 The shortcode can be used within post/pages and in other widgets from the sidebar. For any parameter that is not used, the default value will be used.
+
+= How can I use JavaScript code in order to show up the top in widget? =
+
+You can place the JavaScript code right in `toplytics-template.php` file or use a predefined JS code like this:
+
+`<script type="text/javascript">toplytics_results( toplytics_args  );</script>`
+
+The `toplytics_args` are the options from the current widget passed to the template. For a detailed example see the JavaScript code from `js/toplytics.js` file.
 
 = How can I use the plugin functionality outside the sidebar? =
 
