@@ -12,15 +12,15 @@ function toplytics_results( args ) {
       var toplytics_json_data = JSON.parse(xmlhttp.responseText);
 
       var results = toplytics_json_data[args.period];
-      var k = 0;
+      var counter = 0;
       for ( var index in results ) {
           if ( results.hasOwnProperty( index ) ) {
             var permalink = results[ index ].permalink;
             var title     = results[ index ].title;
             //var post_id   = results[ index ].post_id;
             var views     = results[ index ].views;
-            k++;
-            if ( k > args.numberposts ) { break; }
+            counter++;
+            if ( counter > args.numberposts ) { break; }
 
             var views_html = '';
             if ( args.showviews ) {
@@ -33,9 +33,7 @@ function toplytics_results( args ) {
           }
       }
     }
-    var element = document.createElement('ol');
-    element.innerHTML = html;
-    document.getElementById( args.widget_id ).appendChild( element );
+    document.getElementById( args.widget_id ).innerHTML = '<ol>' + html + '</ol>';
   };
   xmlhttp.open('GET', toplytics.ajax_url + '?action=toplytics_data&ver=' + Math.floor(new Date().getTime() / 1000), true);
   xmlhttp.send();
