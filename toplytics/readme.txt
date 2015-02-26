@@ -162,6 +162,7 @@ This is a major update and you need to re-authenticate with Google Analytics for
 
 * Google Analytics API v3.0 is being used from now on
 * major refactoring
+* removed realtime template - the JS code can now be used only in toplytics-template.php file
 * removed filters and actions
 filters:
     toplytics_ga_api_url_$name

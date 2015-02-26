@@ -30,13 +30,12 @@
 require_once __DIR__ . '/lib/google-api/autoload.php';
 
 class Toplytics {
-	const DEFAULT_POSTS     = 5;
-	const MIN_POSTS         = 1;
-	const MAX_RESULTS       = 1000;
-	const MAX_POSTS         = Toplytics::MAX_RESULTS;
-	const TEMPLATE          = 'toplytics-template.php';
-	const TEMPLATE_REALTIME = 'toplytics-template-realtime.php';
-	const CACHE_TTL         = 3600; // 1h
+	const DEFAULT_POSTS = 5;
+	const MIN_POSTS     = 1;
+	const MAX_RESULTS   = 1000;
+	const MAX_POSTS     = Toplytics::MAX_RESULTS;
+	const TEMPLATE      = 'toplytics-template.php';
+	const CACHE_TTL     = 3600; // 1h
 
 	public $client;
 	public $service;
@@ -116,11 +115,8 @@ class Toplytics {
 		wp_enqueue_script( 'toplytics' );
 	}
 
-	public function get_template_filename( $realtime = false ) {
+	public function get_template_filename() {
 		$toplytics_template_filename = Toplytics::TEMPLATE;
-		if ( 1 == $realtime ) {
-			$toplytics_template_filename = Toplytics::TEMPLATE_REALTIME;
-		}
 
 		$theme_template = get_stylesheet_directory() . "/$toplytics_template_filename";
 		if ( file_exists( $theme_template ) ) {

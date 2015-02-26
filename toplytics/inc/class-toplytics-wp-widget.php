@@ -75,17 +75,10 @@ class Toplytics_WP_Widget extends WP_Widget {
 			if ( $title ) {
 				echo $before_title . $title . $after_title;
 			}
-
-			if ( $realtime ) {
-				$this->realtime_js_script( $period, $numberposts, $showviews, $widget_id );
-				echo "<div id='$widget_id'></div>";
-			} else {
-				include $template_filename;
-			}
+			$this->realtime_js_script( $period, $numberposts, $showviews, $widget_id );
+			echo "<div id='$widget_id'></div>";
+			include $template_filename;
 			echo $after_widget;
-			if ( $realtime ) {
-				include $this->toplytics->get_template_filename( $realtime );
-			}
 		}
 		ob_get_flush();
 	}
@@ -111,7 +104,6 @@ class Toplytics_WP_Widget extends WP_Widget {
 		}
 
 		$instance['showviews'] = isset( $new_instance['showviews'] ) ? 1 : 0;
-		$instance['realtime']  = isset( $new_instance['realtime'] ) ? 1 : 0;
 
 		return $instance;
 	}
@@ -129,13 +121,6 @@ class Toplytics_WP_Widget extends WP_Widget {
 		$showviews_checked = '';
 		if ( isset( $instance['showviews'] ) ) {
 			$showviews_checked = $instance['showviews'] ? ' checked="checked"' : '';
-		}
-
-		$realtime = isset( $instance['realtime']) ? $instance['realtime'] : 0;
-
-		$realtime_checked = '';
-		if ( isset( $instance['realtime'] ) ) {
-			$realtime_checked = $instance['realtime'] ? ' checked="checked"' : '';
 		}
 		?>
 		<p>
@@ -163,11 +148,7 @@ class Toplytics_WP_Widget extends WP_Widget {
 			<input class="checkbox" type="checkbox"<?php echo $showviews_checked; ?> id="<?php echo $this->get_field_id( 'showviews' ); ?>" name="<?php echo $this->get_field_name( 'showviews' ); ?>" /> <label for="<?php echo $this->get_field_id( 'showviews' ); ?>"><?php echo __( 'Display post views', 'toplytics' ); ?>?</label>
 		</p>
 
-		<p>
-			<input class="checkbox" type="checkbox"<?php echo $realtime_checked; ?> id="<?php echo $this->get_field_id( 'realtime' ); ?>" name="<?php echo $this->get_field_name( 'realtime' ); ?>" /><label title="<?php echo __( 'If you choose this, the content will be generated dynamically and your SEO will be affected', 'toplytics' ); ?>" for="<?php echo $this->get_field_id( 'realtime' ); ?>"><?php echo __( 'Display posts in real time', 'toplytics' ); ?>?</label>
-		</p>
-
-		<p><?php _e( 'Template' ); ?>:<br /><?php echo $this->toplytics->get_template_filename( $realtime ); ?></p>
+		<p><?php _e( 'Template' ); ?>:<br /><?php echo $this->toplytics->get_template_filename(); ?></p>
 		<?php
 	}
 }
