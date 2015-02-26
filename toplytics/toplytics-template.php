@@ -4,22 +4,23 @@
  * $showviews         - true/false, show/hide the post pageviews
  */
 if ( ! empty( $toplytics_results ) ) {
-	?>
-	<ol>
-	<?php foreach ( $toplytics_results as $post_id => $post_views ) : ?>
-	<li>
-	<a href="<?php echo get_permalink( $post_id ); ?>" title="<?php echo esc_attr( get_the_title( $post_id ) ); ?>">
-	<?php echo get_the_title( $post_id ); ?>
-	</a>
-	<?php
+	$posts_list = get_posts( array(
+		'post__in' => array_keys( $toplytics_results ),
+		'orderby'  => 'post__in',
+	));
+	?><ol><?php
+	global $post;
+	foreach ( $posts_list as $post ) : setup_postdata( $post );
+		?>
+		<li>
+		<a href="<?php the_permalink(); ?>" title="<?php echo esc_attr( get_the_title() ); ?>"><?php the_title(); ?></a>
+		<?php
 		if ( $showviews ) {
 			echo '<span class="post-views">&nbsp;';
-			printf( __( '%d Views', 'toplytics' ), $post_views );
+			printf( __( '%d Views', 'toplytics' ), $toplytics_results[ get_the_ID() ] ); // pageviews
 			echo '</span>';
 		}
-	?>
-	</li>
-	<?php endforeach; ?>
-	</ol>
-	<?php
+		?></li><?php
+	endforeach; wp_reset_postdata();
+	?></ol><?php
 }
