@@ -36,7 +36,7 @@ class Toplytics {
 	const MAX_POSTS         = Toplytics::MAX_RESULTS;
 	const TEMPLATE          = 'toplytics-template.php';
 	const TEMPLATE_REALTIME = 'toplytics-template-realtime.php';
-	const CACHE_TTL         = 300;
+	const CACHE_TTL         = 3600; // 1h
 
 	public $client;
 	public $service;
@@ -52,6 +52,8 @@ class Toplytics {
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_script' ) );
 		add_action( 'wp_ajax_toplytics_data', array( $this, 'ajax_data' ) );
 		add_action( 'wp_ajax_nopriv_toplytics_data', array( $this, 'ajax_data' ) );
+		add_action( 'wp', array( $this, 'setup_schedule_event' ) );
+		add_action( 'toplytics_cron_event', array( $this, 'update_analytics_data' ) );
 
 		register_activation_hook( __FILE__, array( $this, 'remove_old_credentials' ) );
 
@@ -90,12 +92,22 @@ class Toplytics {
 		);
 	}
 
+	/**
+	 * On an early action hook, check if the hook is scheduled - if not, schedule it.
+	 */
+	function setup_schedule_event() {
+		if ( ! wp_next_scheduled( 'toplytics_cron_event' ) ) {
+			wp_schedule_event( time(), 'hourly', 'toplytics_cron_event' );
+		}
+	}
+
 	public function remove_old_credentials() {
 		delete_option( 'toplytics_oauth_token' );
 		delete_option( 'toplytics_oauth_secret' );
 		delete_option( 'toplytics_auth_token' );
 		delete_option( 'toplytics_account_id' );
 		delete_option( 'toplytics_cache_timeout' );
+		delete_option( 'toplytics_results' );
 	}
 
 	public function enqueue_script() {
@@ -374,6 +386,7 @@ class Toplytics {
 		$results = $this->_convert_data_to_posts( $data );
 		$results['_ts'] = time();
 		set_transient( 'toplytics_cached_results', $results );
+		update_option( 'toplytics_results', $results );
 		return $results;
 	}
 
@@ -382,16 +395,18 @@ class Toplytics {
 		if ( isset( $cached_results[ $when ] ) and ( ( time() - $cached_results['_ts'] ) < Toplytics::CACHE_TTL ) ) {
 			return $cached_results[ $when ];
 		}
-		$results = $this->update_analytics_data();
-		if ( $results === false && ! empty( $cached_results ) ) {
+
+		$results = get_option( 'toplytics_results', array() );
+
+		if ( empty( $results ) && ! empty( $cached_results[ $when ] ) ) {
 			return $cached_results[ $when ];
 		}
 
-		if ( empty( $results[ $when ] ) ) {
-			return array();
-		} else {
+		if ( ! empty( $results[ $when ] ) ) {
 			return $results[ $when ];
 		}
+
+		return array();
 	}
 }
 global $toplytics;
