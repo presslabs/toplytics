@@ -51,9 +51,12 @@ class Toplytics {
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_script' ) );
 		add_action( 'wp_ajax_toplytics_data', array( $this, 'ajax_data' ) );
 		add_action( 'wp_ajax_nopriv_toplytics_data', array( $this, 'ajax_data' ) );
-		add_action( 'wp', array( $this, 'setup_schedule_event' ) );
-		add_action( 'toplytics_cron_event', array( $this, 'update_analytics_data' ) );
 
+		// add cron event
+		if ( $this->get_token() ) {
+			add_action( 'wp', array( $this, 'setup_schedule_event' ) );
+			add_action( 'toplytics_cron_event', array( $this, 'update_analytics_data' ) );
+		}
 		register_activation_hook( __FILE__, array( $this, 'remove_old_credentials' ) );
 
 		try {
