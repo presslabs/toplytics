@@ -27,7 +27,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-require_once __DIR__ . '/lib/google-api/autoload.php';
+require_once __DIR__ . '/lib/google-api-php-client/autoload.php';
 
 class Toplytics {
 	const DEFAULT_POSTS = 5;
