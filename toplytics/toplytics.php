@@ -59,6 +59,13 @@ class Toplytics {
 		}
 		register_activation_hook( __FILE__, array( $this, 'remove_old_credentials' ) );
 
+		$this->ranges = array(
+			'month'  => date( 'Y-m-d', strtotime( '-30 days'  ) ),
+			'2weeks' => date( 'Y-m-d', strtotime( '-14 days'  ) ),
+			'week'   => date( 'Y-m-d', strtotime( '-7 days'   ) ),
+			'today'  => date( 'Y-m-d', strtotime( 'yesterday' ) ),
+		);
+
 		try {
 			$client = new Google_Client();
 			$client->setAuthConfigFile( $this->client_json_file );
@@ -86,12 +93,6 @@ class Toplytics {
 			error_log( $message, E_USER_ERROR );
 			return;
 		}
-		$this->ranges = array(
-			'month'  => date( 'Y-m-d', strtotime( '-30 days'  ) ),
-			'2weeks' => date( 'Y-m-d', strtotime( '-14 days'  ) ),
-			'week'   => date( 'Y-m-d', strtotime( '-7 days'   ) ),
-			'today'  => date( 'Y-m-d', strtotime( 'yesterday' ) ),
-		);
 	}
 
 	/**
@@ -382,6 +383,22 @@ class Toplytics {
 			error_log( 'Cannot update Google Analytics data[' . $e->getCode() . ']: '. $e->getMessage(), E_USER_ERROR );
 			return false;
 		}
+
+		// test if $data is empty
+		$is_data_empty = false;
+		foreach ( $data as $when => $stats ) {
+			if ( is_array( $stats ) && ! empty( $stats ) ) {
+				continue;
+			} else {
+				$is_data_empty = true;
+				break;
+			}
+		}
+
+		if ( $is_data_empty ) {
+			return get_option( 'toplytics_results' );
+		}
+
 		$results = $this->_convert_data_to_posts( $data );
 		$results['_ts'] = time();
 		set_transient( 'toplytics_cached_results', $results );

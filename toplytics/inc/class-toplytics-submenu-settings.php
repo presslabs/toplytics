@@ -44,6 +44,7 @@ class Toplytics_Submenu_Settings extends Toplytics_Menu {
 			foreach ( $this->toplytics->get_profiles_list() as $profile_id => $profile_info ) {
 				if ( $_POST['profile_id'] == $profile_id ) {
 					$this->toplytics->update_profile_data( $profile_id, $profile_info );
+					$this->toplytics->update_analytics_data();
 					break;
 				}
 			}
