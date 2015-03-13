@@ -165,7 +165,7 @@ class Toplytics {
 	 */
 	public function get_profiles_list() {
 		try {
-			$profiles_list = [];
+			$profiles_list = array();
 			$profiles = $this->_get_profiles();
 			foreach ( $profiles as $profile_id => $profile_data ) {
 				$profiles_list[ $profile_id ] = $profile_data['account_name'] . ' > ' . $profile_data['property_name'] . ' (' . $profile_data['property_id'] . ') > ' . $profile_data['profile_name'];
@@ -177,7 +177,7 @@ class Toplytics {
 	}
 
 	private function _get_profiles() {
-		$profiles = [];
+		$profiles = array();
 		$accounts = $this->_get_accounts();
 		foreach ( $accounts as $account_id => $account_name ) {
 			$webproperties = $this->_get_webproperties( $account_id );
@@ -202,7 +202,7 @@ class Toplytics {
 	private function _get_webproperties( $account_id ) {
 		$man_webproperties = $this->service->management_webproperties->listManagementWebproperties( $account_id );
 		if ( 0 < count( $man_webproperties->getItems() ) ) {
-			$webproperties = [];
+			$webproperties = array();
 			foreach ( $man_webproperties->getItems() as $item ) {
 				$webproperties[ $item->getId() ] = $item->getName();
 			}
@@ -215,7 +215,7 @@ class Toplytics {
 	private function _get_accounts() {
 		$man_accounts = $this->service->management_accounts->listManagementAccounts();
 		if ( 0 < count( $man_accounts->getItems() ) ) {
-			$accounts = [];
+			$accounts = array();
 			foreach ( $man_accounts->getItems() as $item ) {
 				$accounts[ $item->getId() ] = $item->getName();
 			}
