@@ -22,6 +22,8 @@ class Toplytics_Debug {
 		global $toplytics;
 		$this->toplytics = $toplytics;
 
+		date_default_timezone_set( get_option( 'timezone_string' ) );
+
 		if ( current_user_can( 'manage_options' ) ) {
 			add_action( 'admin_menu', array( $this, 'add_menu' ) );
 			add_action( 'admin_menu', array( $this, 'hide_menu' ) );
@@ -115,14 +117,17 @@ class Toplytics_Debug {
 		<div class="wrap">
 			<h2>Toplytics Debug</h2>
 
-			<p><strong>Date & time:</strong> <?php echo date( 'd-m-Y h:i:s' ); ?></p>
+			<?php
+			$debug_data        = get_option( 'toplytics_debug_data' );
+			$analytics_data    = get_option( 'toplytics_analytics_data' );
+			$toplytics_results = get_option( 'toplytics_results' );
+			?>
 			<p><strong>Connected to:</strong> <?php echo $this->toplytics->get_profile_info(); ?></p>
+			<p><strong>Data collected at:</strong> <?php if ( ! empty( $toplytics_results['_ts'] ) ) { echo date( 'd-m-Y h:i:s', $toplytics_results['_ts'] ); } else { echo 'NaN'; } ?></p>
 
 			<input type='button' value='Print This Result' onclick='printDiv("wpbody");'/>
 			<hr>
 		<?php
-		$debug_data     = get_option( 'toplytics_debug_data' );
-		$analytics_data = get_option( 'toplytics_analytics_data' );
 		foreach ( $this->toplytics->ranges as $when => $date ) :
 			?>
 			<h3>GA API data[<?php echo $when; ?>]:</h3>
