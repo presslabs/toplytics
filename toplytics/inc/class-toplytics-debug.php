@@ -22,8 +22,6 @@ class Toplytics_Debug {
 		global $toplytics;
 		$this->toplytics = $toplytics;
 
-		date_default_timezone_set( get_option( 'timezone_string' ) );
-
 		if ( current_user_can( 'manage_options' ) ) {
 			add_action( 'admin_menu', array( $this, 'add_menu' ) );
 			add_action( 'admin_menu', array( $this, 'hide_menu' ) );
@@ -113,17 +111,20 @@ class Toplytics_Debug {
 	}
 
 	public function page() {
+		$debug_data        = get_option( 'toplytics_debug_data' );
+		$analytics_data    = get_option( 'toplytics_analytics_data' );
+		$toplytics_results = get_option( 'toplytics_results' );
 		?>
 		<div class="wrap">
 			<h2>Toplytics Debug</h2>
-
-			<?php
-			$debug_data        = get_option( 'toplytics_debug_data' );
-			$analytics_data    = get_option( 'toplytics_analytics_data' );
-			$toplytics_results = get_option( 'toplytics_results' );
-			?>
 			<p><strong>Connected to:</strong> <?php echo $this->toplytics->get_profile_info(); ?></p>
-			<p><strong>Data collected at:</strong> <?php if ( ! empty( $toplytics_results['_ts'] ) ) { echo date( 'd-m-Y h:i:s', $toplytics_results['_ts'] ); } else { echo 'NaN'; } ?></p>
+
+		<?php if ( ! empty( $toplytics_results['_ts'] ) ) {
+			$date_and_time = date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $toplytics_results['_ts'] );
+		?>
+			<p><strong>Data collected at:</strong> <?php echo $date_and_time; ?></p>
+			<p><strong>Timestamp:</strong> <?php echo $toplytics_results['_ts']; ?></p>
+		<?php } ?>
 
 			<input type='button' value='Print This Result' onclick='printDiv("wpbody");'/>
 			<hr>
@@ -147,7 +148,7 @@ class Toplytics_Debug {
 
 }
 
-if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+if ( is_admin() ) {
 	function toplytics_debug_page() {
 		new Toplytics_Debug();
 	}
