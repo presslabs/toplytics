@@ -32,8 +32,8 @@ require_once __DIR__ . '/lib/google-api-php-client/src/Google/autoload.php';
 class Toplytics {
 	const DEFAULT_POSTS = 5;
 	const MIN_POSTS     = 1;
-	const MAX_RESULTS   = 1000;
-	const MAX_POSTS     = Toplytics::MAX_RESULTS;
+	const MAX_RESULTS   = 250;
+	const MAX_POSTS     = 100;
 	const TEMPLATE      = 'toplytics-template.php';
 	const CACHE_TTL     = 3600; // 1h
 
@@ -44,13 +44,22 @@ class Toplytics {
 	private $client_json_file;
 
 	public function __construct() {
+		// set timezone
+		$timezone = get_option( 'timezone_string' );
+		if ( ! empty( $timezone ) ) {
+			date_default_timezone_set( $timezone );
+		}
+
 		$this->client_json_file = __DIR__ . DIRECTORY_SEPARATOR . 'client.json';
 
 		add_filter( 'toplytics_rel_path', array( $this, 'filter_rel_path' ) );
 		add_filter( 'plugin_action_links_' . $this->plugin_basename() , array( $this, '_settings_link' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_script' ) );
-		add_action( 'wp_ajax_toplytics_data', array( $this, 'ajax_data' ) );
-		add_action( 'wp_ajax_nopriv_toplytics_data', array( $this, 'ajax_data' ) );
+
+		add_filter( 'redirect_canonical', array( $this, 'canonical' ) );
+		add_filter( 'query_vars', array( $this, 'add_query_var' ) );
+		add_filter( 'template_include', array( $this, 'handle_endpoint' ) );
+		add_action( 'init', array( $this, 'add_endpoint' ) );
 
 		// add cron event
 		if ( $this->get_token() ) {
@@ -95,6 +104,54 @@ class Toplytics {
 		}
 	}
 
+	public function activation_hook() {
+		$this->remove_old_credentials();
+		$this->add_endpoint();
+	}
+
+	public function deactivation_hook() {
+		$this->remove_endpoint();
+	}
+
+	public function add_query_var( $query_vars ) {
+		$query_vars[] = 'toplytics';
+		return $query_vars;
+	}
+
+	public function remove_endpoint() {
+		global $wp_rewrite;
+		$wp_rewrite->flush_rules();
+	}
+
+	public function add_endpoint() {
+		global $wp_rewrite;
+		add_rewrite_rule( 'toplytics\.json$', 'index.php?toplytics=json', 'top' );
+		$wp_rewrite->flush_rules();
+	}
+
+	public function handle_endpoint( $template ) {
+		global $wp_query;
+		if ( ! empty( $wp_query->query_vars['toplytics'] ) ) {
+			$this->ajax_data();
+		}
+		return $template;
+	}
+
+	/**
+	 * Hook into redirect_canonical to stop trailing slashes on sitemap.xml URLs
+	 *
+	 * @param string $redirect The redirect URL currently determined.
+	 *
+	 * @return bool|string $redirect
+	 */
+	function canonical( $redirect ) {
+		$query_var = get_query_var( 'toplytics' );
+		if ( ! empty( $query_var ) ) {
+			return false;
+		}
+		return $redirect;
+	}
+
 	/**
 	 * On an early action hook, check if the hook is scheduled - if not, schedule it.
 	 */
@@ -115,7 +172,7 @@ class Toplytics {
 
 	public function enqueue_script() {
 		wp_register_script( 'toplytics', plugins_url( 'js/toplytics.js' , __FILE__ ) );
-		wp_localize_script( 'toplytics', 'toplytics', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
+		wp_localize_script( 'toplytics', 'toplytics', array( 'json_url' => esc_url( home_url( '/toplytics.json' ) ) ) );
 		wp_enqueue_script( 'toplytics' );
 	}
 

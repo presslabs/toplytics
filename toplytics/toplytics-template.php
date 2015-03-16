@@ -5,8 +5,9 @@
  */
 if ( ! empty( $toplytics_results ) ) {
 	$posts_list = get_posts( array(
-		'post__in' => array_keys( $toplytics_results ),
-		'orderby'  => 'post__in',
+		'posts_per_page' => count( $toplytics_results ), // the number of posts being displayed
+		'post__in'       => array_keys( $toplytics_results ),
+		'orderby'        => 'post__in',
 	));
 	?><ol><?php
 	global $post;
