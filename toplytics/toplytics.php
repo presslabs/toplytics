@@ -403,6 +403,7 @@ class Toplytics {
 					}
 				}
 			}
+			arsort( $new_data[ $when ] ); // sort the results (revert order)
 		}
 		return apply_filters( 'toplytics_convert_data_to_posts', $new_data, $data );
 	}
