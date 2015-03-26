@@ -117,6 +117,7 @@ class Toplytics_Debug {
 		?>
 		<div class="wrap">
 			<h2>Toplytics Debug</h2>
+			<p><strong>Auth configuration:</strong> <?php echo $this->toplytics->show_auth_config(); ?></p>
 			<p><strong>Connected to:</strong> <?php echo $this->toplytics->get_profile_info(); ?></p>
 
 		<?php if ( ! empty( $toplytics_results['_ts'] ) ) {
