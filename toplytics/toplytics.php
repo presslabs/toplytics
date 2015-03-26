@@ -77,7 +77,7 @@ class Toplytics {
 
 		try {
 			$client = new Google_Client();
-			$client->setAuthConfigFile( $this->client_json_file );
+			$client->setAuthConfig( $this->get_auth_config() );
 			$client->addScope( Google_Service_Analytics::ANALYTICS_READONLY );
 			$client->setAccessType( 'offline' );
 
@@ -481,6 +481,60 @@ class Toplytics {
 		}
 
 		return array();
+	}
+
+	/**
+	 * This function returns the `auth config` as JSON
+	 */
+	public function get_auth_config() {
+		$toplytics_auth_config = get_option( 'toplytics_auth_config' );
+		if ( empty( $toplytics_auth_config ) ) {
+			$toplytics_auth_config = file_get_contents( $this->client_json_file );
+		}
+		return $toplytics_auth_config;
+	}
+
+	/**
+	 * This function returns TRUE if $config is valid, otherwise return FALSE
+	 */
+	public function is_valid_auth_config( $config ) {
+		if ( empty( $config	) || ! is_string( $config ) ) { return false; }
+
+		$config = json_decode( $config, true );
+		if ( ! is_array( $config ) ) { return false; }
+		if ( empty( $config['installed'] ) ) { return false; }
+
+		$config = $config['installed'];
+		if ( empty( $config['client_id'] ) || empty( $config['client_secret'] ) ) { return false; }
+		if ( empty( $config['auth_uri'] ) || empty( $config['token_uri'] ) ) { return false; }
+
+		return true;
+	}
+
+	/**
+	 * This function load the $config
+	 */
+	public function load_auth_config( $config ) {
+		if ( empty( $config ) || ! is_string( $config ) ) { return false; }
+
+		update_option( 'toplytics_auth_config', $config );
+		return true;
+	}
+
+	/**
+	 * This function show up the auth config data as a HTML table
+	 */
+	public function show_auth_config() {
+		$auth_config = json_decode( $this->get_auth_config(), true );
+		$auth_config = $auth_config['installed'];
+		?>
+		<table><tbody>
+			<tr><th>client_id:</th><td><?php echo $auth_config['client_id']; ?></td></tr>
+			<tr><th>client_secret:</th><td><?php echo $auth_config['client_secret']; ?></td></tr>
+			<tr><th>auth_uri:</th><td><?php echo $auth_config['auth_uri']; ?></td></tr>
+			<tr><th>token_uri:</th><td><?php echo $auth_config['token_uri']; ?></td></tr>
+		</tbody></table>
+		<?php
 	}
 }
 global $toplytics;
