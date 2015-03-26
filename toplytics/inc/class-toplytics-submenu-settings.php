@@ -82,6 +82,10 @@ class Toplytics_Submenu_Settings extends Toplytics_Menu {
 		?>
 		<table class="form-table">
 		<tr valign="top">
+		<th scope="row"><label for="auth_config"><?php _e( 'Auth configuration: ', 'toplytics' ); ?></label></th>
+		<td><?php $this->toplytics->show_auth_config(); ?></td>
+		</tr>
+		<tr valign="top">
 		<th scope="row"><label for="profile_id"><?php _e( 'Connected to: ', 'toplytics' ); ?></label></th>
 		<td><?php echo $this->toplytics->get_profile_info(); ?></td>
 		</tr>
