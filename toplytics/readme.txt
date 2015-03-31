@@ -38,6 +38,22 @@ You need to have Google Analytics active on your site if you want to use this pl
 
 Alternatively, go into your WordPress dashboard and click on *Plugins -> Add Plugin* and search for Toplytics. Then click on *Install*, then on *Activate Now*.
 
+= Configuration step 1 =
+In this step please register client application with Google. To register an application please login to the Google account and go to Google API console.
+1. Create a New Project(set a unique project name and id);
+2. Enable the Analytics API in order to be accessed;
+3. From the APIs → Credentials tab create an OAuth 2.0 Client ID;
+3.1. Select application type as “Installed application”;
+3.2. Create Branding information for Client ID by editing the consent screen;
+4. Download the JSON file with API credentials(Auth Config file);
+5. Upload this file in order to make a proper Configuration.
+
+= Configuration step 2 =
+In this step please connect to your Google Analytics Account.
+1. Click the 'Get Authorization Key' button and you will be redirected to google.com;
+2. After logging in you will receive a key;
+3. Then come back to this page and use the key in the 'Authorization Key' field, and then click 'Get Analytics Profiles' button.
+
 = Usage =
 Connect your plugin with Google Analytics Account from the Settings page (*Settigns -> Toplytics*);
 Use the *Toplytics* widget from the *Appearance->Widgets* page;
