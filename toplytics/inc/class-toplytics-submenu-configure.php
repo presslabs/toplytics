@@ -42,6 +42,7 @@ class Toplytics_Submenu_Configure extends Toplytics_Menu {
 			$this->menu_slug,
 			array( $this, 'page' )
 		);
+		new Toplytics_Help( $submenu_hook, 'Configuration' );
 	}
 
 	public function upload_auth_config_file() {

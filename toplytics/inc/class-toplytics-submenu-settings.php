@@ -37,6 +37,7 @@ class Toplytics_Submenu_Settings extends Toplytics_Menu {
 			$this->menu_slug,
 			array( $this, 'page' )
 		);
+		new Toplytics_Help( $submenu_hook, 'configuration' );
 	}
 
 	public function connect() {
