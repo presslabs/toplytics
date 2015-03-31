@@ -64,39 +64,43 @@ class Toplytics {
 		}
 		register_activation_hook( __FILE__, array( $this, 'remove_old_credentials' ) );
 
-		$this->ranges = array(
-			'month'  => date( 'Y-m-d', strtotime( '-30 days'  ) ),
-			'2weeks' => date( 'Y-m-d', strtotime( '-14 days'  ) ),
-			'week'   => date( 'Y-m-d', strtotime( '-7 days'   ) ),
-			'today'  => date( 'Y-m-d', strtotime( 'yesterday' ) ),
+		$ranges = array(
+			'month'  => date( 'Y-m-d', strtotime( '-29 days' ) ),
+			'2weeks' => date( 'Y-m-d', strtotime( '-13 days' ) ),
+			'week'   => date( 'Y-m-d', strtotime( '-6 days'  ) ),
+			'today'  => date( 'Y-m-d', strtotime( 'today'    ) ),
 		);
+		$this->ranges = apply_filters( 'toplytics_ranges', $ranges );
 
-		try {
-			$client = new Google_Client();
-			$client->setAuthConfig( $this->get_auth_config() );
-			$client->addScope( Google_Service_Analytics::ANALYTICS_READONLY );
-			$client->setAccessType( 'offline' );
+		$auth_config = $this->get_auth_config();
+		if ( ! empty( $auth_config ) ) {
+			try {
+				$client = new Google_Client();
+				$client->setAuthConfig( $this->get_auth_config() );
+				$client->addScope( Google_Service_Analytics::ANALYTICS_READONLY );
+				$client->setAccessType( 'offline' );
 
-			$token = $this->get_token();
-			if ( $token ) {
-				$client->setAccessToken( $token );
-			}
-
-			if ( $client->isAccessTokenExpired() ) {
-				$refresh_token = $this->get_refresh_token();
-				if ( $refresh_token ) {
-					$client->refreshToken( $refresh_token );
-					$this->update_token( $client->getAccessToken() );
+				$token = $this->get_token();
+				if ( $token ) {
+					$client->setAccessToken( $token );
 				}
-			}
 
-			$this->client  = $client;
-			$this->service = new Google_Service_Analytics( $this->client );
-		} catch ( Exception $e ) {
-			$message = 'Google Analytics Error[' . $e->getCode() . ']: '. $e->getMessage();
-			$this->disconnect( $message );
-			error_log( $message, E_USER_ERROR );
-			return;
+				if ( $client->isAccessTokenExpired() ) {
+					$refresh_token = $this->get_refresh_token();
+					if ( $refresh_token ) {
+						$client->refreshToken( $refresh_token );
+						$this->update_token( $client->getAccessToken() );
+					}
+				}
+
+				$this->client  = $client;
+				$this->service = new Google_Service_Analytics( $this->client );
+			} catch ( Exception $e ) {
+				$message = 'Google Analytics Error[' . $e->getCode() . ']: '. $e->getMessage();
+				$this->disconnect( $message );
+				error_log( $message, E_USER_ERROR );
+				return;
+			}
 		}
 	}
 
