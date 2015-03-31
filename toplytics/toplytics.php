@@ -370,6 +370,10 @@ class Toplytics {
 		);
 		$result = array();
 		foreach ( $this->ranges as $when => $start_date ) {
+			$fitlers = apply_filters( 'toplytics_analytics_filters', '', $when, $metrics );
+			if ( ! empty( $fitlers ) ) {
+				$optParams['filters'] = $fitlers;
+			}
 			$data = $this->service->data_ga->get( 'ga:' . $this->_get_profile_id(), $start_date, date( 'Y-m-d' ), $metrics, $optParams );
 			apply_filters( 'toplytics_analytics_data', $when, $data->selfLink, $data->modelData['query'], $data->modelData['profileId'] );
 			$result[ $when ] = array();
