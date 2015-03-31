@@ -72,7 +72,7 @@ class Toplytics_Submenu_Configure extends Toplytics_Menu {
 		}
 		check_admin_referer( 'toplytics-admin' );
 		delete_option( 'toplytics_auth_config' );
-		$this->success_redirect( __( 'Auth configurations are now to default values.', 'toplytics' ) );
+		$this->success_redirect( __( 'Auth configurations are now reset.', 'toplytics' ) );
 	}
 
 	public function get_authorization_key() { // User login & consent
@@ -143,41 +143,43 @@ class Toplytics_Submenu_Configure extends Toplytics_Menu {
 				<tr valign="top">
 				<td>
 				<p class="submit">
-					<?php _e( 'Press this button in order to reset the Auth Configurations to default settings', 'toplytics' ); ?>:&nbsp;
+					<?php _e( 'Press this button in order to reset the Auth Configurations', 'toplytics' ); ?>:&nbsp;
 					<input type="submit" name="ToplyticsSubmitResetAuthConfig" class="button" value="<?php _e( 'Reset Auth Config', 'toplytics' ); ?>" />
 				</p>
 				</td>
 				</tr>
 			</form>
 
-			<form action="" method="post">
-				<?php wp_nonce_field( 'toplytics-admin' ); ?>
-				<tr valign="top">
-				<td>
-					<strong><?php _e( 'Please connect to your Google Analytics Account.', 'toplytics' ); ?></strong><br /><br />
-					<ol>
-					<li><?php _e( "Click the 'Get Authorization Key' button and you will be redirected to google.com", 'toplytics' ); ?></li>
-					<li><?php _e( 'After logging in you will receive a key', 'toplytics' ); ?></li>
-					<li><?php _e( "Then come back to this page and use the key in the 'Authorization Key' field, and then click 'Get Analytics Profiles' button", 'toplytics' ); ?></li>
-					</ol>
-				</td>
-				</tr>
+			<?php if ( $this->toplytics->is_valid_auth_config() ) { ?>
+				<form action="" method="post">
+					<?php wp_nonce_field( 'toplytics-admin' ); ?>
+					<tr valign="top">
+					<td>
+						<strong><?php _e( 'Please connect to your Google Analytics Account.', 'toplytics' ); ?></strong><br /><br />
+						<ol>
+						<li><?php _e( "Click the 'Get Authorization Key' button and you will be redirected to google.com", 'toplytics' ); ?></li>
+						<li><?php _e( 'After logging in you will receive a key', 'toplytics' ); ?></li>
+						<li><?php _e( "Then come back to this page and use the key in the 'Authorization Key' field, and then click 'Get Analytics Profiles' button", 'toplytics' ); ?></li>
+						</ol>
+					</td>
+					</tr>
 
-				<tr valign="top">
-				<td>
-					<?php _e( 'Authorization Key', 'toplytics' ); ?>:&nbsp;<input type="text" name="toplytics_authorization_key" value="" />
-				</td>
-				</tr>
+					<tr valign="top">
+					<td>
+						<?php _e( 'Authorization Key', 'toplytics' ); ?>:&nbsp;<input type="text" name="toplytics_authorization_key" value="" />
+					</td>
+					</tr>
 
-				<tr valign="top">
-				<td>
-				<p class="submit">
-					<input type="submit" name="ToplyticsSubmitGetAnalyticsProfiles" class="button-primary" value="<?php _e( 'Get Analytics Profiles', 'toplytics' ); ?>" />
-					<input type="submit" name="ToplyticsSubmitGetAuthorizationKey" class="button" value="<?php _e( 'Get Authorization Key', 'toplytics' ); ?>" />
-				</p>
-				</td>
-				</tr>
-			</form>
+					<tr valign="top">
+					<td>
+					<p class="submit">
+						<input type="submit" name="ToplyticsSubmitGetAnalyticsProfiles" class="button-primary" value="<?php _e( 'Get Analytics Profiles', 'toplytics' ); ?>" />
+						<input type="submit" name="ToplyticsSubmitGetAuthorizationKey" class="button" value="<?php _e( 'Get Authorization Key', 'toplytics' ); ?>" />
+					</p>
+					</td>
+					</tr>
+				</form>
+			<?php } ?>
 
 			</table>
 		</div>

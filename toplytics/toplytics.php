@@ -32,8 +32,8 @@ require_once __DIR__ . '/lib/google-api-php-client/src/Google/autoload.php';
 class Toplytics {
 	const DEFAULT_POSTS = 5;
 	const MIN_POSTS     = 1;
-	const MAX_RESULTS   = 250;
 	const MAX_POSTS     = 100;
+	const MAX_RESULTS   = 250;
 	const TEMPLATE      = 'toplytics-template.php';
 	const CACHE_TTL     = 3600; // 1h
 
@@ -292,6 +292,7 @@ class Toplytics {
 		$this->remove_token();
 		$this->remove_refresh_token();
 		$this->remove_profile_data();
+		$this->remove_auth_config();
 		delete_transient( 'toplytics_cached_results' );
 	}
 
@@ -342,6 +343,17 @@ class Toplytics {
 
 	public function update_refresh_token( $value ) {
 		return update_option( 'toplytics_oauth2_refresh_token', $value );
+	}
+
+	/**
+	 * This function returns the `auth config` as JSON
+	 */
+	public function get_auth_config() {
+		return get_option( 'toplytics_auth_config', '' );
+	}
+
+	public function remove_auth_config() {
+		return delete_option( 'toplytics_auth_config' );
 	}
 
 	private function _get_analytics_data() {
@@ -480,21 +492,12 @@ class Toplytics {
 	}
 
 	/**
-	 * This function returns the `auth config` as JSON
-	 */
-	public function get_auth_config() {
-		$toplytics_auth_config = get_option( 'toplytics_auth_config' );
-		if ( empty( $toplytics_auth_config ) ) {
-			$toplytics_auth_config = file_get_contents( $this->client_json_file );
-		}
-		return $toplytics_auth_config;
-	}
-
-	/**
 	 * This function returns TRUE if $config is valid, otherwise return FALSE
 	 */
-	public function is_valid_auth_config( $config ) {
-		if ( empty( $config	) || ! is_string( $config ) ) { return false; }
+	public function is_valid_auth_config( $config = '' ) {
+		if ( empty( $config ) ) { $config = $this->get_auth_config(); }
+
+		if ( ! is_string( $config ) ) { return false; }
 
 		$config = json_decode( $config, true );
 		if ( ! is_array( $config ) ) { return false; }
@@ -523,22 +526,26 @@ class Toplytics {
 	public function show_auth_config() {
 		$auth_config = json_decode( $this->get_auth_config(), true );
 		$auth_config = $auth_config['installed'];
-		?>
-		<table><tbody>
+		if ( ! empty( $auth_config ) ) {
+			?>
+			<table><tbody>
 			<tr><th>client_id:</th><td><?php echo $auth_config['client_id']; ?></td></tr>
 			<tr><th>client_secret:</th><td><?php echo $auth_config['client_secret']; ?></td></tr>
 			<tr><th>auth_uri:</th><td><?php echo $auth_config['auth_uri']; ?></td></tr>
-			<tr><th>token_uri:</th><td><?php echo $auth_config['token_uri']; ?></td></tr>
-		</tbody></table>
-		<?php
+			</tbody></table>
+			<?php
+		} else {
+			_e( 'Every application has to be registered with the Google API so that we can use the OAuth 2.0 token during the authentication and authorisation process. To get help for this steps, please go to the Help menu(upper-right corner).', 'toplytics' );
+		}
 	}
 }
 global $toplytics;
 $toplytics = new Toplytics();
 
 require_once __DIR__ . '/backward-compatibility.php';
-require_once __DIR__ . '/inc/class-toplytics-admin.php';
+require_once __DIR__ . '/inc/class-toplytics-help.php';
 require_once __DIR__ . '/inc/class-toplytics-menu.php';
+require_once __DIR__ . '/inc/class-toplytics-admin.php';
 require_once __DIR__ . '/inc/class-toplytics-submenu-configure.php';
 require_once __DIR__ . '/inc/class-toplytics-submenu-settings.php';
 require_once __DIR__ . '/inc/class-toplytics-wp-widget.php';
