@@ -11,3 +11,10 @@ $toplytics_options = $wpdb->get_results( "SELECT option_name FROM {$wpdb->prefix
 foreach ( $toplytics_options as $option ) :
 	delete_option( $option->option_name );
 endforeach;
+
+// remove the cron event
+wp_clear_scheduled_hook( 'toplytics_cron_event' );
+
+// flush rewrite rules in order to remove the rewrite rule
+global $wp_rewrite;
+$wp_rewrite->flush_rules();
