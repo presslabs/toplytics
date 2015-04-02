@@ -55,20 +55,20 @@ class Toplytics {
 		add_filter( 'redirect_canonical', array( $this, 'canonical' ) );
 		add_filter( 'query_vars', array( $this, 'add_query_var' ) );
 		add_filter( 'template_include', array( $this, 'handle_endpoint' ) );
-		add_action( 'init', array( $this, 'add_endpoint' ) );
+		add_action( 'wp_loaded', array( $this, 'add_endpoint' ) );
 
 		// add cron event
 		if ( $this->get_token() ) {
 			add_action( 'wp', array( $this, 'setup_schedule_event' ) );
 			add_action( 'toplytics_cron_event', array( $this, 'update_analytics_data' ) );
 		}
-		register_activation_hook( __FILE__, array( $this, 'remove_old_credentials' ) );
+		register_activation_hook( __FILE__, array( $this, 'activation_hook' ) );
+		register_deactivation_hook( __FILE__, array( $this, 'deactivation_hook' ) );
 
 		$ranges = array(
-			'month'  => date( 'Y-m-d', strtotime( '-29 days' ) ),
-			'2weeks' => date( 'Y-m-d', strtotime( '-13 days' ) ),
-			'week'   => date( 'Y-m-d', strtotime( '-6 days'  ) ),
-			'today'  => date( 'Y-m-d', strtotime( 'today'    ) ),
+			'month' => date( 'Y-m-d', strtotime( '-29 days' ) ),
+			'week'  => date( 'Y-m-d', strtotime( '-6 days'  ) ),
+			'today' => date( 'Y-m-d', strtotime( 'today'    ) ),
 		);
 		$this->ranges = apply_filters( 'toplytics_ranges', $ranges );
 
@@ -107,10 +107,11 @@ class Toplytics {
 	public function activation_hook() {
 		$this->remove_old_credentials();
 		$this->add_endpoint();
+		$this->flush_rules();
 	}
 
 	public function deactivation_hook() {
-		$this->remove_endpoint();
+		$this->flush_rules();
 	}
 
 	public function add_query_var( $query_vars ) {
@@ -118,15 +119,13 @@ class Toplytics {
 		return $query_vars;
 	}
 
-	public function remove_endpoint() {
+	public function flush_rules() {
 		global $wp_rewrite;
 		$wp_rewrite->flush_rules();
 	}
 
 	public function add_endpoint() {
-		global $wp_rewrite;
 		add_rewrite_rule( 'toplytics\.json$', 'index.php?toplytics=json', 'top' );
-		$wp_rewrite->flush_rules();
 	}
 
 	public function handle_endpoint( $template ) {
