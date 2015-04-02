@@ -81,7 +81,7 @@ class Toplytics_Shortcode {
 		}
 		$out .= '</ol>';
 
-		return $out;
+		return apply_filters( 'toplytics_shortcode_filter', $out, $args );
 	}
 }
 new Toplytics_Shortcode();
