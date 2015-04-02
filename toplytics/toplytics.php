@@ -35,7 +35,7 @@ class Toplytics {
 	const MAX_POSTS     = 100;
 	const MAX_RESULTS   = 250;
 	const TEMPLATE      = 'toplytics-template.php';
-	const CACHE_TTL     = 3600; // 1h
+	const CACHE_TTL     = 3530; // ~1h
 
 	public $client;
 	public $service;
@@ -47,7 +47,6 @@ class Toplytics {
 		if ( ! empty( $timezone ) ) {
 			date_default_timezone_set( $timezone );
 		}
-
 		add_filter( 'toplytics_rel_path', array( $this, 'filter_rel_path' ) );
 		add_filter( 'plugin_action_links_' . $this->plugin_basename() , array( $this, '_settings_link' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_script' ) );
@@ -305,7 +304,11 @@ class Toplytics {
 			Throw new Exception( 'There is no profile data in DB.' );
 		}
 		$profile_data = json_decode( $profile_data, true );
-		return $profile_data['profile_id'];
+		if ( ! empty( $profile_data['profile_id'] ) ) {
+			return $profile_data['profile_id'];
+		}
+
+		return '';
 	}
 
 	public function get_profile_data() {
@@ -368,22 +371,25 @@ class Toplytics {
 			'max-results' => $this::MAX_RESULTS,
 		);
 		$result = array();
-		foreach ( $this->ranges as $when => $start_date ) {
-			$fitlers = apply_filters( 'toplytics_analytics_filters', '', $when, $metrics );
-			if ( ! empty( $fitlers ) ) {
-				$optParams['filters'] = $fitlers;
-			}
-			$data = $this->service->data_ga->get( 'ga:' . $this->_get_profile_id(), $start_date, date( 'Y-m-d' ), $metrics, $optParams );
-			apply_filters( 'toplytics_analytics_data', $when, $data->selfLink, $data->modelData['query'], $data->modelData['profileId'] );
-			$result[ $when ] = array();
-			if ( $data->rows ) {
-				foreach ( $data->rows as $item ) {
-					$pagepath  = $item[0];
-					$pageviews = $item[1];
-					$result[ $when ][ $pagepath ] = $pageviews;
+		$profile_id = $this->_get_profile_id();
+		if ( ! empty( $profile_id ) ) {
+			foreach ( $this->ranges as $when => $start_date ) {
+				$fitlers = apply_filters( 'toplytics_analytics_filters', '', $when, $metrics );
+				if ( ! empty( $fitlers ) ) {
+					$optParams['filters'] = $fitlers;
 				}
+				$data = $this->service->data_ga->get( 'ga:' . $profile_id, $start_date, date( 'Y-m-d' ), $metrics, $optParams );
+				apply_filters( 'toplytics_analytics_data', $when, $data->selfLink, $data->modelData['query'], $data->modelData['profileId'] );
+				$result[ $when ] = array();
+				if ( $data->rows ) {
+					foreach ( $data->rows as $item ) {
+						$pagepath  = $item[0];
+						$pageviews = $item[1];
+						$result[ $when ][ $pagepath ] = $pageviews;
+					}
+				}
+				apply_filters( 'toplytics_analytics_data_result', $result[ $when ], $when );
 			}
-			apply_filters( 'toplytics_analytics_data_result', $result[ $when ], $when );
 		}
 		return apply_filters( 'toplytics_analytics_data_allresults', $result );
 	}
@@ -557,4 +563,3 @@ require_once __DIR__ . '/inc/class-toplytics-submenu-configure.php';
 require_once __DIR__ . '/inc/class-toplytics-submenu-settings.php';
 require_once __DIR__ . '/inc/class-toplytics-wp-widget.php';
 require_once __DIR__ . '/inc/class-toplytics-shortcode.php';
-require_once __DIR__ . '/inc/class-toplytics-debug.php';
