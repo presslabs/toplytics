@@ -367,7 +367,6 @@ class Toplytics {
 	 * Needs `profile_id`
 	 */
 	private function _get_analytics_data() {
-		$metrics  = 'ga:pageviews';
 		$optParams = array(
 			'quotaUser'   => md5( home_url() ),
 			'dimensions'  => 'ga:pagePath',
@@ -378,18 +377,16 @@ class Toplytics {
 		$profile_id = $this->_get_profile_id();
 		if ( ! empty( $profile_id ) ) {
 			foreach ( $this->ranges as $when => $start_date ) {
-				$filters = apply_filters( 'toplytics_analytics_filters', '', $when, $metrics );
+				$filters = apply_filters( 'toplytics_analytics_filters', '', $when, 'ga:pageviews' );
 				if ( ! empty( $filters ) ) {
 					$optParams['filters'] = $filters;
 				}
-				$data = $this->service->data_ga->get( 'ga:' . $profile_id, $start_date, date( 'Y-m-d' ), $metrics, $optParams );
+				$data = $this->service->data_ga->get( 'ga:' . $profile_id, $start_date, date( 'Y-m-d' ), 'ga:pageviews', $optParams );
 				apply_filters( 'toplytics_analytics_data', $when, $data->selfLink, $data->modelData['query'], $data->modelData['profileId'] );
 				$result[ $when ] = array();
 				if ( $data->rows ) {
 					foreach ( $data->rows as $item ) {
-						$pagepath  = $item[0];
-						$pageviews = $item[1];
-						$result[ $when ][ $pagepath ] = $pageviews;
+						$result[ $when ][ $item[0] ] = $item[1]; // result[ when ][ pagepath ] = pageviews
 					}
 				}
 				apply_filters( 'toplytics_analytics_data_result', $result[ $when ], $when );
