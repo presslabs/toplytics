@@ -367,6 +367,10 @@ class Toplytics {
 		return delete_option( 'toplytics_auth_config' );
 	}
 
+	/**
+	 * Get Google Analytics statistics using `gapi`
+	 * Needs `profile_id`
+	 */
 	private function _get_analytics_data() {
 		$metrics  = 'ga:pageviews';
 		$optParams = array(
