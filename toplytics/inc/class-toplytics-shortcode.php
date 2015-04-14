@@ -60,7 +60,7 @@ class Toplytics_Shortcode {
 
 	private function _show_the_top( $args ) {
 		$args    = $this->_validate_args( $args );
-		$results = $this->toplytics->get_data( $args['period'] );
+		$results = $this->toplytics->get_result( $args['period'] );
 		if ( ! $results ) { return ''; }
 
 		$counter = 0;

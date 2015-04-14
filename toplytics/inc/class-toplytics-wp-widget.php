@@ -60,7 +60,7 @@ class Toplytics_WP_Widget extends WP_Widget {
 		if ( ! in_array( $period, $stats_periods ) ) {
 			$period = $stats_periods[0];
 		}
-		$toplytics_results = $this->toplytics->get_data( $period );
+		$toplytics_results = $this->toplytics->get_result( $period );
 		$toplytics_results = array_slice( $toplytics_results, 0, $numberposts, true );
 
 		// variables for backward compatibilty

@@ -9,7 +9,7 @@ function toplytics_get_results( $args = array() ) {
 	$new_args = array_merge( array( 'period' => 'week', 'numberposts' => 5 ), $args );
 
 	global $toplytics;
-	$data = $toplytics->get_data( $new_args['period'] );
+	$data = $toplytics->get_result( $new_args['period'] );
 	if ( empty( $data ) ) {
 		return false;
 	}
