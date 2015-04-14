@@ -38,40 +38,35 @@ class Toplytics_Admin {
 		}
 	}
 
-	public function admin_notices() {
-		add_action(
-			'admin_notices',
-			create_function(
-				'',
-				"echo '<div class=\"error\"><p>"
-				. sprintf(
-					__( 'Toplytics needs configuration information on its <a href="%s">Settings</a> page.', 'toplytics' ),
-					$this->toplytics->return_settings_link()
-				)
-				. "</p></div>';"
-			)
+	public function notice() {
+		?><div class="error"><p><?php
+		echo sprintf(
+			__( 'Toplytics needs configuration information on its <a href="%s">Settings</a> page.', 'toplytics' ),
+			$this->toplytics->return_settings_link()
 		);
+		?></p></div><?php
+	}
+
+	public function admin_notices() {
+		add_action( 'admin_notices', array( $this, 'notice' ) );
+	}
+
+	public function disconnect_notice() {
+		?><div class="error"><p><?php
+		echo sprintf(
+			__( 'Toplytics plugin was disconnected! Possible reason: %s!', 'toplytics' ),
+			get_option( 'toplytics_disconnect_message' )
+		)
+		. ' '
+		. sprintf(
+			__( '<a href="%s">Dismiss</a>', 'toplytics' ), $this->toplytics->return_settings_link()
+			. '&ToplyticsDismiss=true'
+		);
+		?></p></div><?php
 	}
 
 	public function admin_disconnect_notice() {
-		add_action(
-			'admin_notices',
-			create_function(
-				'',
-				"echo '<div class=\"error\"><p>"
-				. sprintf(
-					__( 'Toplytics plugin was disconnected! Possible reason: %s!', 'toplytics' ),
-					get_option( 'toplytics_disconnect_message' )
-				)
-				. ' '
-				. sprintf(
-					__( '<a href="%s">Dismiss</a>', 'toplytics' ),
-					$this->toplytics->return_settings_link()
-					. '&ToplyticsDismiss=true'
-				)
-				. "</p></div>';"
-			)
-		);
+		add_action( 'admin_notices', array( $this, 'disconnect_notice' ) );
 	}
 
 	public function dismiss() {
