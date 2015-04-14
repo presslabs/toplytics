@@ -176,14 +176,14 @@ class Toplytics {
 	}
 
 	public function get_template_filename() {
-		$toplytics_template_filename = Toplytics::TEMPLATE;
+		$toplytics_template = Toplytics::TEMPLATE;
 
-		$theme_template = get_stylesheet_directory() . "/$toplytics_template_filename";
+		$theme_template = get_stylesheet_directory() . "/$toplytics_template";
 		if ( file_exists( $theme_template ) ) {
 			return $theme_template;
 		}
 
-		$plugin_template = plugin_dir_path( __FILE__ ) . $toplytics_template_filename;
+		$plugin_template = plugin_dir_path( __FILE__ ) . $toplytics_template;
 		if ( file_exists( $plugin_template ) ) {
 			return $plugin_template;
 		}
@@ -479,13 +479,12 @@ class Toplytics {
 			$result = $this->get_result( $when );
 			if ( ! empty( $result ) ) {
 				foreach ( $result as $post_id => $pageviews ) {
-					$data = array();
-
-					$data['permalink'] = get_permalink( $post_id );
-					$data['title']     = get_the_title( $post_id );
-					$data['post_id']   = (int) $post_id;
-					$data['views']     = (int) $pageviews;
-
+					$data = array(
+						'permalink' => get_permalink( $post_id ),
+						'title'     => get_the_title( $post_id ),
+						'post_id'   => (int) $post_id,
+						'views'     => (int) $pageviews,
+					);
 					$post_data[ $when ][] = apply_filters( 'toplytics_json_data', $data, $post_id, $when );
 				}
 			}
