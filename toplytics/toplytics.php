@@ -136,7 +136,7 @@ class Toplytics {
 	public function handle_endpoint( $template ) {
 		global $wp_query;
 		if ( ! empty( $wp_query->query_vars['toplytics'] ) ) {
-			$this->ajax_data();
+			$this->json_data();
 		}
 		return $template;
 	}
