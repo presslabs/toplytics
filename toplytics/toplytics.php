@@ -35,7 +35,6 @@ class Toplytics {
 	const MAX_POSTS     = 100;
 	const MAX_RESULTS   = 250;
 	const TEMPLATE      = 'toplytics-template.php';
-	const CACHE_TTL     = 3530; // ~1h
 
 	public $client;
 	public $service;
@@ -295,7 +294,6 @@ class Toplytics {
 		$this->remove_refresh_token();
 		$this->remove_profile_data();
 		$this->remove_auth_config();
-		delete_transient( 'toplytics_cached_results' );
 	}
 
 	private function _get_profile_id() {
@@ -404,36 +402,75 @@ class Toplytics {
 		return '';
 	}
 
-	private function _convert_data_to_posts( $data ) {
+	/**
+	 * Use the GA data to retrieve WordPress post data
+	 */
+	private function _convert_data_to_posts( $data, $when ) {
 		$new_data = array();
-		foreach ( $data as $when => $stats ) {
-			$new_data[ $when ] = array();
-			foreach ( $stats as $rel_path => $pageviews ) {
-				$rel_path = apply_filters( 'toplytics_rel_path', $rel_path, $when );
-				$url      = home_url() . $rel_path;
-				$post_id  = url_to_postid( $url );
-				$url      = apply_filters( 'toplytics_convert_data_url', $url, $when, $post_id, $rel_path, $pageviews );
-				if ( ( 0 < $post_id ) && ( 'post' == get_post_type( $post_id ) ) ) {
-					$post = get_post( $post_id );
-					if ( is_object( $post ) ) {
-						if ( isset( $new_data[ $when ][ $post_id ] ) ) {
-							$new_data[ $when ][ $post_id ] += $pageviews;
-						} else {
-							$new_data[ $when ][ $post_id ] = (int) $pageviews;
-						}
+		foreach ( $data as $rel_path => $pageviews ) {
+			$rel_path = apply_filters( 'toplytics_rel_path', $rel_path, $when );
+			$url      = home_url() . $rel_path;
+			$post_id  = url_to_postid( $url );
+			$url      = apply_filters( 'toplytics_convert_data_url', $url, $when, $post_id, $rel_path, $pageviews );
+			if ( ( 0 < $post_id ) && ( 'post' == get_post_type( $post_id ) ) ) {
+				$post = get_post( $post_id );
+				if ( is_object( $post ) ) {
+					if ( isset( $new_data[ $post_id ] ) ) {
+						$new_data[ $post_id ] += $pageviews;
+					} else {
+						$new_data[ $post_id ] = (int) $pageviews;
 					}
 				}
 			}
-			arsort( $new_data[ $when ] ); // sort the results (revert order)
 		}
-		return apply_filters( 'toplytics_convert_data_to_posts', $new_data, $data );
+		arsort( $new_data ); // sort the results (revert order)
+		return apply_filters( 'toplytics_convert_data_to_posts', $new_data, $data, $when );
 	}
 
-	public function ajax_data() {
+	/**
+	 * Update Toplytics data collected from Analytics
+	 */
+	public function update_analytics_data() {
+		try {
+			$data = $this->_get_analytics_data();
+		} catch ( Exception $e ) {
+			if ( 401 == $e->getCode() ) {
+				$this->disconnect( 'Invalid Credentials' );
+			}
+			error_log( 'Cannot update Google Analytics data[' . $e->getCode() . ']: '. $e->getMessage(), E_USER_ERROR );
+			return false;
+		}
+
+		$is_updated = false;
+		foreach ( $data as $when => $stats ) {
+			if ( is_array( $stats ) && ! empty( $stats ) ) {
+				$result['result'] = $this->_convert_data_to_posts( $stats, $when );
+				$result['_ts'] = time();
+				update_option( "toplytics_result_$when", $result );
+				$is_updated = true;
+			}
+		}
+
+		return $is_updated;
+	}
+
+	/**
+	 * Get Toplytics result from DB
+	 */
+	public function get_result( $when = 'today' ) {
+		$toplytics_result = get_option( "toplytics_result_$when", array() );
+
+		return $toplytics_result['result'];
+	}
+
+	/**
+	 * Return Toplytics data as a json file
+	 */
+	public function json_data() {
 		header( 'Content-Type: application/json' );
 		$post_data = array();
 		foreach ( array_keys( $this->ranges ) as $when ) {
-			$result = $this->get_data( $when );
+			$result = $this->get_result( $when );
 			if ( ! empty( $result ) ) {
 				foreach ( $result as $post_id => $pageviews ) {
 					$data = array();
@@ -450,58 +487,6 @@ class Toplytics {
 		$json_data = apply_filters( 'toplytics_json_all_data', $post_data, $when );
 		echo json_encode( $json_data, JSON_FORCE_OBJECT );
 		die();
-	}
-
-	public function update_analytics_data() {
-		try {
-			$data = $this->_get_analytics_data();
-		} catch ( Exception $e ) {
-			if ( 401 == $e->getCode() ) {
-				$this->disconnect( 'Invalid Credentials' );
-			}
-			error_log( 'Cannot update Google Analytics data[' . $e->getCode() . ']: '. $e->getMessage(), E_USER_ERROR );
-			return false;
-		}
-
-		// test if $data is empty
-		$is_data_empty = false;
-		foreach ( $data as $when => $stats ) {
-			if ( is_array( $stats ) && ! empty( $stats ) ) {
-				continue;
-			} else {
-				$is_data_empty = true;
-				break;
-			}
-		}
-
-		if ( $is_data_empty ) {
-			return get_option( 'toplytics_results' );
-		}
-
-		$results = $this->_convert_data_to_posts( $data );
-		$results['_ts'] = time();
-		set_transient( 'toplytics_cached_results', $results );
-		update_option( 'toplytics_results', $results );
-		return $results;
-	}
-
-	public function get_data( $when = 'today' ) {
-		$cached_results = get_transient( 'toplytics_cached_results' );
-		if ( isset( $cached_results[ $when ] ) and ( ( time() - $cached_results['_ts'] ) < Toplytics::CACHE_TTL ) ) {
-			return $cached_results[ $when ];
-		}
-
-		$results = get_option( 'toplytics_results', array() );
-
-		if ( empty( $results ) && ! empty( $cached_results[ $when ] ) ) {
-			return $cached_results[ $when ];
-		}
-
-		if ( ! empty( $results[ $when ] ) ) {
-			return $results[ $when ];
-		}
-
-		return array();
 	}
 
 	/**
