@@ -58,13 +58,20 @@ class Toplytics {
 		register_activation_hook( __FILE__, array( $this, 'activation_hook' ) );
 		register_deactivation_hook( __FILE__, array( $this, 'deactivation_hook' ) );
 
+		$this->add_ranges();
+		$this->add_google_client();
+	}
+
+	public function add_ranges() {
 		$ranges = array(
 			'month' => date( 'Y-m-d', strtotime( '-29 days' ) ),
 			'week'  => date( 'Y-m-d', strtotime( '-6 days'  ) ),
 			'today' => date( 'Y-m-d', strtotime( 'today'    ) ),
 		);
 		$this->ranges = apply_filters( 'toplytics_ranges', $ranges );
+	}
 
+	public function add_google_client() {
 		$auth_config = $this->get_auth_config();
 		if ( ! empty( $auth_config ) ) {
 			try {
