@@ -106,10 +106,17 @@ class Toplytics {
 		$this->remove_old_credentials();
 		$this->add_endpoint();
 		$this->flush_rules();
+		$this->add_options();
 	}
 
 	public function deactivation_hook() {
 		$this->flush_rules();
+	}
+
+	public function add_options() {
+		foreach ( $this->ranges as $when => $data ) :
+			add_option( "toplytics_result_$when", array(), '', 'no' );
+		endforeach;
 	}
 
 	public function add_query_var( $query_vars ) {
