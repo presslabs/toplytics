@@ -388,7 +388,7 @@ class Toplytics {
 				if ( ! empty( $filters ) ) {
 					$optParams['filters'] = $filters;
 				}
-				$data = $this->service->data_ga->get( 'ga:' . $profile_id, $start_date, date( 'Y-m-d' ), 'ga:pageviews', $optParams );
+				$data = $this->service->data_ga->get( 'ga:' . $profile_id, $start_date, date_i18n( 'Y-m-d' ), 'ga:pageviews', $optParams );
 				apply_filters( 'toplytics_analytics_data', $when, $data->selfLink, $data->modelData['query'], $data->modelData['profileId'] );
 				$result[ $when ] = array();
 				if ( $data->rows ) {
