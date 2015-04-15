@@ -132,6 +132,7 @@ class Toplytics_Submenu_Configure extends Toplytics_Menu {
 
 			<form enctype="multipart/form-data" action="" method="post">
 				<?php wp_nonce_field( 'toplytics-admin' ); ?>
+				<?php if ( ! $this->toplytics->is_valid_auth_config() ) { ?>
 				<tr valign="top">
 				<td>
 				<p class="submit">
@@ -140,6 +141,7 @@ class Toplytics_Submenu_Configure extends Toplytics_Menu {
 				</p>
 				</td>
 				</tr>
+				<?php } else { ?>
 				<tr valign="top">
 				<td>
 				<p class="submit">
@@ -148,6 +150,7 @@ class Toplytics_Submenu_Configure extends Toplytics_Menu {
 				</p>
 				</td>
 				</tr>
+				<?php } ?>
 			</form>
 
 			<?php if ( $this->toplytics->is_valid_auth_config() ) { ?>
