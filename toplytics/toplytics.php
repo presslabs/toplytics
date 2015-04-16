@@ -64,9 +64,9 @@ class Toplytics {
 
 	public function add_ranges() {
 		$ranges = array(
-			'month' => date( 'Y-m-d', strtotime( '-29 days' ) ),
-			'week'  => date( 'Y-m-d', strtotime( '-6 days'  ) ),
-			'today' => date( 'Y-m-d', strtotime( 'today'    ) ),
+			'month' => date_i18n( 'Y-m-d', strtotime( '-29 days' ) ),
+			'week'  => date_i18n( 'Y-m-d', strtotime( '-6 days'  ) ),
+			'today' => date_i18n( 'Y-m-d', strtotime( 'today'    ) ),
 		);
 		$this->ranges = apply_filters( 'toplytics_ranges', $ranges );
 	}
