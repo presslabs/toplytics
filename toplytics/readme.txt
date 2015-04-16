@@ -8,7 +8,7 @@ Stable tag: 3.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Displays the most visited posts as a widget using data from Google Analytics. Designed to be used under high-traffic or low server resources in a cache friendly manner.
+Displays the most visited posts as a widget using data from Google Analytics. Designed to be used under high-traffic or low server resources.
 
 == Description ==
 This plugin displays the most visited posts as a widget using data extracted from Google Analytics. It is designed to work with high-traffic sites and all types of caching.
@@ -16,16 +16,16 @@ This plugin displays the most visited posts as a widget using data extracted fro
 = IMPORTANT! =
 You need to have Google Analytics active on your site if you want to use this plugin!
 
-= Features: =
-* Connection with Google Analytics Account using OAuth method;
+= Features =
+* Connection with Google Analytics Account using OAuth 2.0 method;
 * Starting with the plugin version 3.0 we have switched to GA API v3
 * Widget displaying most visited posts as simple links;
 * The widget can display the most viewed articles from the past day, week, two weeks or month;
-* You can set the number of posts to be displayed between 1 and 1000;
+* You can set the number of posts to be displayed between 1 and 250;
 * It can also display the number of views as counted by Google Analytics;
 * i18n support/translation requests are more than welcome;
 * Generate the list of the most viewed posts dynamicaly with JavaScript;
-* custom template for displaying the widget is available and should be included in the active theme folder;
+* Custom template for displaying the widget is available and should be included in the active theme folder;
 * You can use some of the plugin's functions if the above are not enough for your customization needs. Check FAQ for details;
 * Shortcodes are now supported for easier integration into posts/pages or other widgets. Check FAQ for details;
 
@@ -40,23 +40,33 @@ Alternatively, go into your WordPress dashboard and click on *Plugins -> Add Plu
 
 = Configuration step 1 =
 In this step please register client application with Google. To register an application please login to the Google account and go to Google API console.
+
 1. Create a New Project(set a unique project name and id);
+
 2. Enable the Analytics API in order to be accessed;
+
 3. From the APIs → Credentials tab create an OAuth 2.0 Client ID;
+
 3.1. Select application type as “Installed application”;
+
 3.2. Create Branding information for Client ID by editing the consent screen;
+
 4. Download the JSON file with API credentials(Auth Config file);
+
 5. Upload this file in order to make a proper Configuration.
 
 = Configuration step 2 =
 In this step please connect to your Google Analytics Account.
+
 1. Click the 'Get Authorization Key' button and you will be redirected to google.com;
+
 2. After logging in you will receive a key;
+
 3. Then come back to this page and use the key in the 'Authorization Key' field, and then click 'Get Analytics Profiles' button.
 
 = Usage =
 Connect your plugin with Google Analytics Account from the Settings page (*Settigns -> Toplytics*);
-Use the *Toplytics* widget from the *Appearance->Widgets* page;
+Use the *Toplytics* widget from the *Appearance -> Widgets* page;
 
 == Frequently Asked Questions ==
 
@@ -72,7 +82,7 @@ To use a custom template you just need to copy the file `toplytics-template.php`
 You can then customize your template. The plugin will first search for the file `toplytics-template.php` in the active theme folder, and, if that's not found, it will search for it in the plugin folder. The custom template from the theme folder has priority over the one in the plugin folder.
 
 = How can I use the shortcode? =
-The shortcode has 3 parameters: period -> default=month (today/week/2weeks/month), numberposts -> default=5 (min=1/max=1000), showviews -> default=false (true/false)
+The shortcode has 3 parameters: period -> default=month (today/week/month), numberposts -> default=5 (min=1/max=250), showviews -> default=false (true/false)
 
 Shortcode example:
 
@@ -117,8 +127,8 @@ Here is a simple example that displays the first 7 most visited posts in the pas
 
 `<?php
 	$toplytics_args = array(
-		'period' => 'month',  // default=month (today/week/2weeks/month)
-		'numberposts' => 7,   // default=5 (min=1/max=1000)
+		'period' => 'month',  // default=month (today/week/month)
+		'numberposts' => 7,   // default=5 (min=1/max=250)
 		'showviews' => true   // default=false (true/false)
 	);
 	if ( function_exists( 'toplytics_results' ) )
@@ -137,8 +147,8 @@ toplytics_get_results() returns the toplytics results into an array; in this cas
 **Parameters**
 
 args -> This parameter is a list of toplytics options:
-		period      - represents the statistics period, default=month (today/week/2weeks/month);
-		numberposts - represents the number of posts to be displayed, default=5 (min=1/max=1000);
+		period      - represents the statistics period, default=month (today/week/month);
+		numberposts - represents the number of posts to be displayed, default=5 (min=1/max=250);
 
 **Return Values**
 
@@ -149,8 +159,8 @@ If the toplytics results contains at least one element, the function will return
 `<?php
 	if ( function_exists( 'toplytics_get_results' ) ) {
 		$toplytics_args = array(
-			'period' => 'month',  // default=month (today/week/2weeks/month)
-			'numberposts' => 3    // default=5 (min=1/max=1000)
+			'period' => 'month',  // default=month (today/week/month)
+			'numberposts' => 3    // default=5 (min=1/max=250)
 		);
 		$toplytics_results = toplytics_get_results( $toplytics_args );
 		if ( $toplytics_results ) {
@@ -173,10 +183,49 @@ The outcome will look like this:
 3.) This is the third most visited post - 12 Views
 
 
-= How to use the debug page? =
-1.First you must be sure to set the WP_DEBUG constant to `true`.
-2.Then go to the plugins list `Plugins->Installed plugins` and click to the `Debug` link founded at Toplytics plugin.
-3.View the information for debugging.
+= How to change the data ranges? =
+You can use the filter `toplytics_ranges` in order to change the default ranges (today/week/month).
+
+**Example 1**
+
+Here is a simple example that adds `year` range:
+
+`<?php
+add_filter( 'toplytics_ranges', 'toplytics_add_on_ranges' );
+function toplytics_add_on_ranges( $ranges  ) {
+    $ranges['year'] = date_i18n( 'Y-m-d', strtotime( '-364 days' ) );
+    return $ranges;
+}
+?>`
+
+**Example 2**
+
+Here is a simple example that remove all ranges less `month`:
+
+`<?php
+add_filter( 'toplytics_ranges', 'toplytics_add_on_ranges' );
+function toplytics_add_on_ranges( $ranges  ) {
+    if ( ! empty( $ranges['month'] ) ) {
+        $new_ranges['month'] = $ranges['month'];
+        return $new_ranges;
+    }
+    return $ranges;
+}
+?>`
+
+= What is `toplytics.json` file? =
+This file contains the statistics in JSON format, and is designed to be used with JS custom template code.
+
+= Where is `toplytics.json` file located? =
+The file `toplytics.json` is located to the root of the site.
+
+**Example**
+
+If the site domain is `http://www.example.com/` the file url is `http://www.example.com/toplytics.json`.
+
+== Screenshots ==
+
+1. Output of the top most visited posts from last month.
 
 == Changelog ==
 
@@ -194,7 +243,7 @@ filters:
     toplytics_ga_api_result_simplexml_$name
 action:
     action toplytics_options_general_page
-* updated debug page
+* removed debug page
 * added new filters in order to get more information about how the plugin works
     toplytics_disconnect_message
     toplytics_analytics_data
@@ -205,6 +254,7 @@ action:
     toplytics_convert_data_to_posts
     toplytics_json_data
     toplytics_json_all_data
+* removed `2weeks` from the data range.
 * removed Romanian translation
 
 
