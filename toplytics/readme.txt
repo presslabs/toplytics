@@ -1,9 +1,9 @@
 === Toplytics ===
-Contributors: PressLabs, olarmarius
+Contributors: Presslabs, olarmarius
 Donate link: http://www.presslabs.com/
 Tags: presslabs, analytics, posts, top, most visited, most viewed posts, top content, toplytics, popular, google analytics, high traffic, popular posts, oauth, server resources, settings, widget, embed code, javascript, json, json file, simple, post views
 Requires at least: 3.9
-Tested up to: 4.1
+Tested up to: 4.1.1
 Stable tag: 3.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -19,12 +19,12 @@ You need to have Google Analytics active on your site if you want to use this pl
 = Features =
 * Connection with Google Analytics Account using OAuth 2.0 method;
 * Starting with the plugin version 3.0 we have switched to GA API v3
-* Widget displaying most visited posts as simple links;
-* The widget can display the most viewed articles from the past day, week, two weeks or month;
+* Offers a widget displaying the most visited posts as simple links (no styling);
+* The widget can display the most visited posts from the past day, week or month;
 * You can set the number of posts to be displayed between 1 and 250;
 * It can also display the number of views as counted by Google Analytics;
 * i18n support/translation requests are more than welcome;
-* Generate the list of the most viewed posts dynamicaly with JavaScript;
+* Generate the list of the most visited posts dynamicaly with JavaScript to correctly display them with any caching mechanism/plugin;
 * Custom template for displaying the widget is available and should be included in the active theme folder;
 * You can use some of the plugin's functions if the above are not enough for your customization needs. Check FAQ for details;
 * Shortcodes are now supported for easier integration into posts/pages or other widgets. Check FAQ for details;
@@ -39,33 +39,35 @@ You need to have Google Analytics active on your site if you want to use this pl
 Alternatively, go into your WordPress dashboard and click on *Plugins -> Add Plugin* and search for Toplytics. Then click on *Install*, then on *Activate Now*.
 
 = Configuration step 1 =
-In this step please register client application with Google. To register an application please login to the Google account and go to Google API console.
+In this step please register a new client application with Google. To register an application please login to your Google account and go to Google API console.
 
-1. Create a New Project(set a unique project name and id);
+1. Create a New Project (set a unique project name and id);
 
-2. Enable the Analytics API in order to be accessed;
+2. Enable the Analytics API by going to APIs & auth → API → Analytics API and then click on *Enable API*;
 
-3. From the APIs → Credentials tab create an OAuth 2.0 Client ID;
+3. From the APIs → Credentials tab create an OAuth 2.0 Client ID by clicking on *Create new Client ID*;
 
-3.1. Select application type as “Installed application”;
+4. Select application type as *Installed application*;
 
-3.2. Create Branding information for Client ID by editing the consent screen;
+5. Create the Branding information for the Client ID by editing the consent screen. It's compulsory to select your e-mail addres and to set a Product name;
 
-4. Download the JSON file with API credentials(Auth Config file);
+6. Create the Client ID by selecting again *Installed application* and *Other*;
 
-5. Upload this file in order to make a proper Configuration.
+7. Download the JSON file with the API credentials (Auth Config file);
+
+7. Upload this file in the plugin Settings page and click on *Upload Auth Config File*.
 
 = Configuration step 2 =
 In this step please connect to your Google Analytics Account.
 
-1. Click the 'Get Authorization Key' button and you will be redirected to google.com;
+1. Click the *Get Authorization Key* button from the plugin's settings page and you will be redirected to google.com;
 
-2. After logging in you will receive a key;
+2. After logging in you need to agree that the newly created app will access your Analytics data. After that you get a key;
 
-3. Then come back to this page and use the key in the 'Authorization Key' field, and then click 'Get Analytics Profiles' button.
+3. Then come back to the plugin settings page and use the key in the *Authorization Key* field. Click on *Get Analytics Profiles* button, select the profile for your current site and click on *Connect*.
 
 = Usage =
-Connect your plugin with Google Analytics Account from the Settings page (*Settigns -> Toplytics*);
+Connect your plugin with Google Analytics Account from the Settings page (*Settings -> Toplytics*);
 Use the *Toplytics* widget from the *Appearance -> Widgets* page;
 
 == Frequently Asked Questions ==
@@ -77,7 +79,7 @@ You should use this plugin if you want to display the most visited posts of your
 The data from GA is refreshed every hour. During this interval, the information is safely stored using transients and options.
 
 = How to use the custom template? =
-To use a custom template you just need to copy the file `toplytics-template.php` from toplytics' plugin folder to your theme folder.
+To use a custom template you just need to copy the file `toplytics-template.php` from Toplytics' plugin folder to your theme folder.
 
 You can then customize your template. The plugin will first search for the file `toplytics-template.php` in the active theme folder, and, if that's not found, it will search for it in the plugin folder. The custom template from the theme folder has priority over the one in the plugin folder.
 
@@ -106,7 +108,7 @@ The plugin offers 2 functions that can be used either in the theme or by another
 
 **Description**
 
-`mixed toplytics_results ( [ array $args ] )`
+`mixed toplytics_results( [ array $args ] )`
 
 toplytics_results() prints the toplytics results in `<ol>` format.
 
@@ -114,7 +116,7 @@ toplytics_results() prints the toplytics results in `<ol>` format.
 
 args -> This parameter is a list of toplytics options:
 		period      - represents the statistics period, default=month (today/week/month);
-		numberposts - represents the number of posts to be displayed, default=5 (min=1/max=20);
+		numberposts - represents the number of posts to be displayed, default=5 (min=1/max=250);
 		showviews   - set this parameter to true if you want to print out the number of posts views, default=false (true/false);
 
 **Return Values**
@@ -140,7 +142,7 @@ Here is a simple example that displays the first 7 most visited posts in the pas
 
 **Description**
 
-`mixed toplytics_get_results ( [ array $args ] )`
+`mixed toplytics_get_results( [ array $args ] )`
 
 toplytics_get_results() returns the toplytics results into an array; in this case, the toplytics results' HTML can be formatted according with your needs.
 
@@ -192,7 +194,7 @@ Here is a simple example that adds `year` range:
 
 `<?php
 add_filter( 'toplytics_ranges', 'toplytics_add_on_ranges' );
-function toplytics_add_on_ranges( $ranges  ) {
+function toplytics_add_on_ranges( $ranges ) {
     $ranges['year'] = date_i18n( 'Y-m-d', strtotime( '-364 days' ) );
     return $ranges;
 }
@@ -200,7 +202,7 @@ function toplytics_add_on_ranges( $ranges  ) {
 
 **Example 2**
 
-Here is a simple example that remove all ranges less `month`:
+Here is a simple example that removes all ranges except `month`:
 
 `<?php
 add_filter( 'toplytics_ranges', 'toplytics_add_on_ranges' );
@@ -214,14 +216,14 @@ function toplytics_add_on_ranges( $ranges  ) {
 ?>`
 
 = What is `toplytics.json` file? =
-This file contains the statistics in JSON format, and is designed to be used with JS custom template code.
+This file contains the statistics in JSON format, and is designed to be used with the JS custom template code.
 
 = Where is `toplytics.json` file located? =
-The file `toplytics.json` is located to the root of the site.
+The file `toplytics.json` is located to the root folder of the site.
 
 **Example**
 
-If the site domain is `http://www.example.com/` the file url is `http://www.example.com/toplytics.json`.
+If the site domain is `http://www.example.com/` then the file url is `http://www.example.com/toplytics.json`.
 
 == Screenshots ==
 
@@ -231,11 +233,11 @@ If the site domain is `http://www.example.com/` the file url is `http://www.exam
 
 = 3.0 =
 
-This is a major update and you need to re-authenticate with Google Analytics for the plugin to work!
+**This is a major update and you need to re-authenticate with Google Analytics for the plugin to work!**
 
 * Google Analytics API v3.0 is being used from now on
-* major refactoring
-* removed realtime template - the JS code can now be used only in toplytics-template.php file
+* major code refactoring
+* removed realtime template - the JS code can now be used directly in toplytics-template.php file
 * removed filters and actions
 filters:
     toplytics_ga_api_url_$name
@@ -254,7 +256,7 @@ action:
     toplytics_convert_data_to_posts
     toplytics_json_data
     toplytics_json_all_data
-* removed `2weeks` from the data range.
+* removed `2weeks` from the data range.
 * removed Romanian translation
 
 
@@ -305,8 +307,8 @@ action:
 == Upgrade Notice ==
 
 = 3.0 =
-Starting this version, Toplytics uses Google Analytics API v3.0. This is a major update and you need to re-authenticate with Google Analytics for the plugin to work!
+Starting with version 3.0, Toplytics uses Google Analytics API v3.0. This is a major update and you need to re-authenticate with Google Analytics for the plugin to work!
 
 = 2.0 =
-The option `Display posts in real time` will let you get the results from one JSON file with JavaScript code. All HTML code is generated dynamically and as a result, the SEO will be affected.
+The option `Display posts in real time` will let you get the results from one JSON file with JavaScript code. All HTML code is generated dynamically.
 Major plugin changes & code rewrite. Added theme custom template, OAuth login, i18n support, shortcode support.

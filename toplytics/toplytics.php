@@ -3,7 +3,7 @@
  * Plugin Name: Toplytics
  * Plugin URI: http://wordpress.org/extend/plugins/toplytics/
  * Description: Plugin for displaying most viewed content using data from a Google Analytics account. Relieves the DB from writing every click.
- * Author: PressLabs
+ * Author: Presslabs
  * Version: 3.0
  * Author URI: http://www.presslabs.com/
  * License: GPL2
@@ -11,7 +11,7 @@
  * Domain Path: /languages/
  */
 
-/*  Copyright 2014 PressLabs SRL <ping@presslabs.com>
+/*  Copyright 2014-2015 Presslabs SRL <ping@presslabs.com>
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License, version 2, as
@@ -543,7 +543,7 @@ class Toplytics {
 			</tbody></table>
 			<?php
 		} else {
-			_e( 'Every application has to be registered with the Google API so that we can use the OAuth 2.0 token during the authentication and authorisation process. To get help for this steps, please go to the Help menu(upper-right corner).', 'toplytics' );
+			_e( 'Every application has to be registered with the Google API so that we can use the OAuth 2.0 token during the authentication and authorisation process. To get help with this, please go to the Help menu (upper-right corner).', 'toplytics' );
 		}
 	}
 }
