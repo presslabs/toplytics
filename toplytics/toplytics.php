@@ -30,6 +30,7 @@
 require_once __DIR__ . '/lib/google-api-php-client/src/Google/autoload.php';
 
 class Toplytics {
+	const VERSION       = '3.0';
 	const DEFAULT_POSTS = 5;
 	const MIN_POSTS     = 1;
 	const MAX_POSTS     = 100;
@@ -557,3 +558,4 @@ require_once __DIR__ . '/inc/class-toplytics-submenu-configure.php';
 require_once __DIR__ . '/inc/class-toplytics-submenu-settings.php';
 require_once __DIR__ . '/inc/class-toplytics-wp-widget.php';
 require_once __DIR__ . '/inc/class-toplytics-shortcode.php';
+require_once __DIR__ . '/inc/class-toplytics-update.php';
