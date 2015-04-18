@@ -1,5 +1,5 @@
 === Toplytics ===
-Contributors: Presslabs, olarmarius
+Contributors: PressLabs, olarmarius
 Donate link: http://www.presslabs.com/
 Tags: presslabs, analytics, posts, top, most visited, most viewed posts, top content, toplytics, popular, google analytics, high traffic, popular posts, oauth, server resources, settings, widget, embed code, javascript, json, json file, simple, post views
 Requires at least: 3.9
