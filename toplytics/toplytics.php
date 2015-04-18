@@ -45,6 +45,7 @@ class Toplytics {
 		add_filter( 'toplytics_rel_path', array( $this, 'filter_rel_path' ) );
 		add_filter( 'plugin_action_links_' . $this->plugin_basename() , array( $this, '_settings_link' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_script' ) );
+		add_action( 'plugins_loaded', array( $this, 'load_plugin_textdomain' ) );
 
 		add_filter( 'redirect_canonical', array( $this, 'canonical' ) );
 		add_filter( 'query_vars', array( $this, 'add_query_var' ) );
@@ -72,6 +73,9 @@ class Toplytics {
 		$this->ranges = apply_filters( 'toplytics_ranges', $ranges );
 	}
 
+	public function load_plugin_textdomain() {
+		load_plugin_textdomain( 'toplytics', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
+	}
 	public function add_google_client() {
 		$auth_config = $this->get_auth_config();
 		if ( ! empty( $auth_config ) ) {

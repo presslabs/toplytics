@@ -50,14 +50,14 @@ class Toplytics_Submenu_Settings extends Toplytics_Menu {
 					break;
 				}
 			}
-			$this->success_redirect( 'Toplytics connected successfully!' );
+			$this->success_redirect( __( 'Toplytics connected successfully!', 'toplytics' ) );
 		}
 	}
 
 	public function disconnect() {
 		if ( isset( $_POST['ToplyticsSubmitDisconnect'] ) ) {
-			$this->toplytics->disconnect( 'Manually Disconnected' );
-			$this->success_redirect( 'Toplytics disconnected successfully!' );
+			$this->toplytics->disconnect( __( 'Manually Disconnected', 'toplytics' ) );
+			$this->success_redirect( __( 'Toplytics disconnected successfully!', 'toplytics' ) );
 		}
 	}
 
@@ -84,11 +84,11 @@ class Toplytics_Submenu_Settings extends Toplytics_Menu {
 		?>
 		<table class="form-table">
 		<tr valign="top">
-		<th scope="row"><label for="auth_config"><?php _e( 'Auth configuration: ', 'toplytics' ); ?></label></th>
+		<th scope="row"><label for="auth_config"><?php _e( 'Auth configuration', 'toplytics' ); ?>: </label></th>
 		<td><?php $this->toplytics->show_auth_config(); ?></td>
 		</tr>
 		<tr valign="top">
-		<th scope="row"><label for="profile_id"><?php _e( 'Connected to: ', 'toplytics' ); ?></label></th>
+		<th scope="row"><label for="profile_id"><?php _e( 'Connected to', 'toplytics' ); ?>: </label></th>
 		<td><?php echo $this->toplytics->get_profile_info(); ?></td>
 		</tr>
 		</table>
@@ -99,7 +99,7 @@ class Toplytics_Submenu_Settings extends Toplytics_Menu {
 		$this->show_message();
 		?>
 		<div class="wrap">
-		<h2><?php _e( 'Toplytics Settings', 'toplytics' ); ?></h2>
+		<h2>Toplytics <?php _e( 'Settings', 'toplytics' ); ?></h2>
 
 		<form action="" method="POST">
 		<?php

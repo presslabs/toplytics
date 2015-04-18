@@ -106,10 +106,10 @@ class Toplytics_Submenu_Configure extends Toplytics_Menu {
 			$refresh_token = $this->toplytics->client->getRefreshToken();
 			$this->toplytics->update_refresh_token( $refresh_token );
 
-			$this->success_redirect( 'Google Analytics token was saved in DB successfully!' );
+			$this->success_redirect( __( 'Google Analytics token was saved in DB successfully!', 'toplytics' ) );
 		} catch ( Exception $e ) {
 			if ( 400 === $e->getCode() ) { // 'invalid_grant: Code was already redeemed.'
-				$this->redirect( 'Invalid Authorization Key: ' . $_GET['code'] );
+				$this->redirect( __( 'Invalid Authorization Key: ', 'toplytics' ) . $_GET['code'] );
 			} else {
 				trigger_error( 'Exception: ' . $e->getCode() . ' -> '. $e->getMessage(), E_USER_ERROR );
 				return false;
@@ -121,7 +121,7 @@ class Toplytics_Submenu_Configure extends Toplytics_Menu {
 		$this->show_message();
 		?>
 		<div class="wrap">
-			<h2><?php _e( 'Toplytics Configuration', 'toplytics' ); ?></h2>
+			<h2>Toplytics <?php _e( 'Configuration', 'toplytics' ); ?></h2>
 			<table class="form-table">
 				<tr valign="top">
 				<td>
