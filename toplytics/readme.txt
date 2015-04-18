@@ -55,7 +55,7 @@ In this step please register a new client application with Google. To register a
 
 7. Download the JSON file with the API credentials (Auth Config file);
 
-7. Upload this file in the plugin Settings page and click on *Upload Auth Config File*.
+8. Upload this file in the plugin Settings page and click on *Upload Auth Config File*.
 
 = Configuration step 2 =
 In this step please connect to your Google Analytics Account.

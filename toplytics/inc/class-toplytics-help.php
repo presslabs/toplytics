@@ -47,12 +47,12 @@ class Toplytics_Help {
 		echo '<p>' . __( '4. Select application type as <em>Installed application</em>;', 'toplytics' ) . '</p>';
 		echo '<p>' . __( '5. Create the Branding information for the Client ID by editing the consent screen. It is compulsory to select your e-mail addres and to set a Product name;', 'toplytics' ) . '</p>';
 		echo '<p>' . __( '6. Create the Client ID by selecting again <em>Installed application</em> and <em>Other</em>;', 'toplytics' ) . '</p>';
-                echo '<p>' . __( '7. Download the JSON file with the API credentials (Auth Config file);', 'toplytics' ) . '</p>';
-		echo '<p>' . __( '8. Upload this file in the plugin Settings page and click on <em>Upload Auth Config File<em>.', 'toplytics' ) . '</p>';
+		echo '<p>' . __( '7. Download the JSON file with the API credentials (Auth Config file);', 'toplytics' ) . '</p>';
+		echo '<p>' . __( '8. Upload this file in the plugin Settings page and click on <em>Upload Auth Config File</em>.', 'toplytics' ) . '</p>';
 		echo '<p><strong>' . __( 'Configuration step 2', 'toplytics' ) . '</strong><br />' . __( 'In this step please connect to your Google Analytics Account.', 'toplytics' ) . '</p>';
-		echo '<p>' . __( "1. Click the <em>Get Authorization Key</em> button and you will be redirected to google.com;", 'toplytics' ) . '</p>';
+		echo '<p>' . __( '1. Click the <em>Get Authorization Key</em> button and you will be redirected to google.com;', 'toplytics' ) . '</p>';
 		echo '<p>' . __( '2. After logging in you need to agree that the newly created app will access your Analytics data. After that you get a key;', 'toplytics' ) . '</p>';
-		echo '<p>' . __( "3. Then come back to this page and use the key in the <em>Authorization Key</em> field, and then click <em>Get Analytics Profiles</em> button.", 'toplytics' ) . '</p>';
+		echo '<p>' . __( '3. Then come back to this page and use the key in the <em>Authorization Key</em> field, and then click <em>Get Analytics Profiles</em> button.', 'toplytics' ) . '</p>';
 		$this->documentation();
 	}
 }
