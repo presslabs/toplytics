@@ -30,17 +30,18 @@ class Toplytics_WP_Widget extends WP_Widget {
 		$this->toplytics = $toplytics;
 	}
 
-	private function realtime_js_script( $period, $numberposts, $showviews, $widget_id ) {
-		?>
-			<script type="text/javascript">
-				toplytics_args = {
-					period       : '<?php print $period; ?>',
-					numberposts  : <?php print $numberposts; ?>,
-					showviews    : <?php print $showviews; ?>,
-					widget_id    : '<?php print $widget_id; ?>'
-				}
-			</script>
-		<?php
+	private function realtime_js_script( $args ) {
+		$args = apply_filters( 'toplytics_widget_args', $args );
+		$toplytics_args = '';
+		foreach ( $args as $key => $data ) :
+			if ( is_string( $data ) ) {
+				$data = trim( $data );
+				$toplytics_args .= "$key : '$data',";
+			} else if ( is_integer( $data ) || is_bool( $data ) || is_float( $data ) ) {
+				$toplytics_args .= "$key : $data,";
+			}
+		endforeach;
+		?><script type="text/javascript">toplytics_args = {<?php echo $toplytics_args; ?>}</script><?php
 	}
 
 	function widget( $args, $instance ) {
@@ -75,7 +76,16 @@ class Toplytics_WP_Widget extends WP_Widget {
 			if ( $title ) {
 				echo $before_title . $title . $after_title;
 			}
-			$this->realtime_js_script( $period, $numberposts, $showviews, $widget_id );
+			$toplytics_args = array(
+				'widget_id'    => $widget_id,
+				'period'       => $period,
+				'numberposts'  => $numberposts,
+				'showviews'    => $showviews,
+				'before_title' => $before_title,
+				'title'        => $title,
+				'after_title'  => $after_title,
+			);
+			$this->realtime_js_script( $toplytics_args );
 			echo "<div id='$widget_id'></div>";
 			include $template_filename;
 			echo $after_widget;
