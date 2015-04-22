@@ -498,7 +498,7 @@ class Toplytics {
 				}
 			}
 		}
-		$json_data = apply_filters( 'toplytics_json_all_data', $post_data, $when );
+		$json_data = apply_filters( 'toplytics_json_all_data', $post_data );
 		echo json_encode( $json_data, JSON_FORCE_OBJECT );
 		die();
 	}
