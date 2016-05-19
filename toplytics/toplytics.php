@@ -475,7 +475,7 @@ class Toplytics {
 	public function get_result( $when = 'today' ) {
 		$toplytics_result = get_option( "toplytics_result_$when", array() );
 
-		return $toplytics_result['result'];
+		return empty( $toplytics_result ) ? array() : $toplytics_result['result'];
 	}
 
 	/**
