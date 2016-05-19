@@ -77,7 +77,7 @@ class Toplytics_WP_Widget extends WP_Widget {
 				echo $before_title . $title . $after_title;
 			}
 			$toplytics_args = array(
-				'widget_id'    => $widget_id,
+				'widget_id'    => $widget_id . '-inner',
 				'period'       => $period,
 				'numberposts'  => $numberposts,
 				'showviews'    => $showviews,
@@ -86,7 +86,7 @@ class Toplytics_WP_Widget extends WP_Widget {
 				'after_title'  => $after_title,
 			);
 			$this->realtime_js_script( $toplytics_args );
-			echo "<div id='$widget_id'></div>";
+			echo "<div id='$widget_id-inner'></div>";
 			include $template_filename;
 			echo $after_widget;
 		}
