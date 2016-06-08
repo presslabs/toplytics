@@ -18,12 +18,12 @@
 class Toplytics_WP_Widget extends WP_Widget {
 	private $toplytics;
 
-	public function Toplytics_WP_Widget() {
+	public function __construct() {
 		$widget_ops = array(
 			'classname'   => 'toplytics_widget',
 			'description' => __( 'The most visited posts on your site from Google Analytics', 'toplytics' ),
 		);
-		$this->WP_Widget( 'toplytics-widget', 'Toplytics', $widget_ops );
+		parent::__construct( 'toplytics-widget', 'Toplytics', $widget_ops );
 		$this->alt_option_name = 'toplytics_widget';
 
 		global $toplytics;
