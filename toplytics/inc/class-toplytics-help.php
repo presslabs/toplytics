@@ -22,7 +22,7 @@ class Toplytics_Help {
 	}
 
 	public function documentation() {
-		echo '<p><a href="' . plugins_url( '../doc/toplytics-api.pdf', __FILE__ ) . '" target="_blank">' . __( 'Click here to download the complete documentation in PDF format.', 'toplytics' ) . '</a></p>';
+		echo '<p><a href="https://www.presslabs.com/help/toplytics/usage" target="_blank">' . __( 'Click here to read the complete documentation.', 'toplytics' ) . '</a></p>';
 	}
 
 	public function faq() {
