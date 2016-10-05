@@ -429,7 +429,9 @@ class Toplytics {
 			$url      = home_url() . $rel_path;
 			$post_id  = url_to_postid( $url );
 			$url      = apply_filters( 'toplytics_convert_data_url', $url, $when, $post_id, $rel_path, $pageviews );
-			if ( ( 0 < $post_id ) && ( 'post' == get_post_type( $post_id ) ) ) {
+			$allowed_post_types = apply_filters( 'toplytics_allowed_post_types', array( 'post' ) );
+			$post_type = get_post_type( $post_id );
+			if ( ( 0 < $post_id ) && in_array( $post_type, $allowed_post_types  ) )  {
 				$post = get_post( $post_id );
 				if ( is_object( $post ) ) {
 					if ( isset( $new_data[ $post_id ] ) ) {
