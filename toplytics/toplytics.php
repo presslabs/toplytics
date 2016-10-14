@@ -102,7 +102,13 @@ class Toplytics {
 				$this->service = new Google_Service_Analytics( $this->client );
 			} catch ( Exception $e ) {
 				$message = 'Google Analytics Error[' . $e->getCode() . ']: '. $e->getMessage();
-				if ( 7 != $e->getCode() ) { // exclude disconnecting for 'Network is unreachable!'
+				/**
+				 * exclude disconnecting for:
+				 *
+				 * 6 - 'name lookup timed out!'
+				 * 7 - 'Network is unreachable!'
+				 */
+				if ( ! in_array( $e->getCode(), array( 6, 7 ) ) ) {
 					$this->disconnect( $message );
 				}
 				error_log( $message, E_USER_ERROR );
