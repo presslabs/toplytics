@@ -3,8 +3,8 @@ Contributors: PressLabs
 Donate link: http://www.presslabs.com/
 Tags: presslabs, analytics, posts, top, most visited, most viewed posts, top content, toplytics, popular, google analytics, high traffic, popular posts, oauth, server resources, settings, widget, embed code, javascript, json, json file, simple, post views
 Requires at least: 3.9
-Tested up to: 4.5
-Stable tag: 3.0
+Tested up to: 4.6
+Stable tag: 3.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -230,6 +230,21 @@ If the site domain is `http://www.example.com/` then the file url is `http://www
 1. Output of the top most visited posts from last month.
 
 == Changelog ==
+
+= 3.1 =
+
+* Allow multiple post types via filter
+* Add shortcode to features list fix #115
+* Remove PDF. Change documentation link from PDF docs to Presslabs site
+* Fix #109 - deprecated constructor method call
+* Fix #100, exclude disconnecting for network is unreachable
+* Fix travis tests
+* Use different ID for wrapper div of list of posts
+* Fixed get_result() returning null instead of array()
+* Update readme.txt
+* Remove unused parameter `$when`
+* Fix add_query_arg vulnerability
+* Add the filter `toplytics_widget_args`
 
 = 3.0 =
 
