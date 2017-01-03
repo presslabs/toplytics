@@ -17,6 +17,7 @@ This plugin displays the most visited posts as a widget using data extracted fro
 You need to have Google Analytics active on your site if you want to use this plugin!
 
 = Features =
+* Shortcodes are now supported for easier integration into posts/pages or other widgets. `[toplytics period="week" numberposts="3" showviews="true"]` Check FAQ for details;
 * Connection with Google Analytics Account using OAuth 2.0 method;
 * Starting with the plugin version 3.0 we have switched to GA API v3
 * Offers a widget displaying the most visited posts as simple links (no styling);
@@ -27,7 +28,6 @@ You need to have Google Analytics active on your site if you want to use this pl
 * Generate the list of the most visited posts dynamicaly with JavaScript to correctly display them with any caching mechanism/plugin;
 * Custom template for displaying the widget is available and should be included in the active theme folder;
 * You can use some of the plugin's functions if the above are not enough for your customization needs. Check FAQ for details;
-* Shortcodes are now supported for easier integration into posts/pages or other widgets. Check FAQ for details;
 
 == Installation ==
 
