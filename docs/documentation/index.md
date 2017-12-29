@@ -2,8 +2,8 @@
 
 Toplytics is a WordPress plugin which displays the most visited posts as a widget using data extracted from Google Analytics. It is designed to work with high-traffic sites and all types of caching.
 
-### IMPORTANT!!!
-You need to have Google Analytics active on your site if you want to use this plugin!
+!!! Important
+    You need to have Google Analytics active on your site if you want to use this plugin!
 
 ### Why should I use this plugin?
 You should use this plugin if you want to display the most visited posts of your site in a safe and stable manner, with no risk of downtime or slowness, based on data from Google Analytics statistics. The plugin is built for high-traffic sites where counting every visitor's click loads up the DB and can potentially crash the site.
