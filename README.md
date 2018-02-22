@@ -1,5 +1,6 @@
 toplytics (3.1) [![Build Status](https://travis-ci.org/PressLabs/toplytics.svg)](https://travis-ci.org/PressLabs/toplytics) [![Coverage](https://codeclimate.com/github/PressLabs/toplytics/coverage.png)](https://codeclimate.com/github/PressLabs/toplytics) [![Code Climate](https://codeclimate.com/github/PressLabs/toplytics.png)](https://codeclimate.com/github/PressLabs/toplytics)
 =========
+# Welcome to Toplytics
 
 ### About the makers
 This plugin was developed by the crafty people at Presslabs—the Smart Managed WordPress Hosting Platform. Here we bring high-performance hosting and business intelligence for WordPress sites. In our spare time, we contribute to the global open-source community with our plugins.
@@ -31,4 +32,4 @@ Development of Toplytics happens at http://github.com/PressLabs/toplytics
 Issues are tracked at http://github.com/PressLabs/toplytics/issues 
 This WordPress plugin can be found at https://wordpress.org/plugins/toplytics/  
 
-For more details about Toplytics, head here: http://docs.presslabs.com/toplytics/usage/  
+For more details about Toplytics, head here: https://www.presslabs.org/toplytics/
