@@ -1,5 +1,4 @@
 
-
 up:
 	@echo "\nStarting local development environment using docker ...\n"
 	@docker-compose up -d --remove-orphans nginx mysql phpmyadmin

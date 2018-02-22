@@ -48,7 +48,7 @@ else
 	WP_TESTS_TAG="tags/$LATEST_VERSION"
 fi
 
-set -ex
+set -e
 
 install_wp() {
 

@@ -1,4 +1,6 @@
+wordpress-tests-lib/
 node_modules/
+public/
 vendor/
 .idea/
 
