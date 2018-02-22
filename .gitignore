@@ -1,1 +1,13 @@
+node_modules/
+vendor/
+.idea/
+
+wp-cli.local.yml
 toplytics.json
+Thumbs.db
+.DS_Store
+*.tar.gz
+*.sql
+*.zip
+*.log
+.env
