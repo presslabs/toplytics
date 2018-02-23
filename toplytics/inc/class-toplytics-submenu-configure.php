@@ -46,7 +46,8 @@ class Toplytics_Submenu_Configure extends Toplytics_Menu {
 	}
 
 	public function upload_auth_config_file() {
-		if ( empty( $_POST['ToplyticsSubmitUploadAuthConfigFile'] ) ) {
+		if ( empty( $_POST['ToplyticsSubmitUploadAuthConfigFile'] ) ||
+             (bool)get_option('toplytics_oauth2_remote_token') ) {
 			return;
 		}
 		check_admin_referer( 'toplytics-admin' );
@@ -122,40 +123,41 @@ class Toplytics_Submenu_Configure extends Toplytics_Menu {
 		?>
 		<div class="wrap">
 			<h2>Toplytics <?php _e( 'Configuration', 'toplytics' ); ?></h2>
-			<table class="form-table">
-				<tr valign="top">
-				<td>
-					<strong><?php _e( 'Auth configuration', 'toplytics' ); ?>:</strong><br /><br />
-					<?php $this->toplytics->show_auth_config(); ?>
-				</td>
-				</tr>
 
-			<form enctype="multipart/form-data" action="" method="post">
-				<?php wp_nonce_field( 'toplytics-admin' ); ?>
-				<?php if ( ! $this->toplytics->is_valid_auth_config() ) { ?>
-				<tr valign="top">
-				<td>
-				<p class="submit">
-					<input type="file" name="ToplyticsAuthConfigFile" value="" />
-					<input type="submit" name="ToplyticsSubmitUploadAuthConfigFile" class="button" value="<?php _e( 'Upload Auth Config File', 'toplytics' ); ?>" />
-				</p>
-				</td>
-				</tr>
-				<?php } else { ?>
-				<tr valign="top">
-				<td>
-				<p class="submit">
-					<?php _e( 'Press this button in order to reset the Auth Configurations', 'toplytics' ); ?>:&nbsp;
-					<input type="submit" name="ToplyticsSubmitResetAuthConfig" class="button" value="<?php _e( 'Reset Auth Config', 'toplytics' ); ?>" />
-				</p>
-				</td>
-				</tr>
-				<?php } ?>
-			</form>
+            <?php if( ! (bool)get_option('toplytics_oauth2_remote_token')) : ?>
+                <table class="form-table">
+                    <tr valign="top">
+                    <td>
+                        <strong><?php _e( 'Auth configuration', 'toplytics' ); ?>:</strong><br /><br />
+                        <?php $this->toplytics->show_auth_config(); ?>
+                    </td>
+                    </tr>
+
+                <form enctype="multipart/form-data" action="" method="post">
+                    <?php wp_nonce_field( 'toplytics-admin' ); ?>
+                    <?php if ( ! $this->toplytics->is_valid_auth_config() ) { ?>
+                    <tr valign="top">
+                    <td>
+                    <p class="submit">
+                        <input type="file" name="ToplyticsAuthConfigFile" value="" />
+                        <input type="submit" name="ToplyticsSubmitUploadAuthConfigFile" class="button" value="<?php _e( 'Upload Auth Config File', 'toplytics' ); ?>" />
+                    </p>
+                    </td>
+                    </tr>
+                    <?php } else { ?>
+                    <tr valign="top">
+                    <td>
+                    <p class="submit">
+                        <?php _e( 'Press this button in order to reset the Auth Configurations', 'toplytics' ); ?>:&nbsp;
+                        <input type="submit" name="ToplyticsSubmitResetAuthConfig" class="button" value="<?php _e( 'Reset Auth Config', 'toplytics' ); ?>" />
+                    </p>
+                    </td>
+                    </tr>
+                    <?php } ?>
+                </form>
+            <?php endif; ?>
 
 			<?php if ( $this->toplytics->is_valid_auth_config() ) { ?>
-				<form action="" method="post">
-					<?php wp_nonce_field( 'toplytics-admin' ); ?>
 					<tr valign="top">
 					<td>
 						<strong><?php _e( 'Please connect to your Google Analytics Account.', 'toplytics' ); ?></strong><br /><br />
@@ -167,6 +169,7 @@ class Toplytics_Submenu_Configure extends Toplytics_Menu {
 					</td>
 					</tr>
 
+                    <form action="" method="post">
 					<tr valign="top">
 					<td>
 						<?php _e( 'Authorization Key', 'toplytics' ); ?>:&nbsp;<input type="text" name="toplytics_authorization_key" value="" />
@@ -175,17 +178,29 @@ class Toplytics_Submenu_Configure extends Toplytics_Menu {
 
 					<tr valign="top">
 					<td>
-					<p class="submit">
-						<input type="submit" name="ToplyticsSubmitGetAnalyticsProfiles" class="button-primary" value="<?php _e( 'Get Analytics Profiles', 'toplytics' ); ?>" />
-						<input type="submit" name="ToplyticsSubmitGetAuthorizationKey" class="button" value="<?php _e( 'Get Authorization Key', 'toplytics' ); ?>" />
-					</p>
+                        <div class="submit">
+                                <?php wp_nonce_field( 'toplytics-admin' ); ?>
+                            <input style="float:left; margin: 10px;" type="submit" name="ToplyticsSubmitGetAnalyticsProfiles" class="button-primary" value="<?php _e( 'Get Analytics Profiles', 'toplytics' ); ?>" />
+                    </form>
+                            <form action="" method="post" onsubmit="target_popup(this)" style="float:left; margin: 10px;">
+	                            <?php wp_nonce_field( 'toplytics-admin' ); ?>
+                                <input type="submit" name="ToplyticsSubmitGetAuthorizationKey" class="button" value="<?php _e( 'Get Authorization Key', 'toplytics' ); ?>" />
+                            </form>
+                        </div>
 					</td>
 					</tr>
-				</form>
 			<?php } ?>
+
 
 			</table>
 		</div>
+
+        <script>
+            function target_popup(form) {
+                window.open('', 'authorization-popup', 'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width=' + 800 + ', height=' + 400 + ', top=' + (screen.height / 8) + ', left=' + ((screen.width / 2) - 400));
+                form.target = 'authorization-popup';
+            }
+        </script>
 		<?php
 	}
 }
