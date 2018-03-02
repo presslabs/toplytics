@@ -1,17 +1,20 @@
 <?php
 /**
  * Plugin Name: Toplytics
- * Plugin URI: http://wordpress.org/extend/plugins/toplytics/
+ * Plugin URI: https://www.presslabs.org/toplytics/
  * Description: Plugin for displaying most viewed content using data from a Google Analytics account. Relieves the DB from writing every click.
  * Author: Presslabs
- * Version: 3.1
- * Author URI: http://www.presslabs.com/
+ * Version: 3.2
+ * Author URI: https://www.presslabs.com/
  * License: GPL2
  * Text Domain: toplytics
- * Domain Path: /languages/
+ * Domain Path: /languages
  */
 
-/*  Copyright 2014-2017 Presslabs SRL <ping@presslabs.com>
+// client ID: 613533497706-99g70ih9v02i0kbs32cr7oqlahjf9h0p.apps.googleusercontent.com
+// client secret: 2tP2vrJjLsXXf_dokDRr8s2o
+
+/*  Copyright 2014-2018 Presslabs SRL <ping@presslabs.com>
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License, version 2, as
@@ -27,15 +30,21 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+
+// Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) )
+	exit();
+
 require_once __DIR__ . '/lib/google-api-php-client/src/Google/autoload.php';
 
 class Toplytics {
-	const VERSION       = '3.0';
+	const VERSION       = '3.2';
 	const DEFAULT_POSTS = 5;
 	const MIN_POSTS     = 1;
 	const MAX_POSTS     = 100;
 	const MAX_RESULTS   = 250;
 	const TEMPLATE      = 'toplytics-template.php';
+	const REMOTE_AUTH   = 'https://www.presslabs.org/toplytics/auth.json';
 
 	public $client;
 	public $service;
@@ -122,6 +131,7 @@ class Toplytics {
 		$this->add_endpoint();
 		$this->flush_rules();
 		$this->add_options();
+		$this->get_remote_auth_config_file();
 	}
 
 	public function deactivation_hook() {
@@ -132,6 +142,8 @@ class Toplytics {
 		foreach ( $this->ranges as $when => $data ) :
 			add_option( "toplytics_result_$when", array(), '', 'no' );
 		endforeach;
+
+		update_option('toplytics_oauth2_remote_token', FALSE);
 	}
 
 	public function add_query_var( $query_vars ) {
@@ -316,6 +328,9 @@ class Toplytics {
 		$this->remove_refresh_token();
 		$this->remove_profile_data();
 		$this->remove_auth_config();
+
+		// Attempt to get a new config
+		$this->get_remote_auth_config_file();
 	}
 
 	private function _get_profile_id() {
@@ -369,6 +384,15 @@ class Toplytics {
 
 	public function update_refresh_token( $value ) {
 		return update_option( 'toplytics_oauth2_refresh_token', $value );
+	}
+
+	public function get_remote_auth_config_file() {
+		$remote_config = file_get_contents(self::REMOTE_AUTH);
+
+		if ( $this->is_valid_auth_config( $remote_config ) && $this->load_auth_config( $remote_config ) ) {
+			update_option('toplytics_oauth2_remote_token', TRUE);
+		}
+
 	}
 
 	/**
@@ -546,6 +570,9 @@ class Toplytics {
 	 * This function show up the auth config data as a HTML table
 	 */
 	public function show_auth_config() {
+	    if ((bool)get_option('toplytics_oauth2_remote_token'))
+	        return;
+
 		$auth_config = json_decode( $this->get_auth_config(), true );
 		$auth_config = $auth_config['installed'];
 		if ( ! empty( $auth_config ) ) {

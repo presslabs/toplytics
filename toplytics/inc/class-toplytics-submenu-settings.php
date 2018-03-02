@@ -69,9 +69,10 @@ class Toplytics_Submenu_Settings extends Toplytics_Menu {
 		<td>
 		<select id="profile_id" name="profile_id">
 		<?php
-		foreach ( $this->toplytics->get_profiles_list() as $profile_id => $profile_info ) {
-			echo '<option value="' . $profile_id . '">' . $profile_info . '</option>';
-		}
+            if ($this->toplytics->get_profiles_list())
+            foreach ( $this->toplytics->get_profiles_list() as $profile_id => $profile_info ) {
+                echo '<option value="' . $profile_id . '">' . $profile_info . '</option>';
+            }
 		?>
 		</select>
 		</td>
