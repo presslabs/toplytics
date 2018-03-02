@@ -1,1 +1,15 @@
+wordpress-tests-lib/
+node_modules/
+public/
+vendor/
+.idea/
+
+wp-cli.local.yml
 toplytics.json
+Thumbs.db
+.DS_Store
+*.tar.gz
+*.sql
+*.zip
+*.log
+.env

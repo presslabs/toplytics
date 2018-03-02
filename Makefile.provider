@@ -1,0 +1,32 @@
+
+up:
+	@echo "\nStarting local development environment using docker ...\n"
+	@docker-compose up -d --remove-orphans nginx mysql phpmyadmin
+	@echo "\nEnvironment started. Go to http://localhost/ and test it out!"
+	@echo "\nPhpMyAdmin is available at: http://localhost:8080/ with details:"
+	@echo "Host: mysql   |   User: default   |   Password: secret"
+	@echo "\nUse 'make down' to stop the environment."
+	@echo "Use 'make bash' to get inside the container."
+	@echo "Use 'make mysql' to get inside the mysql container and use the mysql CLI tool."
+	@echo "Use 'make log' to listen for the output of containers.\n"
+
+down:
+	@echo "\nShutting down containers ...\n"
+	@docker-compose down
+	@echo "\nDevelopment environment is down!\n"
+
+log:
+	@echo "\nListeing for logs ...\n"
+	@docker-compose logs -f -t
+
+bash:
+	@echo "\nDropping you to an interactive shell.\nHappy Testing!\n"
+	@docker-compose exec --user=laradock workspace bash
+
+mysql:
+	@echo "\nDropping you to an interactive shell in the mysql container."
+	@echo "\n\nUse command 'mysql -u default -p' to start get into mysql CLI."
+	@echo "\nWhen prompted use 'secret' as password."
+	@docker-compose exec mysql bash
+
+.PHONY: up down log bash mysql

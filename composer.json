@@ -1,5 +1,5 @@
 {
     "require-dev": {
-        "codeclimate/php-test-reporter": "dev-master"
+        "codeclimate/php-test-reporter": "^0.4"
     }
 }
