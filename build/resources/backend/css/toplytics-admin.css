@@ -1,0 +1,215 @@
+/**
+ * All of the CSS for your admin-specific functionality should be
+ * included in this file.
+ */
+
+/* GENERAL */
+
+.toplevel_page_ct-presslabs.auto-fold #wpcontent,
+[class*="presslabs_page_ct-presslabs-"].auto-fold #wpcontent,
+.post-type-ct_ugdpr_service.auto-fold #wpcontent {
+    padding: 0 10px;
+}
+
+.toplevel_page_ct-presslabs #wpcontent,
+[class*="presslabs_page_ct-presslabs-"] #wpcontent,
+.post-type-ct_ugdpr_service #wpcontent {
+    background-color: #f1f1f1;
+}
+
+#wpbody-content > .ct-presslabs-wrap {
+    padding-top: 65px;
+    /* margin: 10px -10px 0 0; */
+}
+
+.toplevel_page_ct-presslabs p,
+[class*="presslabs_page_ct-presslabs-"] p,
+.post-type-ct_ugdpr_service p {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 13px;
+    line-height: 20px;
+    margin: 20px 0 0 0;
+}
+
+.toplevel_page_ct-presslabs h2,
+[class*="presslabs_page_ct-presslabs-"] h2,
+.post-type-ct_ugdpr_service h2 {
+    font-size: 18px;
+}
+
+.toplevel_page_ct-presslabs ol,
+[class*="presslabs_page_ct-presslabs-"] ol,
+.post-type-ct_ugdpr_service ol {
+    margin-top: 20px;
+}
+
+.toplevel_page_ct-presslabs li,
+[class*="presslabs_page_ct-presslabs-"] li,
+.post-type-ct_ugdpr_service li {
+    font-size: 13px;
+    margin-left: 20px;
+}
+
+.toplevel_page_ct-presslabs .form-table input[type="text"],
+[class*="presslabs_page_ct-presslabs-"] .form-table input[type="text"],
+.post-type-ct_ugdpr_service .form-table input[type="text"],
+.toplevel_page_ct-presslabs .form-table textarea,
+[class*="presslabs_page_ct-presslabs-"] .form-table textarea,
+.post-type-ct_ugdpr_service .form-table textarea,
+.toplevel_page_ct-presslabs .form-table select,
+[class*="presslabs_page_ct-presslabs-"] .form-table select,
+.post-type-ct_ugdpr_service .form-table select {
+    width: 100%;
+}
+
+.toplevel_page_ct-presslabs .form-table th,
+[class*="presslabs_page_ct-presslabs-"] .form-table th,
+.post-type-ct_ugdpr_service .form-table th {
+    font-weight: 400;
+    min-width: 290px;
+}
+
+.ct-presslabs-width,
+.toplevel_page_ct-presslabs table,
+[class*="presslabs_page_ct-presslabs-"] table,
+.post-type-ct_ugdpr_service table {
+    max-width: 1228px;
+}
+
+.ct-presslabs-inner-wrap {
+    background-color: #fff;
+    box-shadow: 0 0 5px #dcdcdc !important;
+    color: #444444;
+    font-family: 'Open Sans', sans-serif;
+    margin-top: 23px;
+    padding: 20px;
+}
+
+.ct-presslabs-compact-list li {
+    margin-left: 0;
+    padding-left: 0;
+}
+
+.ct-presslabs-head {
+    margin: 0 0 10px 0;
+    display: block;
+}
+
+.ct-presslabs-link {
+    color: #0073aa;
+    font-weight: 600;
+    text-decoration: underline;
+}
+
+.ct-presslabs-inner-wrap p:first-child {
+    margin-top: 0;
+}
+
+table.ct-presslabs-inner-wrap {
+    padding: 0;
+}
+
+.nav-tab-wrapper {
+    display: block;
+    padding-top: 25px;
+}
+
+h2 .nav-tab {
+    margin-right: 0;
+    padding: 5px 5px;
+    text-align: center;
+}
+
+h2 .nav-tab:before {
+    font-size: 14px;
+    vertical-align: top;
+}
+
+.nav-tab:first-child {
+    margin-left: 0;
+}
+
+.nav-tab-active,
+.nav-tab-active:focus,
+.nav-tab-active:focus:active,
+.nav-tab-active:hover {
+    -webkit-box-shadow: none;
+    border-bottom: 1px solid #ccc;
+    cursor: auto;
+    outline: none;
+    text-decoration: none;
+}
+
+.ct-presslabs-wrap form {
+    margin-top: 10px;
+}
+
+@media screen and ( min-width: 568px ) {
+
+    .nav-tab {
+        padding: 5px 25px;
+    }
+
+    h2 .nav-tab {
+        padding: 5px 25px;
+        width: auto;
+    }
+
+    .nav-tab-active,
+    .nav-tab-active:focus,
+    .nav-tab-active:focus:active,
+    .nav-tab-active:hover {
+        background-color: #f1f1f1;
+        border-bottom: 1px solid #f1f1f1;
+    }
+
+    h2.nav-tab-active {
+        border-bottom: none;
+    }
+
+}
+
+/* PLUGIN BRANDING */
+
+.ct-presslabs-wrap .ct-presslabs-branding {
+    background-color: #10AF43;
+    height: 75px;
+    left: -20px;
+    padding-left: 20px;
+    padding-top: 15px;
+    top: 46px;
+    z-index: 0;
+    margin-top: -75px;
+    margin-left: -25px;
+    margin-right: -30px;
+}
+
+@media screen and ( min-width: 667px ) {
+
+    .ct-presslabs-wrap .ct-presslabs-branding {
+        top: 0;
+    }
+
+}
+
+.ct-presslabs-wrap .ct-presslabs-img {
+    float: left;
+}
+
+.ct-presslabs-wrap .text {
+    color: #fff;
+    display: inline-block;
+    margin-left: 20px;
+    margin: 10px 0;
+    font-size: 16px;
+}
+
+.ct-presslabs-wrap .ct-presslabs-plugin-name {
+    font-size: 24px;
+    line-height: 20px;
+    margin-bottom: 3px;
+}
+
+.update-nag {
+    display: none;
+}

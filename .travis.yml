@@ -1,5 +1,4 @@
 sudo: false
-dist: trusty
 
 language: php
 
@@ -19,46 +18,39 @@ cache:
 
 matrix:
   include:
-    - php: 7.1
+    - php: 7.2
       env: WP_VERSION=latest
     - php: 7.1
-      env: WP_TRAVISCI=phpcs
+      env: WP_VERSION=latest
     - php: 7.0
       env: WP_VERSION=latest
+    - php: 7.1
+      env: WP_VERSION=trunk
+    - php: 7.1
+      env: WP_TRAVISCI=phpcs
+  allow_failures:
+    - env: WP_TRAVISCI=phpcs
 
 before_script:
-  - export PATH="$HOME/.composer/vendor/bin:$PATH"
-  - |
-    if [ -f ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/xdebug.ini ]; then
-      phpenv config-rm xdebug.ini
-    else
-      echo "xdebug.ini does not exist"
-    fi
+  - export PATH="$(pwd)/vendor/bin:$PATH"
   - |
     if [[ ! -z "$WP_VERSION" ]] ; then
-      composer install --dev
       bash bin/install-wp-tests.sh wordpress_test root '' localhost $WP_VERSION
-      composer global require phpunit/phpunit ^7.0
+      composer require "phpunit/phpunit=~7.0" "antecedent/patchwork=~2.1"
     fi
   - |
     if [[ "$WP_TRAVISCI" == "phpcs" ]] ; then
-      composer global require wp-coding-standards/wpcs
-      phpcs --config-set installed_paths $HOME/.composer/vendor/wp-coding-standards/wpcs
+      composer require wp-coding-standards/wpcs
+      phpcs --config-set installed_paths "$(pwd)/vendor/wp-coding-standards/wpcs"
     fi
 
 script:
   - |
     if [[ ! -z "$WP_VERSION" ]] ; then
-      phpunit --tap --coverage-clover build/logs/clover.xml
+      phpunit
       WP_MULTISITE=1 phpunit
     fi
   - |
     if [[ "$WP_TRAVISCI" == "phpcs" ]] ; then
-      phpcs
-    fi
-
-after_script:
-  - |
-    if [[ ! -z "$WP_VERSION" ]] ; then
-      bash bin/code-climate-coverage.sh
+      phpcs --standard=phpcs.ruleset.xml $(find . -name '*.php')
     fi
