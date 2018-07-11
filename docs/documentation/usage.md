@@ -43,11 +43,11 @@ Your newly created credentials will appear on the **Credentials** page, and you 
 
 ### Step 2: Authorising Requests
 
-At the end of the registration process you will be able to get the clientId and the clientSecret keys. By using these keys the client application will avoid sharing the username and/or password with any other Toplytics users.
+You can get the Client ID and the Client Secret keys by pressing the **Edit OAuth Client** button from the Credeantials section (the one near the download button). By using these keys the client application will avoid sharing the username and/or password with any other Toplytics users.
 
 When the client application is executed, it prompts the users to allow access and redirects the users to the Google URL which will provide an authorisation code. The authorisation code is fed back to the client application which then uses the code to get the access token. In this way a secure connection is established between Toplytics and the newly created application, that will offer the data from Google Analytics, needed by Toplytics to display the most visited posts from your site.
 
-In this step please connect to your Google Analytics Account from WordPress Toplytics settings page.
+In this step please connect to your Google Analytics Account from the Toplytics settings page in your wp-admin.
 
 #### 2.1. Get Authorization Key
 
