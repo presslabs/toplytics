@@ -6,39 +6,35 @@ Connect your plugin with Google Analytics Account from the Settings page (Settin
 
 ### Register client application with Google (configuration step 1)
 
-Every application has to be registered with the Google API so that we can use the OAuth 2.0 token during the authentication and authorisation process. To register an application the user has to login to the Google account and go to [Google API console](https://console.developers.google.com/).
+Every application has to be registered with the Google API so that we can use the OAuth 2.0 token during the authentication and authorisation process. To register an application the user has to login to the Google account and go to [Google API Dashboard](https://console.developers.google.com/).
+
+![Google API Dashboard](images/toplytics_google.png)
 
 #### 1. Create new project
 
-From Google API console create a new project using the “Create Project” button.
+From Google API console create a new project using the “Create Project” button. To set up properly the client application, select a unique “project name”.
 
-![pic](01-1-create-project.png)
-
-To set up properly the client application, select a unique “project name”.
-
-![pic](01-2-new-project.png)
-
-![pic](01-3-go-to-credentials.png)
+![Creating a new project](images/toplytics_create_project.png)
 
 #### 2. Enable the Analytics API
 
-![pic](02-1-select-project.png)
+![Enable API's and Services](images/toplytics_enable_api.png)
 
-![pic](02-2-select-api.png)
+![Search for the Analytics API](images/toplytics_enable_api2.png)
 
-![pic](02-3-analytics-api.png)
-
-![pic](02-4-enable-analytics-api.png)
+![Enable the Analytics API](images/toplytics_enable_api3.png)
 
 #### 3. Create new Client ID
 
-![pic](03-1-credentials-setup.png)
+![Set up your product name](images/toplytics_consent_screen.png)
 
-![pic](03-2-credentials-setup2.png)
+![pic](images/toplytics_credentials.png)
+
+![pic](images/toplytics_client_ID.png)
 
 #### 4. Download the JSON file with the API credentials (Auth Config file)
 
-![pic](04-1-download-json-file.png)
+![pic](images/toplytics_download_json.png)
 
 ### Authorising Requests (configuration step 2)
 
