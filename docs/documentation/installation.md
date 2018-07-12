@@ -1,4 +1,24 @@
-## Installing
+---
+title: Install and configure Toplytics
+description: Check out how to install and configure the Presslabs Toplytics plugin to your Google Analytics account with step-by-step detailed explanations and screenshots.  
+---
+
+# Install and configure Toplytics
+You can simply search it in the WordPress plugins, install and activate it, or [download it](https://www.presslabs.org/toplytics/) and upload it in wp-content/plugins and again activate it from WordPress.
+
+As mentioned before, Toplytics displays the most visited posts as a widget using data extracted from Google Analytics, so it needs to be connected to Google Analytics. We offer two possibilities to use Toplytics: through **Public Authorization** or the **Private Authorization**.
+
+## Public Authorization
+To use the **Public Authorization** simply press the **Log in with your Google Account via Presslabs.org** button and you will be redirected to the Google Authorization screen where you will be asked for read access to your analytics profiles. This method is using the Presslabs public API key to authenticate you to the Google Analytics API, so no further configuration is needed. 
+
+![Toplytics Public Authorization](images/toplytics_public.png)
+
+## Private Authorization
+The private authorization is the recommanded way in using Toplytics, as it offers you complete control over the connection by using your very own API keys and application for granting access. 
+
+![Toplytics Private Authorization](images/toplytics_private_authorize.png)
+
+You need to enter your Client ID and Client Secret from your Google Analytics account. The next steps will guide you in configuring your Google Analytics account to Toplytics. Keep in mind that you will need the **Redirect URL** mentioned in this page further in configuring Toplytics.
 
 ### Step 1: Register client application with Google
 
