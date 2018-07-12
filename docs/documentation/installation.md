@@ -46,34 +46,36 @@ Go to the **Credentials -> OAuth consent screen** tab to set up your product nam
 
 ![Set up your product name](images/toplytics_consent_screen.png)
 
-After you set up your product name, you can create your credentials. Go back to the **Dashboard** section, click on the arrow of the button **Create credentials** and choose the **OAuth Client ID** option. When asked to choose your application type choose the **Other** option and your product name will appear below, then press **Create**.
+After you set up your product name, you can create your credentials. Go back to the **Dashboard** section, click on the arrow of the button **Create credentials** and choose the **OAuth Client ID** option. 
 
 ![Go to OAuth Client ID](images/toplytics_credentials.png)
 
-![Create OAuth Client ID](images/toplytics_client_ID.png)
+When asked to choose your application type choose the **Web application** option. You will be asked to introduce the **Javascript Origins** and **Redirects URI's**. As **Authorized JavaScipt Origins** introduce your domain name, and as **Authorized redirect URI** you need to introduce the [Redirect URL](./installation/#private-authorization) from `Settings -> Toplytics -> Private Authorization`.
 
-#### 1.4. Download the JSON file with the API credentials (Auth Config file)
-Your newly created credentials will appear on the **Credentials** page, and you need to download the JSON file with the API credentials using the download button.
+![Create OAuth Client ID](images/toplytics_create_client_ID.png)
 
-![How to download the JSON file with the API credentials](images/toplytics_download_json.png)
+Your newly created credentials will appear on the **Credentials** page and the **Client ID** and **Client secret** you need to authorize the **Private Authentification** will appear in a pop up. You can also see them by pressing the **Edit OAuth Client** button from the Credentials section.
+
+![Credentials section](images/toplytics_get_credentials.png)
 
 ### Step 2: Authorising Requests
 
-You can get the Client ID and the Client Secret keys by pressing the **Edit OAuth Client** button from the Credeantials section (the one near the download button). By using these keys the client application will avoid sharing the username and/or password with any other Toplytics users.
+Copy the Client ID and the Client Secret keys from the **Credentials section**, then go back to `Settings -> Toplytics -> Private Authorization` to paste these credentials. By using these keys the client application will avoid sharing the username and/or password with any other Toplytics users.
 
-When the client application is executed, it prompts the users to allow access and redirects the users to the Google URL which will provide an authorisation code. The authorisation code is fed back to the client application which then uses the code to get the access token. In this way a secure connection is established between Toplytics and the newly created application, that will offer the data from Google Analytics, needed by Toplytics to display the most visited posts from your site.
+![Private Authorization](images/toplytics_private.png)
 
-In this step please connect to your Google Analytics Account from the Toplytics settings page in your wp-admin.
+Click the **Private Authorize** button and after logging in you need to agree that the newly created app will access your Analytics data and you are all set.
 
-#### 2.1. Get Authorization Key
+![Allow your domain to access your Google account](images/toplytics_permission.png)
 
-Click the Get Authorization Key button from the plugin's settings page and you will be redirected to google.com;
+You can select from the list of profiles the one you want to use for this site or you can disconnect your Google account.
 
-#### 2.2. Grant Access to Analytics
+![Select user profile](images/toplytics_select_user_profile.png)
 
-After logging in you need to agree that the newly created app will access your Analytics data. After that you get a key;
+In case you have no user profile set up in your Analytics account, a warning message will appear:
 
-#### 2.3. Connect the plugin to Analytics
+![No user profile warning](images/toplytics_no_profile.png)
 
-Then come back to the plugin settings page and use the key in the Authorization Key field. Click on Get Analytics Profiles button, select the profile for your current site and click on Connect.
+This means you need to set up your site in [Google Analytics](https://www.google.com/analytics/). To set up your site in Google Analytics you need to create an account and to add your site (create a new property). Fill in your website details and click the **Get Tracking ID button**. Here you have a tracking code you need to copy and paste as the first item into the **HEAD** of every webpage you want to track or you can use the **Google Tag Manager** to help you help you add tags to your site.
 
+![Get Tracking ID](images/analytics_tracking_code.png)
