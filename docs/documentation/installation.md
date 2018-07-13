@@ -8,6 +8,10 @@ You can simply search it in the WordPress plugins, install and activate it, or [
 
 As mentioned before, Toplytics displays the most visited posts as a widget using data extracted from Google Analytics, so it needs to be connected to Google Analytics. You need to have Google Analytics active on your site if you want to use this plugin.
 
+This means you need to set up your site in [Google Analytics](https://www.google.com/analytics/). To set up your site in Google Analytics you need to [create an account and to add your site as a property](https://support.google.com/analytics/answer/1008015?hl=en&ref_topic=3544906). Then you need to [set up Analytics tracking on your site](https://support.google.com/analytics/answer/1008080?hl=en). You will have a tracking code you need to copy and paste as the first item into the **HEAD** of every webpage you want to track or you can use the **Google Tag Manager** to help you help you add tags to your site.
+
+![Get Tracking ID](images/analytics_tracking_code.png)
+
 We offer two possibilities to use Toplytics: through **Public Authorization** or the **Private Authorization**.
 
 ## Public Authorization
@@ -19,19 +23,17 @@ To use the **Public Authorization** simply press the **Log in with your Google A
 
 ![Allow your domain to access your Google account](images/toplytics_permission.png)
 
-Then you need to select your profile and you are all set to [use Toplytics](./usage/) to display your most visited posts.
+Then you need to select your profile.
 
 ![Select your Analytics Profile](images/toplytics_select_profile.png)
-
-![Toplytics public configuration done](images/toplytics_done.png)
 
 In case you have no user profile set up in your Analytics account, a warning message will appear:
 
 ![No user profile warning](images/toplytics_no_profile.png)
 
-This means you need to set up your site in [Google Analytics](https://www.google.com/analytics/). To set up your site in Google Analytics you need to [create an account and to add your site as a property](https://support.google.com/analytics/answer/1008015?hl=en&ref_topic=3544906). Then you need to [set up Analytics tracking on your site](https://support.google.com/analytics/answer/1008080?hl=en). You will have a tracking code you need to copy and paste as the first item into the **HEAD** of every webpage you want to track or you can use the **Google Tag Manager** to help you help you add tags to your site.
+Now you are all set to [use Toplytics](./usage/) to display your most visited posts.
 
-![Get Tracking ID](images/analytics_tracking_code.png)
+![Toplytics public configuration done](images/toplytics_done.png)
 
 ## Private Authorization
 The private authorization is the recommanded way in using Toplytics, as it offers you complete control over the connection by using your very own API keys and application for granting access. 
@@ -88,12 +90,10 @@ Click the **Private Authorize** button and after logging in you need to agree th
 
 ![Allow your domain to access your Google account](images/toplytics_permission.png)
 
-You can select from the list of profiles the one you want to use for this site or you can disconnect your Google account.
-
-![Select user profile](images/toplytics_select_user_profile.png)
-
-Then you need to select your profile and you are all set to [use Toplytics](./usage/) to display your most visited posts. Make sure you have a Google Analytics profile set up, otherwise a warning message will appear that there are no profiles on the selected Google account.
+You can select from the list of profiles the one you want to use for this site or you can disconnect your Google account. Make sure you have a Google Analytics profile set up, otherwise a warning message will appear that there are no profiles on the selected Google account.
 
 ![Select your Analytics Profile](images/toplytics_select_profile.png)
+
+Now you are all set to [use Toplytics](./usage/) to display your most visited posts.
 
 ![Toplytics private configuration done](images/toplytics_done_private.png)
