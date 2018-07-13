@@ -90,9 +90,9 @@ You should use this plugin if you want to display the most visited posts of your
 The data from GA is refreshed every hour. During this interval, the information is safely stored using transients and options.
 
 = How to use the custom template? =
-To use a custom template you just need to copy the file `toplytics-template.php` from Toplytics' plugin folder to your theme folder.
+To use a custom template you need to create a file named custom.blade.php in /wp-content/plugins/toplytics/resources/views/frontend. You can simply copy the widget.blade.php file found here and rename it custom.blade.php. You can then customize your template.
 
-You can then customize your template. The plugin will first search for the file `toplytics-template.php` in the active theme folder, and, if that's not found, it will search for it in the plugin folder. The custom template from the theme folder has priority over the one in the plugin folder.
+Toplytics will look for the custom.blade.php file if it exists at the before mentioned path, then for the file toplytics-template.php in the active theme folder (this is to ensure backwards compatibility) and last but not least for the widget.blade.php file found at /wp-content/plugins/toplytics/resources/views/frontend.
 
 = How can I use the shortcode? =
 The shortcode has 3 parameters: period -> default=month (today/week/month), numberposts -> default=5 (min=1/max=250), showviews -> default=false (true/false)
