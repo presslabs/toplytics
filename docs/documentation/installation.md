@@ -6,12 +6,32 @@ description: Check out how to install and configure the Presslabs Toplytics plug
 # Install and configure Toplytics
 You can simply search it in the WordPress plugins, install and activate it, or [download it](https://www.presslabs.org/toplytics/) and upload it in wp-content/plugins and again activate it from WordPress.
 
-As mentioned before, Toplytics displays the most visited posts as a widget using data extracted from Google Analytics, so it needs to be connected to Google Analytics. We offer two possibilities to use Toplytics: through **Public Authorization** or the **Private Authorization**.
+As mentioned before, Toplytics displays the most visited posts as a widget using data extracted from Google Analytics, so it needs to be connected to Google Analytics. You need to have Google Analytics active on your site if you want to use this plugin.
+
+We offer two possibilities to use Toplytics: through **Public Authorization** or the **Private Authorization**.
 
 ## Public Authorization
-To use the **Public Authorization** simply press the **Log in with your Google Account via Presslabs.org** button and you will be redirected to the Google Authorization screen where you will be asked for read access to your analytics profiles. This method is using the Presslabs public API key to authenticate you to the Google Analytics API, so no further configuration is needed. 
+This method is using the Presslabs public API key to authenticate you to the Google Analytics API, and you don't have to set up your own API keys. 
 
 ![Toplytics Public Authorization](images/toplytics_public.png)
+
+To use the **Public Authorization** simply press the **Log in with your Google Account via Presslabs.org** button and you will be redirected to the Google Authorization screen where you will be asked for read access to your analytics profiles.
+
+![Allow your domain to access your Google account](images/toplytics_permission.png)
+
+Then you need to select your profile and you are all set to [use Toplytics](./usage/) to display your most visited posts.
+
+![Select your Analytics Profile](images/toplytics_select_profile.png)
+
+![Toplytics public configuration done](images/toplytics_done.png)
+
+In case you have no user profile set up in your Analytics account, a warning message will appear:
+
+![No user profile warning](images/toplytics_no_profile.png)
+
+This means you need to set up your site in [Google Analytics](https://www.google.com/analytics/). To set up your site in Google Analytics you need to [create an account and to add your site as a property](https://support.google.com/analytics/answer/1008015?hl=en&ref_topic=3544906). Then you need to [set up Analytics tracking on your site](https://support.google.com/analytics/answer/1008080?hl=en). You will have a tracking code you need to copy and paste as the first item into the **HEAD** of every webpage you want to track or you can use the **Google Tag Manager** to help you help you add tags to your site.
+
+![Get Tracking ID](images/analytics_tracking_code.png)
 
 ## Private Authorization
 The private authorization is the recommanded way in using Toplytics, as it offers you complete control over the connection by using your very own API keys and application for granting access. 
@@ -72,10 +92,8 @@ You can select from the list of profiles the one you want to use for this site o
 
 ![Select user profile](images/toplytics_select_user_profile.png)
 
-In case you have no user profile set up in your Analytics account, a warning message will appear:
+Then you need to select your profile and you are all set to [use Toplytics](./usage/) to display your most visited posts. Make sure you have a Google Analytics profile set up, otherwise a warning message will appear that there are no profiles on the selected Google account.
 
-![No user profile warning](images/toplytics_no_profile.png)
+![Select your Analytics Profile](images/toplytics_select_profile.png)
 
-This means you need to set up your site in [Google Analytics](https://www.google.com/analytics/). To set up your site in Google Analytics you need to create an account and to add your site (create a new property). Fill in your website details and click the **Get Tracking ID button**. Here you have a tracking code you need to copy and paste as the first item into the **HEAD** of every webpage you want to track or you can use the **Google Tag Manager** to help you help you add tags to your site.
-
-![Get Tracking ID](images/analytics_tracking_code.png)
+![Toplytics private configuration done](images/toplytics_done_private.png)
