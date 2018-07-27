@@ -103,6 +103,6 @@ You can select from the list of profiles the one you want to use for this site o
 
 {{< img src="../images/toplytics_select_profile" type="png" alt="Select your Analytics Profile" caption="Select your Analytics Profile" >}}
 
-Now you are all set to [use Toplytics](./usage/) to display your most visited posts.
+Now you are all set to [use Toplytics]({{< ref "usage.md" >}}) to display your most visited posts.
 
 {{< img src="../images/toplytics_done_private" type="png" alt="Toplytics private configuration done" caption="Toplytics private configuration done" >}}
