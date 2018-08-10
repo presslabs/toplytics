@@ -84,7 +84,7 @@ class Frontend
          */
 
         wp_enqueue_style(
-            $this->plugin_basename,
+            $this->TOPLYTICS_DOMAIN,
             plugin_dir_url(__FILE__) . '../resources/frontend/css/toplytics-public.css',
             array(),
             $this->version,
@@ -112,37 +112,60 @@ class Frontend
          * class.
          */
 
-        wp_enqueue_script(
-            $this->plugin_basename,
+        wp_register_script(
+            TOPLYTICS_DOMAIN,
             plugin_dir_url(__FILE__) . '../resources/frontend/js/toplytics-public.js',
             array( 'jquery' ),
             $this->version,
             false
         );
-    }
 
-    public function addEndpoint()
-    {
-        add_rewrite_rule('toplytics\.json$', 'index.php?toplytics=json', 'top');
-    }
-
-    public function handleEndpoint($template)
-    {
-
-        if (get_query_var('toplytics', false) == 'json') {
-            $this->jsonData();
-        }
-
-        return $template;
+        wp_localize_script(TOPLYTICS_DOMAIN, TOPLYTICS_DOMAIN, array( 'json_url' => esc_url(home_url('/toplytics.json')) ));
+        wp_enqueue_script(TOPLYTICS_DOMAIN);
     }
 
     /**
-     * Return Toplytics data as a json file.
+     * This is where our endpoint is being declared. We'll handle it
+     * in another method that will catch the 'toplytics' param
+     * and return the apropiate JSON formated data.
+     *
+     * @since 3.0.0
+     * @return void
+     */
+    public function addEndpoint()
+    {
+        add_rewrite_tag('%toplytics%', '([^&]+)');
+        add_rewrite_rule('^toplytics\.json$', 'index.php?toplytics=json', 'top');
+    }
+
+    /**
+     * This is the endpoint where we handle our json redirection done
+     * above. We will return json formated data from the DB for the
+     * frontend javascript code to handle and display it.
+     *
+     * @since 3.0.0
+     * @return void
+     */
+    public function handleEndpoint()
+    {
+        if (get_query_var('toplytics', false) == 'json') {
+            wp_send_json($this->jsonData());
+        }
+
+        return;
+    }
+
+    /**
+     * Return Toplytics data from the DB constants formated only
+     * with required data for the frontend to display.
+     *
+     * @since 3.0.0
+     * @return string The json data
      */
     public function jsonData()
     {
-        // header('Content-Type: application/json');
         $post_data = array();
+
         foreach (array_keys($this->ranges) as $when) {
             $result = $this->getResult($when);
             if (! empty($result)) {
@@ -157,10 +180,9 @@ class Frontend
                 }
             }
         }
+
         $json_data = apply_filters('toplytics_json_all_data', $post_data);
-        wp_send_json($json_data);
-        // echo json_encode($json_data, JSON_FORCE_OBJECT);
-        // die();
+        return $json_data;
     }
 
     /**
@@ -190,7 +212,8 @@ class Frontend
     }
     
     /**
-     * Get Toplytics result from DB
+     * Get Toplytics result from DB - this result is stored in an
+     * option which should be re-fetched every hour via a CRON.
      */
     public function getResult($when = 'today')
     {
@@ -211,36 +234,31 @@ class Frontend
         register_widget(new \Toplytics\Widget($this));
     }
 
+    /**
+     * This adds this rest API endpoint to be used by anybody or even
+     * by us in a future version of the plugin.
+     *
+     * Example:
+     * http://localhost:8080/wp-json/toplytics/results
+     *
+     * @since 4.0.0
+     */
     public function restApiInit()
     {
-        register_rest_route('toplytics/', '/auth/', array(
+        register_rest_route('toplytics/', 'results', array(
         
             'methods' => 'GET',
-            'callback' => 'toplyticsMasterApiEndpoint',
+            'callback' => [$this, 'toplyticsMasterApiEndpoint'],
         ));
     }
 
-    // function toplyticsMasterApiEndpoint($data)
-    // {
-        // if(!isset($data['state']) || !$data['state'] ||
-        //  !isset($data['code']) || !$data['code'])
-        //  return 'Gee. Go get a coffe, this is not for you!';
-        // // $posts = get_posts(array(
-        // //     'author' => $data['id'],
-        // // ));
-
-        // // if (empty($posts)) {
-        // //     return null;
-        // // }
-
-        // // return var_export($data, true);
-        // // return 'yes';
-        // // return $data['state'];
-        // $url = add_query_arg([
-        //  'ok' => 'ok',
-        //  'code' => $data['code'],
-        // ], $data['state']);
-        // // return $url;
-        // wp_redirect($url, 303);
-    // }
+    /**
+     * This callback returns the data as JSON via the REST API.
+     *
+     * @since 4.0.0
+     */
+    public function toplyticsMasterApiEndpoint()
+    {
+        return $this->jsonData();
+    }
 }

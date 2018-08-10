@@ -3,6 +3,6 @@ composer.phar
 Thumbs.db
 .DS_Store
 /.vscode
-storage/
-vendor
+/storage
+/vendor
 /.idea
