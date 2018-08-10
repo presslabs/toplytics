@@ -472,7 +472,7 @@ class Backend
      *
      * @return void
      */
-    protected function setupScheduleEvent()
+    public function setupScheduleEvent()
     {
         if (! wp_next_scheduled('toplytics_cron_event')) {
             wp_schedule_event(time(), 'hourly', 'toplytics_cron_event');

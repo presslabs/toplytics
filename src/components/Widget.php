@@ -65,7 +65,7 @@ class Widget extends \WP_Widget
             }
         }
 
-        echo "<script type=\"text/javascript\">toplytics_args = {$toplytics_args}</script>";
+        echo "<script type=\"text/javascript\">toplytics_args = {{$toplytics_args}};</script>";
     }
 
     /**
@@ -103,6 +103,7 @@ class Widget extends \WP_Widget
         $widget_period = $period;
         $widget_numberposts = $numberposts;
         $widget_showviews = $showviews;
+        $widget_loadViaJS = $loadViaJS;
 
         echo $before_widget;
 
@@ -114,6 +115,7 @@ class Widget extends \WP_Widget
             'period' => $period,
             'numberposts' => $numberposts,
             'showviews' => $showviews,
+            'loadViaJS' => $loadViaJS,
             'before_title' => $before_title,
             'title' => $title,
             'after_title' => $after_title,
@@ -121,35 +123,40 @@ class Widget extends \WP_Widget
         $this->realtimeScriptArgs($toplytics_args);
         echo "<div id='$widget_id-inner'></div>";
 
-        $template_file = $this->frontend->getCustomTemplateFile();
+        if ($loadViaJS) {
+            // This functionality is still rudimentary and requires a serious rewrite
+            echo "<script type=\"text/javascript\">jQuery(document).ready(function(){toplytics_results(toplytics_args)});</script>";
+        } else {
+            $template_file = $this->frontend->getCustomTemplateFile();
 
-        if ($template_file && pathinfo($template_file, PATHINFO_EXTENSION) == 'php') {
-            // Legacy support, bail fast on it. All logic inside template (bad).
-            include $template_file;
-        } elseif (!empty($toplytics_results)) {
-            // Modern approach using Blade templates. Separated logic and template.
+            if ($template_file && pathinfo($template_file, PATHINFO_EXTENSION) == 'php') {
+                // Legacy support, bail fast on it. All logic inside template (bad).
+                include $template_file;
+            } elseif (!empty($toplytics_results)) {
+                // Modern approach using Blade templates. Separated logic and template.
 
-            $posts_list = get_posts(array(
-                'posts_per_page' => count($toplytics_results), // the number of posts being displayed
-                'post__in' => array_keys($toplytics_results),
-                'orderby' => 'post__in',
-            ));
+                $posts_list = get_posts(array(
+                    'posts_per_page' => count($toplytics_results), // the number of posts being displayed
+                    'post__in' => array_keys($toplytics_results),
+                    'orderby' => 'post__in',
+                ));
 
-            $posts = [];
+                $posts = [];
 
-            // We get only the items we need from these posts and append
-            // the view count as well, in case we need to display it.
-            foreach ($posts_list as $post) {
-                $posts[] = (object) [
-                    'permalink' => get_the_permalink($post),
-                    'title' => get_the_title($post),
-                    'views' => isset($toplytics_results[get_the_ID($post)]) ? $toplytics_results[get_the_ID($post)] : 0,
-                ];
+                // We get only the items we need from these posts and append
+                // the view count as well, in case we need to display it.
+                foreach ($posts_list as $post) {
+                    $posts[] = (object) [
+                        'permalink' => get_the_permalink($post),
+                        'title' => get_the_title($post),
+                        'views' => isset($toplytics_results[get_the_ID($post)]) ? $toplytics_results[get_the_ID($post)] : 0,
+                    ];
+                }
+
+                $template = $this->frontend->window->validateView($template_file) ? $template_file : 'frontend.widget';
+
+                $this->frontend->window->open($template, compact('posts', 'showviews'), true, false);
             }
-
-            $template = $this->frontend->window->validateView($template_file) ? $template_file : 'frontend.widget';
-
-            $this->frontend->window->open($template, compact('posts', 'showviews'), true, false);
         }
 
         echo $after_widget;
@@ -179,7 +186,8 @@ class Widget extends \WP_Widget
         }
 
         $instance['showviews'] = isset($new_instance['showviews']) ? 1 : 0;
-
+        $instance['loadViaJS'] = isset($new_instance['loadViaJS']) ? 1 : 0;
+        
         return $instance;
     }
 
@@ -197,6 +205,10 @@ class Widget extends \WP_Widget
         $showviews_checked = '';
         if (isset($instance['showviews'])) {
             $showviews_checked = $instance['showviews'] ? ' checked="checked"' : '';
+        }
+        $loadViaJS_checked = '';
+        if (isset($instance['loadViaJS'])) {
+            $loadViaJS_checked = $instance['loadViaJS'] ? ' checked="checked"' : '';
         }
         ?>
         <p>
@@ -227,6 +239,10 @@ class Widget extends \WP_Widget
 
         <p>
             <input class="checkbox" type="checkbox"<?php echo $showviews_checked; ?> id="<?php echo $this->get_field_id('showviews'); ?>" name="<?php echo $this->get_field_name('showviews'); ?>" /> <label for="<?php echo $this->get_field_id('showviews'); ?>"><?php echo __('Display post views', 'toplytics'); ?>?</label>
+        </p>
+
+        <p>
+            <input class="checkbox" type="checkbox"<?php echo $loadViaJS_checked; ?> id="<?php echo $this->get_field_id('loadViaJS'); ?>" name="<?php echo $this->get_field_name('loadViaJS'); ?>" /> <label for="<?php echo $this->get_field_id('loadViaJS'); ?>"><?php echo __('Load via Javascript (ignores any custom template)', 'toplytics'); ?>?</label>
         </p>
 
         <p><?php _e('Template');?>:<br /><?php echo $this->frontend->getCustomTemplateFile() ?: '<strong>Default.</strong>&nbsp;See docs for more info on how to change this.'; ?></p>

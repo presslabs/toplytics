@@ -150,8 +150,9 @@ class Engine
         $plugin_public = new \Toplytics\Frontend($this->getPluginBasename(), $this->getVersion(), $this->window);
 
         $this->loader->addAction('wp_loaded', $plugin_public, 'addEndpoint');
-        $this->loader->addAction('template_include', $plugin_public, 'handleEndpoint');
+        $this->loader->addAction('template_redirect', $plugin_public, 'handleEndpoint');
 
+        $this->loader->addAction('rest_api_init', $plugin_public, 'restApiInit');
         $this->loader->addAction('widgets_init', $plugin_public, 'registerWidget');
         $this->loader->addAction('wp_enqueue_scripts', $plugin_public, 'enqueueStyles');
         $this->loader->addAction('wp_enqueue_scripts', $plugin_public, 'enqueueScripts');
