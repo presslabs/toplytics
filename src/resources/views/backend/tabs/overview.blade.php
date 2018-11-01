@@ -56,13 +56,13 @@ analytics on the last update.
             </tr>
             <tr valign="top">
                 <th scope="row">
-                    <label>{{ __( 'Last Top Update', 'toplytics' ) }}</label>
+                    <label>{{ __( 'Last Data Update', 'toplytics' ) }}</label>
                 </th>
                 <td>{{ $lastUpdateTime }}</td>
             </tr>
             <tr valign="top">
                 <th scope="row">
-                    <label>{{ __( 'Updated Items', 'toplytics' ) }}</label>
+                    <label>{{ __( 'Fetched from Google', 'toplytics' ) }}</label>
                 </th>
                 <td>{{ $lastUpdateCount }}</td>
             </tr>
@@ -92,6 +92,7 @@ analytics on the last update.
         {{-- We show different submit buttons based on whether the user has chosen a profile or not. --}}
         @if ( isset($profile) && $profile )
             <a href="{!! admin_url('widgets.php') !!}" class="button-primary">{{ __('Widgets Management', TOPLYTICS_DOMAIN) }}</a>&nbsp;&nbsp;
+            <input type="submit" name="ToplyticsSubmitForceUpdate" class="button" value="{{ __( 'Update Now', TOPLYTICS_DOMAIN ) }}" />&nbsp;&nbsp;
             <input type="submit" name="ToplyticsSubmitProfileSwitch" class="button" value="{{ __( 'Switch Profile', TOPLYTICS_DOMAIN ) }}" />
         @elseif(isset($profiles) && $profiles)
             <input type="submit" name="ToplyticsProfileSelect" class="button-primary" value="{{ __( 'Select Profile', TOPLYTICS_DOMAIN ) }}" />
@@ -99,7 +100,15 @@ analytics on the last update.
 
         &nbsp;&nbsp;
 
-        <input type="submit" name="ToplyticsSubmitAccountDisconnect" class="button" value="{{   __( 'Disconnect Google Account', TOPLYTICS_DOMAIN ) }}" />
+        <input id="ToplyticsSubmitAccountDisconnect" type="submit" name="ToplyticsSubmitAccountDisconnect" class="button" value="{{   __( 'Disconnect Google Account', TOPLYTICS_DOMAIN ) }}" />
     </div>
 
 </form>
+
+{{-- We need to prevent accidental disconnect.--}}
+<script type="text/javascript">
+    var disconnect_btn = document.getElementById("ToplyticsSubmitAccountDisconnect");
+    if (disconnect_btn !== null) disconnect_btn.onclick = function(){
+        return confirm("{{ __( 'Are you sure you want to disconnect your Google Account?', TOPLYTICS_DOMAIN ) }}");
+    };
+</script>

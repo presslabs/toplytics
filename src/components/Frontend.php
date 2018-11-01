@@ -47,6 +47,8 @@ class Frontend
      */
     public $window;
 
+    private $settings;
+
     /**
      * Initialize the class and set its properties.
      *
@@ -54,13 +56,14 @@ class Frontend
      * @param      string    $plugin_basename       The name of the plugin.
      * @param      string    $version    The version of this plugin.
      */
-    public function __construct($plugin_basename, $version, Window $window)
+    public function __construct($plugin_basename, $version, Window $window, $settings = null)
     {
 
         $this->plugin_basename = $plugin_basename;
         $this->version = $version;
-        $this->ranges = $this->initRanges();
         $this->window = $window;
+        $this->settings = $settings ?: get_option('toplytics_settings', null);
+        $this->ranges = $this->initRanges();
     }
 
     /**
@@ -84,12 +87,23 @@ class Frontend
          */
 
         wp_enqueue_style(
-            $this->TOPLYTICS_DOMAIN,
+            TOPLYTICS_DOMAIN,
             plugin_dir_url(__FILE__) . '../resources/frontend/css/toplytics-public.css',
             array(),
             $this->version,
             'all'
         );
+    }
+
+    public function checkSetting($var, $requiredValue = null)
+    {
+        $status = isset($this->settings[$var]) && $this->settings[$var];
+
+        if (isset($this->settings[$var]) && !is_null($requiredValue)) {
+            $status = ($this->settings[$var] === $requiredValue);
+        }
+
+        return $status;
     }
 
     /**
@@ -112,16 +126,19 @@ class Frontend
          * class.
          */
 
-        wp_register_script(
-            TOPLYTICS_DOMAIN,
-            plugin_dir_url(__FILE__) . '../resources/frontend/js/toplytics-public.js',
-            array( 'jquery' ),
-            $this->version,
-            false
-        );
+        // if ($this->checkSetting('enable_json') && $this->checkSetting('json_path')) {
+        //     wp_register_script(
+        //         TOPLYTICS_DOMAIN,
+        //         plugin_dir_url(__FILE__) . '../resources/frontend/js/toplytics-public.js',
+        //         array( 'jquery' ),
+        //         $this->version,
+        //         false
+        //     );
 
-        wp_localize_script(TOPLYTICS_DOMAIN, TOPLYTICS_DOMAIN, array( 'json_url' => esc_url(home_url('/toplytics.json')) ));
-        wp_enqueue_script(TOPLYTICS_DOMAIN);
+        //     wp_localize_script(TOPLYTICS_DOMAIN, TOPLYTICS_DOMAIN, array( 'json_url' => esc_url(home_url('/' . $this->settings['json_path'])) ));
+        //     wp_enqueue_script(TOPLYTICS_DOMAIN);
+        // }
+        
     }
 
     /**
@@ -134,8 +151,12 @@ class Frontend
      */
     public function addEndpoint()
     {
-        add_rewrite_tag('%toplytics%', '([^&]+)');
-        add_rewrite_rule('^toplytics\.json$', 'index.php?toplytics=json', 'top');
+        if ($this->checkSetting('enable_json') && $this->checkSetting('json_path')) {
+            add_rewrite_tag('%toplytics%', '([^&]+)');
+            add_rewrite_rule('^' . preg_quote($this->settings['json_path']) . '$', 'index.php?toplytics=json', 'top');
+        }
+        
+        return;
     }
 
     /**
@@ -148,7 +169,9 @@ class Frontend
      */
     public function handleEndpoint()
     {
-        if (get_query_var('toplytics', false) == 'json') {
+        if ($this->checkSetting('enable_json') &&
+            $this->checkSetting('json_path') &&
+            get_query_var('toplytics', false) == 'json') {
             wp_send_json($this->jsonData());
         }
 
@@ -164,21 +187,8 @@ class Frontend
      */
     public function jsonData()
     {
-        $post_data = array();
-
         foreach (array_keys($this->ranges) as $when) {
-            $result = $this->getResult($when);
-            if (! empty($result)) {
-                foreach ($result as $post_id => $pageviews) {
-                    $data = array(
-                        'permalink' => get_permalink($post_id),
-                        'title'     => get_the_title($post_id),
-                        'post_id'   => (int) $post_id,
-                        'views'     => (int) $pageviews,
-                    );
-                    $post_data[ $when ][] = apply_filters('toplytics_json_data', $data, $post_id, $when);
-                }
-            }
+            $post_data[$when] = $this->getResult($when);
         }
 
         $json_data = apply_filters('toplytics_json_all_data', $post_data);
@@ -195,7 +205,7 @@ class Frontend
      */
     public function getCustomTemplateFile()
     {
-        $toplytics_template = CUSTOM_TEMPLATE_DEFAULT_NAME . '.php';
+        $toplytics_template = TOPLYTICS_CUSTOM_TEMPLATE_DEFAULT_NAME . '.php';
 
         $theme_template = get_stylesheet_directory() . '/' . $toplytics_template;
         if (file_exists($theme_template)) {
@@ -219,19 +229,31 @@ class Frontend
     {
         $toplytics_result = get_option("toplytics_result_$when", array());
 
-        return empty($toplytics_result) ? array() : $toplytics_result['result'];
+        // TODO: Make this better by maybe including all results in a single option?
+        return $toplytics_result['result'][$when] ?? [];
     }
 
     public function initRanges()
     {
         $ranges = get_option('toplytics_results_ranges');
 
+        if (!$ranges) {
+            return [];
+        }
+
+        foreach ($ranges as $range => $timestamp) {
+            if (!$this->checkSetting('fetch_' . $range)) {
+                unset($ranges[$range]);
+            }
+        }
+
         return apply_filters('toplytics_ranges', $ranges);
     }
 
     public function registerWidget()
     {
-        register_widget(new \Toplytics\Widget($this));
+        // error_log(var_export($this->settings, true));
+        register_widget(new \Toplytics\Widget($this, $this->settings));
     }
 
     /**
@@ -245,11 +267,13 @@ class Frontend
      */
     public function restApiInit()
     {
-        register_rest_route('toplytics/', 'results', array(
+        if ($this->checkSetting('enable_rest_endpoint')) {
+            register_rest_route('toplytics/', 'results', array(
         
             'methods' => 'GET',
             'callback' => [$this, 'toplyticsMasterApiEndpoint'],
-        ));
+            ));
+        }
     }
 
     /**

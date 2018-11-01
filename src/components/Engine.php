@@ -52,6 +52,8 @@ class Engine
 
     protected $window;
 
+    protected $settings;
+
     /**
      * Define the core functionality of the plugin.
      *
@@ -76,6 +78,8 @@ class Engine
          */
         $this->loader = new \Toplytics\Loader();
         $this->window = new \Toplytics\Window();
+
+        $this->settings = get_option('toplytics_settings', null);
 
         $this->setLocale();
         $this->defineAdminHooks();
@@ -116,7 +120,7 @@ class Engine
         /**
          * The class responsible for defining all actions that occur in the admin area.
          */
-        $plugin_admin = new \Toplytics\Backend($this->getPluginBasename(), $this->getVersion(), $this->window);
+        $plugin_admin = new \Toplytics\Backend($this->getPluginBasename(), $this->getVersion(), $this->window, $this->settings);
 
         $this->loader->addAction('admin_enqueue_scripts', $plugin_admin, 'enqueueStyles');
         $this->loader->addAction('admin_enqueue_scripts', $plugin_admin, 'enqueueScripts');
@@ -127,6 +131,9 @@ class Engine
         $this->loader->addAction('admin_init', $plugin_admin, 'serviceDisconnect');
         $this->loader->addAction('admin_init', $plugin_admin, 'profileSelect');
         $this->loader->addAction('admin_init', $plugin_admin, 'switchProfile');
+        $this->loader->addAction('admin_init', $plugin_admin, 'initSettings');
+        $this->loader->addAction('admin_init', $plugin_admin, 'forceUpdate');
+        
         $this->loader->addAction('admin_menu', $plugin_admin, 'registerPluginSettingsPage');
 
         $this->loader->addFilter('plugin_action_links_' . $this->plugin_basename, $plugin_admin, 'pluginActionLinks');
@@ -147,10 +154,11 @@ class Engine
          * The class responsible for defining all actions that occur in the public-facing
          * side of the site.
          */
-        $plugin_public = new \Toplytics\Frontend($this->getPluginBasename(), $this->getVersion(), $this->window);
+        $plugin_public = new \Toplytics\Frontend($this->getPluginBasename(), $this->getVersion(), $this->window, $this->settings);
 
-        $this->loader->addAction('wp_loaded', $plugin_public, 'addEndpoint');
-        $this->loader->addAction('template_redirect', $plugin_public, 'handleEndpoint');
+        // TODO: We should completely remove these once we make sure everythig is working ok
+        // $this->loader->addAction('wp_loaded', $plugin_public, 'addEndpoint');
+        // $this->loader->addAction('template_redirect', $plugin_public, 'handleEndpoint');
 
         $this->loader->addAction('rest_api_init', $plugin_public, 'restApiInit');
         $this->loader->addAction('widgets_init', $plugin_public, 'registerWidget');
