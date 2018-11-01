@@ -32,14 +32,16 @@ define('TOPLYTICS_APP_NAME', 'Toplytics - Popular Posts Widget');
 define('TOPLYTICS_DOMAIN', 'toplytics');
 define('TOPLYTICS_ENTRY', 'toplytics.php');
 define('TOPLYTICS_SUBMENU_PAGE', 'options-general.php');
-define('DEFAULT_POSTS', '5');
-define('MIN_POSTS', '1');
-define('MAX_POSTS', '100');
-define('MAX_RESULTS', '250');
-define('CUSTOM_TEMPLATE_DEFAULT_NAME', 'toplytics-template');
-define('AUTH_API_VERSION', '1');
-define('AUTH_API_BASE_URL', 'https://www.presslabs.org/toplytics/');
-define('AUTH_API_BASE_CONFIG', 'apiconfig.json');
+define('TOPLYTICS_DEFAULT_POSTS', '5');
+define('TOPLYTICS_MIN_POSTS', '1');
+define('TOPLYTICS_MAX_POSTS', '250');
+define('TOPLYTICS_MAX_RESULTS', '20');
+define('TOPLYTICS_CUSTOM_TEMPLATE_DEFAULT_NAME', 'toplytics-template');
+define('TOPLYTICS_AUTH_API_VERSION', '1');
+define('TOPLYTICS_AUTH_API_BASE_URL', 'https://toplytics.presslabs.org/toplytics/');
+define('TOPLYTICS_AUTH_API_BASE_CONFIG', 'apiconfig.json');
+define('TOPLYTICS_WIDGET_TEMPLATE_VERSION', '1109f5d1bd032ee5088dfe771e78d08d');
+define('TOPLYTICS_FOLDER_ROOT', plugin_dir_path(__FILE__));
 
 /**
  * We load the composer dependencies at this stage and the

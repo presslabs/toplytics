@@ -2,16 +2,3 @@
  * All of the CSS for the public-facing functionality
  * of the actual default widget is here.
  */
-
-.toplytics-list {
-    display: block;
-    clear:both;
-}
-
-.toplytics-list.toplytics-anchor {
-    float: left;
-}
-
-.toplytics-list.toplytics-views-count {
-    float: right;
-}

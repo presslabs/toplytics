@@ -110,6 +110,7 @@ class Activator
                 'month' => date_i18n('Y-m-d', strtotime('-29 days')),
                 'week'  => date_i18n('Y-m-d', strtotime('-6 days')),
                 'today' => date_i18n('Y-m-d', strtotime('today')),
+                'realtime' => 0,
             ],
             'toplytics_private_auth_config' => false,
             'toplytics_last_update_status' => false,

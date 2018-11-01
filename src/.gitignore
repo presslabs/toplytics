@@ -1,8 +1,0 @@
-composer.phar
-/phpunit.xml
-Thumbs.db
-.DS_Store
-/.vscode
-/storage
-/vendor
-/.idea

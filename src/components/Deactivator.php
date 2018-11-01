@@ -39,6 +39,7 @@ class Deactivator
             'toplytics_auth_config',
             'toplytics_auth_code',
             'toplytics_auth_type',
+            'toplytics_settings'
         ];
 
         foreach ($options as $option_name) {
