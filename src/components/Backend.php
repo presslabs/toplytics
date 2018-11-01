@@ -45,10 +45,12 @@ class Backend
      * @var      Window                     $window     Used for output.
      * @var      Google_Client              $client     Used for connection.
      * @var      Google_Service_Analytics   $service    Used for retrival.
+     * @var      array                      $settings   The settings of the plugin.
      */
     private $window;
     private $client;
     private $service;
+    private $settings;
 
     /**
      * Initialize the backend class and set its properties.
@@ -58,13 +60,16 @@ class Backend
      * @param      string    $version    The version of this plugin.
      * @param      Window    $window     The window instance.
      */
-    public function __construct($plugin_basename, $version, Window $window)
+    public function __construct($plugin_basename, $version, Window $window, $settings = null)
     {
 
         $this->plugin_basename = $plugin_basename;
         $this->version = $version;
 
         $this->window = $window;
+
+        // TODO: This should become it's own class in the future
+        $this->settings = $settings ?: get_option('toplytics_settings', null);
 
         /**
          * We are initializing the Google Client for authorization
@@ -181,7 +186,7 @@ class Backend
 
     /**
      * This is the place where we disconnect from the Google Services
-     * by simply forgoting the options.
+     * by simply forgoting the options and pinging Google to revoke the token.
      *
      * @since   4.0.0
      * @return  void
@@ -212,7 +217,7 @@ class Backend
                 TOPLYTICS_DOMAIN
             ));
         }
-        
+
         $this->window->redirect(
             __(
                 'Google account disconnected. Most probaby this is due to an error. Please try again.',
@@ -220,6 +225,407 @@ class Backend
             ),
             'warning'
         );
+    }
+
+    /**
+     * This action clears the selected profile from options so we can
+     * selecte a new profile on the next load.
+     *
+     * @since 4.0.0
+     *
+     * @return Redirect
+     */
+    public function forceUpdate()
+    {
+        if (empty($_POST['ToplyticsSubmitForceUpdate'])) {
+            return false;
+        }
+
+        check_admin_referer('toplytics-settings');
+
+        $update = $this->updateAnalyticsData();
+
+        if ($update) {
+            $this->window->successRedirect(__('The data has been updated.', TOPLYTICS_DOMAIN));
+        } else {
+            $this->window->errorRedirect(__('Update failed. Check your logs for more info.', TOPLYTICS_DOMAIN));
+        }
+    }
+
+    /**
+     * The settings page for our plugin.
+     *
+     * TODO: These settings declaration functions and getters / setters should
+     * be moved to their own Class.
+     *
+     * @since 4.0.0
+     *
+     * @return void
+     */
+    public function initSettings()
+    {
+        $options = get_option('toplytics_settings');
+        if ($options == false) {
+            $options = $this->getDefaultSettings();
+            add_option('toplytics_settings', $options);
+        }
+
+        register_setting('toplytics', 'toplytics_settings');
+
+        // Below line is for DEBUG ONLY
+        // update_option('toplytics_settings', $this->getDefaultSettings());
+
+        // Primary Section
+        add_settings_section('toplytics_settings', __('Global Settings', TOPLYTICS_DOMAIN), [$this, 'getSettingsHeader'], 'toplytics');
+
+        // Enable REST API JSON Output
+        add_settings_field(
+            'skip_local_post_discovery',
+            $this->getLabel(__('Skip Local Post Discovery', TOPLYTICS_DOMAIN), 'skip_local_post_discovery'),
+            [$this, 'printInput'],
+            'toplytics',
+            'toplytics_settings',
+            [
+                'id' => 'skip_local_post_discovery',
+                'tooltip' => __('TAKE CARE! This will render a few of the options below useless since it will skip local post discovery. This will affect the settings below and limit the amount of data you have available in the JSON output. We\'ll also try to generate a human readable title from your URL, this works if you\'re using preety permalinks. After you change this setting, you will also need to re-fetch from Google the data. Default: Disabled', TOPLYTICS_DOMAIN),
+            ]
+        );
+
+        // Enable REST API JSON Output
+        add_settings_field(
+            'custom_domain',
+            $this->getLabel(__('Custom Domain', TOPLYTICS_DOMAIN), 'custom_domain'),
+            [$this, 'printInput'],
+            'toplytics',
+            'toplytics_settings',
+            [
+                'id' => 'custom_domain',
+                'option' => 'toplytics_settings',
+                'input' => 'text',
+                'disabled' => !$this->checkSetting('skip_local_post_discovery'),
+                'tooltip' => __('This works together with local post discovery since GA will not give us the domain in the URL so we need to build it using this custom domain. Enable "Skip Local Post Discovery" and then this will be enabled. The domain needs to include the protocol but not the final slash. Default: ' . get_home_url(), TOPLYTICS_DOMAIN),
+            ]
+        );
+
+        // Enable REST API JSON Output
+        add_settings_field(
+            'enable_rest_endpoint',
+            $this->getLabel(__('Enable REST API Endpoint', TOPLYTICS_DOMAIN), 'enable_rest_endpoint'),
+            [$this, 'printInput'],
+            'toplytics',
+            'toplytics_settings',
+            [
+                'id' => 'enable_rest_endpoint',
+                'tooltip' => __('Enables and disables the default WP REST API endpoint. The endpoint is: ' . esc_url(get_rest_url(null, '/toplytics/results')) . ' Default: Enabled', TOPLYTICS_DOMAIN),
+            ]
+        );
+
+        // Enable JSON Output
+        add_settings_field(
+            'enable_json',
+            $this->getLabel(__('Enable custom JSON endpoint', TOPLYTICS_DOMAIN), 'enable_json'),
+            [$this, 'printInput'],
+            'toplytics',
+            'toplytics_settings',
+            [
+                'id' => 'enable_json',
+                'tooltip' => __('Enables and disables the JSON output on a custom endpoint. Use the WP REST API endpoint for common tasks. The endpoint is: ' . esc_url(home_url('/' . $this->settings['json_path'])) . ' Default: Disabled', TOPLYTICS_DOMAIN),
+            ]
+        );
+
+        // JSON output Path
+        add_settings_field(
+            'json_path',
+            $this->getLabel(__('Json Endpoint Path', TOPLYTICS_DOMAIN), 'json_path'),
+            [$this, 'printInput'],
+            'toplytics',
+            'toplytics_settings',
+            [
+                'id' => 'json_path',
+                'option' => 'toplytics_settings',
+                'input' => 'text',
+                'tooltip' => __('This is the path where your JSON will be available on the frontend if enabled. Please don\'t forget to flush the Permalink cache after you change this by visiting Settings > Permalink and saving that form with no change. Default: toplytics.json', TOPLYTICS_DOMAIN),
+            ]
+        );
+
+        // Enable Monthly Fetch
+        add_settings_field(
+            'fetch_month',
+            $this->getLabel(__('Fetch monthly data', TOPLYTICS_DOMAIN), 'fetch_month'),
+            [$this, 'printInput'],
+            'toplytics',
+            'toplytics_settings',
+            [
+                'id' => 'fetch_month',
+                'tooltip' => __('Enables the fetch of monthly data from Google Analytics in the local DB. Default: Enabled', TOPLYTICS_DOMAIN),
+            ]
+        );
+
+        // Enable Weekly Fetch
+        add_settings_field(
+            'fetch_week',
+            $this->getLabel(__('Fetch weekly data', TOPLYTICS_DOMAIN), 'fetch_week'),
+            [$this, 'printInput'],
+            'toplytics',
+            'toplytics_settings',
+            [
+                'id' => 'fetch_week',
+                'tooltip' => __('Enables the fetch of weekly data from Google Analytics in the local DB. Default: Enabled', TOPLYTICS_DOMAIN),
+            ]
+        );
+
+        // Enable Daily Fetch
+        add_settings_field(
+            'fetch_today',
+            $this->getLabel(__('Fetch daily data', TOPLYTICS_DOMAIN), 'fetch_today'),
+            [$this, 'printInput'],
+            'toplytics',
+            'toplytics_settings',
+            [
+                'id' => 'fetch_today',
+                'tooltip' => __('Enables the fetch of daily data from Google Analytics in the local DB. Default: Enabled', TOPLYTICS_DOMAIN),
+            ]
+        );
+
+        // Enable Realtime Fetch
+        add_settings_field(
+            'fetch_realtime',
+            $this->getLabel(__('Fetch realtime data', TOPLYTICS_DOMAIN), 'fetch_realtime'),
+            [$this, 'printInput'],
+            'toplytics',
+            'toplytics_settings',
+            [
+                'id' => 'fetch_realtime',
+                'tooltip' => __('Enables the fetch of realtime data from Google Analytics in the local DB. Default: Disabled', TOPLYTICS_DOMAIN),
+            ]
+        );
+
+        // The custom post variables that will be included in the JSON output when fetching posts from DB
+        add_settings_field(
+            'max_posts_fetch_limit',
+            $this->getLabel(__('Posts to fetch from GA', TOPLYTICS_DOMAIN), 'max_posts_fetch_limit'),
+            [$this, 'printInput'],
+            'toplytics',
+            'toplytics_settings',
+            [
+                'id' => 'max_posts_fetch_limit',
+                'option' => 'toplytics_settings',
+                'input' => 'text',
+                'tooltip' => __('The maximum number of posts to fetch for each data range set from GA. Default: 20', TOPLYTICS_DOMAIN),
+            ]
+        );
+
+        // The custom post variables that will be included in the JSON output when fetching posts from DB
+        add_settings_field(
+            'cron_exec_interval',
+            $this->getLabel(__('GA Data Refresh Interval', TOPLYTICS_DOMAIN), 'cron_exec_interval'),
+            [$this, 'printInput'],
+            'toplytics',
+            'toplytics_settings',
+            [
+                'id' => 'cron_exec_interval',
+                'option' => 'toplytics_settings',
+                'input' => 'select',
+                'options' => ['hourly', 'twicedaily', 'daily'],
+                'tooltip' => __('How often do you want your data refreshed for your top? Default: hourly', TOPLYTICS_DOMAIN),
+            ]
+        );
+
+        // The custom post variables that will be included in the JSON output when fetching posts from DB
+        add_settings_field(
+            'custom_output_post_variables',
+            $this->getLabel(__('Custom post variables in JSON output', TOPLYTICS_DOMAIN), 'custom_output_post_variables'),
+            [$this, 'printInput'],
+            'toplytics',
+            'toplytics_settings',
+            [
+                'id' => 'custom_output_post_variables',
+                'option' => 'toplytics_settings',
+                'input' => 'text',
+                'disabled' => $this->checkSetting('skip_local_post_discovery'),
+                'tooltip' => __('Use commas (,) to separate variable names. For variable names see: <a href="https://codex.wordpress.org/Class_Reference/WP_Post" target="_blank" title="WP Post Class Reference">WP Codex: WP_POST</a>. Default: Empty', TOPLYTICS_DOMAIN),
+            ]
+        );
+
+        // Enable Realtime Fetch
+        add_settings_field(
+            'include_featured_image_in_json',
+            $this->getLabel(__('Include Featured Image in JSON Output', TOPLYTICS_DOMAIN), 'include_featured_image_in_json'),
+            [$this, 'printInput'],
+            'toplytics',
+            'toplytics_settings',
+            [
+                'id' => 'include_featured_image_in_json',
+                'disabled' => $this->checkSetting('skip_local_post_discovery'),
+                'tooltip' => __('Adds the featured_image for each post when fetching into JSON output. Default: Disabled', TOPLYTICS_DOMAIN),
+            ]
+        );
+
+        // Featured image size
+        add_settings_field(
+            'custom_featured_image_size',
+            $this->getLabel(__('Featured image thumbnail size', TOPLYTICS_DOMAIN), 'custom_featured_image_size'),
+            [$this, 'printInput'],
+            'toplytics',
+            'toplytics_settings',
+            [
+                'id' => 'custom_featured_image_size',
+                'option' => 'toplytics_settings',
+                'input' => 'select',
+                'disabled' => $this->checkSetting('skip_local_post_discovery'),
+                'options' => get_intermediate_image_sizes(),
+                'tooltip' => __('The image size name. See <a href="https://developer.wordpress.org/reference/functions/add_image_size/" target="_blank" title="Registering a new image size.">Add Image Size docs</a> for the name. Default: post-thumbnail', TOPLYTICS_DOMAIN),
+            ]
+        );
+
+        // Allowed post types
+        add_settings_field(
+            'allowed_post_types',
+            $this->getLabel(__('Allowed post types', TOPLYTICS_DOMAIN), 'allowed_post_types'),
+            [$this, 'printInput'],
+            'toplytics',
+            'toplytics_settings',
+            [
+                'id' => 'allowed_post_types',
+                'option' => 'toplytics_settings',
+                'input' => 'text',
+                'disabled' => $this->checkSetting('skip_local_post_discovery'),
+                'tooltip' => __('A comma (,) separated list of allowed post types to allow in the feed. Default: post', TOPLYTICS_DOMAIN),
+            ]
+        );
+
+        // Ignore posts ids
+        add_settings_field(
+            'ignore_posts_ids',
+            $this->getLabel(__('Ignore Post IDs', TOPLYTICS_DOMAIN), 'ignore_posts_ids'),
+            [$this, 'printInput'],
+            'toplytics',
+            'toplytics_settings',
+            [
+                'id' => 'ignore_posts_ids',
+                'option' => 'toplytics_settings',
+                'input' => 'text',
+                'disabled' => $this->checkSetting('skip_local_post_discovery'),
+                'tooltip' => __('A comma (,) separated list of post ids (any post type including pages) to be ignored. Default: Empty', TOPLYTICS_DOMAIN),
+            ]
+        );
+    }
+
+    /**
+     * We are outputing the settings header for our settings page.
+     *
+     * TODO: This should go in a blade template in the future.
+     *
+     * @since 4.0.0
+     *
+     * @return void
+     */
+    public function getSettingsHeader()
+    {
+        echo '<p>' . __('Configure your Toplytics the way you want. These settings are global for all of your widgets.', TOPLYTICS_DOMAIN) . '</p>';
+    }
+
+    /**
+     * We setup the label for each setting if requested.
+     * TODO: This should go in a blade template in the future.
+     *
+     * @since 4.0.0
+     *
+     * @return string The label formated as an HTML element
+     */
+    public function getLabel($label, $id = '', $checkbox = false)
+    {
+        if (!empty($id) && $checkbox) {
+            $label = "<label for='" . $id . "'>" . $label . "</label>";
+        }
+        
+        return $label;
+    }
+
+    /**
+     * We avoid creating each individual input by creating and outputing them
+     * using a dynamic function that will add them for us.
+     *
+     * @since 4.0.0
+     *
+     * @return void
+     */
+    public function printInput($args)
+    {
+        $option = 'toplytics_settings';
+        $settings = get_option($option);
+    
+        echo "<div style='display: table; width: 100%;'>";
+            echo "<div>";
+    
+        //Text
+        if (!empty($args['input']) && ($args['input'] == 'text' || $args['input'] == 'color')) {
+            echo "<input type='text' id='" . $args['id'] . "' name='" . $option . "[" . $args['id'] . "]' value='" . (!empty($settings[$args['id']]) ? $settings[$args['id']] : '') . "' placeholder='" . (!empty($args['placeholder']) ? $args['placeholder'] : '') . "' " . (!empty($args['disabled']) && $args['disabled'] ? 'readonly="readonly"' : '') . " />";
+        }
+
+        //Select
+        elseif (!empty($args['input']) && $args['input'] == 'select') {
+            echo "<select id='" . $args['id'] . "' name='" . $option . "[" . $args['id'] . "]' " . (!empty($args['disabled']) && $args['disabled'] ? 'disabled' : '') . ">";
+            foreach ($args['options'] as $value => $title) {
+                    echo "<option value='" . $value . "' ";
+                if (!empty($settings[$args['id']]) && $settings[$args['id']] == $value) {
+                    echo "selected";
+                }
+                    echo ">" . $title . "</option>";
+            }
+                    echo "</select>";
+        }
+    
+        //Checkbox + Toggle
+        else {
+            echo "<input type='checkbox' id='" . $args['id'] . "' name='" . $option . "[" . $args['id'] . "]' value='1' style='display: block; margin: 0px;' ";
+            if (!empty($settings[$args['id']]) && $settings[$args['id']] == "1") {
+                echo "checked";
+            }
+            echo (!empty($args['disabled']) && $args['disabled'] ? 'disabled' : '') . " >";
+        }
+                
+            echo "</div>";
+    
+        if (!empty($args['tooltip'])) {
+            echo "<div style='display: table; height: 100%; width: 100%;'>";
+                echo "<div style='display: table-cell; vertical-align: middle;'>";
+                    echo "<span>" . $args['tooltip'] . "</span>";
+                echo "</div>";
+            echo "</div>";
+        }
+        echo "</div>";
+    }
+
+    /**
+     * This will define our basic default settings for the settings page.
+     *
+     * @since 4.0.0
+     *
+     * @return array Filtered default settings
+     */
+    private function getDefaultSettings()
+    {
+        $defaults = [
+            'enable_json' => '0',
+            'skip_local_post_discovery' => '0',
+            'custom_domain' => get_home_url(),
+            'enable_rest_endpoint' => '1',
+            'json_path' => 'toplytics.json',
+            'fetch_month' => '1',
+            'fetch_week' => '1',
+            'fetch_today' => '1',
+            'fetch_realtime' => '0',
+            'custom_output_post_variables' => '',
+            'include_featured_image_in_json' => '0',
+            'custom_featured_image_size' => 'post-thumbnail',
+            'allowed_post_types' => 'post',
+            'ignore_posts_ids' => '',
+            'max_posts_fetch_limit' => '20',
+            'cron_exec_interval' => 'hourly',
+        ];
+
+        return apply_filters('defaultToplyticsSettings', $defaults);
     }
 
     /**
@@ -243,6 +649,13 @@ class Backend
         $this->window->successRedirect(__('Ok. Go ahead and select another profile.', TOPLYTICS_DOMAIN));
     }
 
+    /**
+     * We select the profile and do the initial data read from Google.
+     *
+     * @since 3.0
+     *
+     * @return redirect Send us to the plugin settings overview page
+     */
     public function profileSelect()
     {
         if (empty($_POST['ToplyticsProfileSelect']) || empty($_POST['profile_id'])) {
@@ -268,10 +681,20 @@ class Backend
         $this->window->successRedirect(__('Well done. You have selected your analytics profile.', TOPLYTICS_DOMAIN));
     }
     
+    /**
+     * We update our database with the latest data from GA.
+     * We do 2 separate data fetchings for normal data and realtime
+     * which we parse the same way.
+     *
+     * @since 4.0.0
+     *
+     * @return bool The status of the update
+     */
     public function updateAnalyticsData()
     {
         try {
             $data = $this->getAnalyticsData();
+            $realtime = $this->getAnalyticsRealTimeData();
         } catch (\Exception $e) {
             if (401 == $e->getCode()) {
                 $this->serviceDisconnect(true);
@@ -280,22 +703,98 @@ class Backend
             return false;
         }
 
+        // At this point we get and process the normal Analytics data
         $is_updated = false;
         foreach ($data as $when => $stats) {
-            if (is_array($stats) && ! empty($stats)) {
+            if (is_array($stats) && $stats) {
                 $result['result'] = $this->convertDataToPosts($stats, $when);
                 $result['_ts'] = time();
                 update_option("toplytics_result_$when", $result);
-                $is_updated += 1;
+                $is_updated += count($stats);
             }
         }
 
+        // Now we get the real time data and process it the same way as the rest
+        if ($realtime) {
+            update_option("toplytics_result_realtime", [
+                'result' => $this->convertDataToPosts($realtime, 'realtime'),
+                '_ts' => time(),
+            ]);
+            $is_updated += count($realtime);
+        }
         update_option('toplytics_last_update_status', [
             'time' => time(),
             'count' => $is_updated,
         ]);
 
         return $is_updated;
+    }
+
+    /**
+     * We need to make sure that the var is set and that it contains
+     * a proper value before using it.
+     *
+     * TODO: Remove required value as it's not being used.
+     *
+     * @since 4.0.0
+     *
+     * @return bool the settings status
+     */
+    public function checkSetting($var, $requiredValue = null)
+    {
+        $status = isset($this->settings[$var]) && $this->settings[$var];
+
+        if (isset($this->settings[$var]) && !is_null($requiredValue)) {
+            $status = ($this->settings[$var] === $requiredValue);
+        }
+
+        return $status;
+    }
+    
+    /**
+     * We use a separate method to read the Google realtime
+     * Analytics data and store them in our options.
+     *
+     * @since 4.0.0
+     *
+     * @return array The realtime filtered data recived from GA.
+     */
+    private function getAnalyticsRealTimeData()
+    {
+        if ($this->checkSetting('fetch_realtime')) {
+            return [];
+        }
+
+        // data_realtime
+        $optParams = [
+            'dimensions' => 'rt:pagePath',
+            'sort'        => '-rt:activeUsers',
+            'max-results' => $this->checkSetting('max_posts_fetch_limit') ? (int)$this->settings['max_posts_fetch_limit'] : TOPLYTICS_MAX_RESULTS,
+        ];
+
+        $results = [];
+        $profile_id = get_option('toplytics_profile_data')['profile_id'];
+
+        if ($profile_id) {
+            try {
+                $data = $this->service->data_realtime->get(
+                    'ga:' . $profile_id,
+                    'rt:activeUsers',
+                    $optParams
+                );
+
+                if ($data->getRows()) {
+                    foreach ($data->getRows() as $item) {
+                        $results[ $item[0] ] = $item[1];
+                    }
+                }
+            } catch (apiServiceException $e) {
+              // Handle API service exceptions.
+                error_log($e->getMessage());
+            }
+        }
+
+        return $results;
     }
     
     /**
@@ -312,12 +811,17 @@ class Backend
             'quotaUser'   => md5(home_url()),
             'dimensions'  => 'ga:pagePath',
             'sort'        => '-ga:pageviews',
-            'max-results' => MAX_RESULTS,
+            'max-results' => $this->checkSetting('max_posts_fetch_limit') ? (int)$this->settings['max_posts_fetch_limit'] : TOPLYTICS_MAX_RESULTS,
         ];
         $result = [];
         $profile_id = get_option('toplytics_profile_data')['profile_id'];
         if ($profile_id) {
             foreach (get_option('toplytics_results_ranges') as $when => $start_date) {
+                // We make sure fetching is enabled in settings
+                if (! $start_date || ! $this->checkSetting('fetch_' . $when)) {
+                    continue;
+                }
+
                 $filters = apply_filters('toplytics_analytics_filters', '', $when, 'ga:pageviews');
                 if (! empty($filters)) {
                     $optParams['filters'] = $filters;
@@ -342,6 +846,7 @@ class Backend
                         $result[ $when ][ $item[0] ] = $item[1];
                     }
                 }
+                
                 apply_filters('toplytics_analytics_data_result', $result[ $when ], $when);
             }
         }
@@ -362,28 +867,91 @@ class Backend
     {
         $new_data = [];
 
-        foreach ($data as $rel_path => $pageviews) {
-            $rel_path = apply_filters('toplytics_rel_path', $rel_path, $when);
-            $url      = home_url() . $rel_path;
-            $post_id  = url_to_postid($url);
-            $url      = apply_filters('toplytics_convert_data_url', $url, $when, $post_id, $rel_path, $pageviews);
-            $allowed_post_types = apply_filters('toplytics_allowed_post_types', ['post']);
-            $post_type = get_post_type($post_id);
+        if ($this->checkSetting('ignore_posts_ids')) {
+            $ignored_posts = explode(',', preg_replace('/\s+/', '', $this->settings['ignore_posts_ids']));
+        }
 
-            if (( 0 < $post_id ) && in_array($post_type, $allowed_post_types)) {
-                $post = get_post($post_id);
-                if (is_object($post)) {
-                    if (isset($new_data[ $post_id ])) {
-                        $new_data[ $post_id ] += $pageviews;
-                    } else {
-                        $new_data[ $post_id ] = (int) $pageviews;
+        // TODO: Improve this IF and explode it in multiple functions to prevent repeated code.
+        if ($this->checkSetting('skip_local_post_discovery') && $this->checkSetting('custom_domain')) {
+            // We bypass the local post discovery and simply use the URL straight from GA.
+            $counter = 0;
+            foreach ($data as $rel_path => $pageviews) {
+                $rel_path = apply_filters('toplytics_rel_path', $rel_path, $when);
+                $url = $this->settings['custom_domain'] . $rel_path;
+                if (!isset($new_data[$when][$counter]['permalink'])) {
+                    $new_data[$when][$counter]['permalink'] = $url;
+                }
+                if (!isset($new_data[$when][$counter]['title'])) {
+                    $new_data[$when][$counter]['title'] = ucwords(str_replace(['/', '-'], ' ', stripslashes($rel_path)));
+                }
+                // Pageviews counting
+                if (isset($new_data[$when][ $counter ]['pageviews'])) {
+                    $new_data[$when][ $counter ]['pageviews'] += (int) $pageviews;
+                } else {
+                    $new_data[$when][ $counter ]['pageviews'] = (int) $pageviews;
+                }
+
+                $counter++;
+            }
+        } else {
+            foreach ($data as $rel_path => $pageviews) {
+                $rel_path = apply_filters('toplytics_rel_path', $rel_path, $when);
+                $url      = home_url() . $rel_path;
+                $post_id  = url_to_postid($url);
+                $url      = apply_filters('toplytics_convert_data_url', $url, $when, $post_id, $rel_path, $pageviews);
+                $allowed_post_types = apply_filters('toplytics_allowed_post_types', $this->checkSetting('allowed_post_types') ? explode(',', preg_replace('/\s+/', '', $this->settings['allowed_post_types'])) : ['post']);
+                $post_type = get_post_type($post_id);
+
+                if (( 0 < $post_id ) && in_array($post_type, $allowed_post_types)) {
+                    // We make sure the user did not ignore this post
+                    if (isset($ignored_posts) && in_array($post_id, $ignored_posts)) {
+                        continue;
+                    }
+
+                    // $new_data = [pageviews, featured_image_url, ...] (can include custom vars)
+
+                    $post = get_post($post_id);
+                    if (is_object($post)) {
+                        //Required data: permalink, title
+                        if (!isset($new_data[$when][ $post_id ]['permalink'])) {
+                            $new_data[$when][ $post_id ]['permalink'] = get_permalink($post);
+                        }
+                        if (!isset($new_data[$when][ $post_id ]['title'])) {
+                            $new_data[$when][ $post_id ]['title'] = get_the_title($post);
+                        }
+
+                        // Pageviews counting
+                        if (isset($new_data[$when][ $post_id ]['pageviews'])) {
+                            $new_data[$when][ $post_id ]['pageviews'] += (int) $pageviews;
+                        } else {
+                            $new_data[$when][ $post_id ]['pageviews'] = (int) $pageviews;
+                        }
+
+                        // Featured image
+                        $new_data[$when][$post_id]['featured_image'] = ''; //Sensible default
+                        if ($this->checkSetting('include_featured_image_in_json')) {
+                            $image_size = $this->checkSetting('custom_featured_image_size') ?
+                            $this->settings['custom_featured_image_size'] : 'post-thumbnail';
+                            $new_data[$when][$post_id]['featured_image'] = get_the_post_thumbnail_url($post, $image_size);
+                        }
+
+                        // Custom Post Variables
+                        if ($this->checkSetting('custom_output_post_variables')) {
+                            $vars = explode(',', preg_replace('/\s+/', '', $this->settings['custom_output_post_variables']));
+                            foreach ($vars as $var) {
+                                if (property_exists($post, $var) && !isset($new_data[$when][$post_id][$var])) {
+                                    $new_data[$when][$post_id][$var] = $post->$var;
+                                }
+                            }
+                        }
                     }
                 }
             }
         }
         
         // sort the results (revert order)
-        arsort($new_data);
+        // arsort($new_data);
+
         return apply_filters('toplytics_convert_data_to_posts', $new_data, $data, $when);
     }
 
@@ -475,7 +1043,7 @@ class Backend
     public function setupScheduleEvent()
     {
         if (! wp_next_scheduled('toplytics_cron_event')) {
-            wp_schedule_event(time(), 'hourly', 'toplytics_cron_event');
+            wp_schedule_event(time(), $this->checkSetting('cron_exec_interval') ? $this->settings['cron_exec_interval'] : 'hourly', 'toplytics_cron_event');
         }
     }
 
@@ -508,6 +1076,13 @@ class Backend
             }
 
             $auth = get_option('toplytics_auth_type') == 'private' ? 'private' : 'public';
+
+            if (md5_file(TOPLYTICS_FOLDER_ROOT . 'resources/views/frontend/widget.blade.php') !== TOPLYTICS_WIDGET_TEMPLATE_VERSION) {
+                $this->window->notifyAdmins('warning', __('WARNING! You have modified the default template file. On plugin update you will lose these changes. Please copy the template and rename it to custom.blade.php to prevent the customization from being lost.', TOPLYTICS_DOMAIN), false, '', true);
+                if (defined('WP_DEBUG') && WP_DEBUG) {
+                    error_log('Toplytics Debug: The new md5 of the widget file is ' . md5_file(TOPLYTICS_FOLDER_ROOT . 'resources/views/frontend/widget.blade.php'));
+                }
+            }
 
             $this->window->open(
                 'backend.settings',
@@ -573,12 +1148,10 @@ class Backend
         if (isset($_GET['code']) && $_GET['page'] === 'toplytics') {
             if (isset($_GET['status']) && $_GET['status'] && $_GET['status'] == 'error') {
                 $get_error = filter_input(INPUT_GET, 'code', FILTER_SANITIZE_STRING);
-                
 
                 if ($get_error == 'access_denied') {
                     $this->window->errorRedirect(__('You have canceled the auth process.', TOPLYTICS_DOMAIN));
                 }
-                
                 
                 $this->window->errorRedirect(__(
                     'Google sent an error. Authorization faild. Error code: ',
@@ -613,10 +1186,10 @@ class Backend
      */
     public function getRemoteConfigUri($subdir = '', $file = '')
     {
-        $base = AUTH_API_BASE_URL . 'v' . AUTH_API_VERSION . '/';
+        $base = TOPLYTICS_AUTH_API_BASE_URL . 'v' . TOPLYTICS_AUTH_API_VERSION . '/';
 
         if (!$subdir && !$file) {
-            return $base . AUTH_API_BASE_CONFIG . '?nocache';
+            return $base . TOPLYTICS_AUTH_API_BASE_CONFIG . '?nocache';
         }
 
         return $base . $subdir . '/' . $file . '.json?nocache';
@@ -715,7 +1288,7 @@ class Backend
         $authorizationLink = $this->getGoogleAuthLink();
 
         if ($authorizationLink) {
-            return wp_redirect($this->getGoogleAuthLink());
+            return wp_redirect($authorizationLink);
         }
 
         return $this->window->errorRedirect('Authorization link build faild. Try the private method instead.');
@@ -984,17 +1557,25 @@ class Backend
     public function pluginActionLinks($links)
     {
 
-        $settings_link = $this->window->open('backend.partials.url', [
-            'url' => $this->window->getSettingsLink(),
-            'title' => 'Settings',
-        ]);
-
-        $widgets_link = $this->window->open('backend.partials.url', [
-            'url' => admin_url('widgets.php'),
-            'title' => 'Widgets',
-        ]);
-
-        array_unshift($links, $widgets_link, $settings_link);
+        // TODO: We should rewrite this entire IF more elegantly
+        if (get_option('toplytics_google_token')) {
+            $settings_link = $this->window->open('backend.partials.url', [
+                'url' => $this->window->getSettingsLink(),
+                'title' => 'Settings',
+            ]);
+    
+            $widgets_link = $this->window->open('backend.partials.url', [
+                'url' => admin_url('widgets.php'),
+                'title' => 'Widgets',
+            ]);
+            array_unshift($links, $widgets_link, $settings_link);
+        } else {
+            $settings_link = $this->window->open('backend.partials.url', [
+                'url' => $this->window->getSettingsLink(),
+                'title' => 'Connect Google Analytics',
+            ]);
+            array_unshift($links, $settings_link);
+        }
 
         return $links;
     }
@@ -1019,20 +1600,21 @@ class Backend
 
         $links = [
             $this->window->open('backend.partials.url', [
-                'url' => 'https://www.presslabs.org/toplytics/docs/usage/',
-                'title' => 'Usage Documentation',
+                'url' => 'https://www.presslabs.com/code/toplytics/',
+                'title' => __('Usage Documentation', TOPLYTICS_DOMAIN),
                 'target' => 'blank',
                 'icon' => 'media-document',
             ]),
             $this->window->open('backend.partials.url', [
                 'url' => 'https://wordpress.org/support/plugin/toplytics/reviews/',
-                'title' => 'Review us!',
+                'title' => __('Review us!', TOPLYTICS_DOMAIN),
                 'target' => 'blank',
                 'icon' => 'format-status',
             ]),
             $this->window->open('backend.partials.url', [
-                'url' => 'email:support@presslabs.com',
-                'title' => 'Need help? Support is here!',
+                'url' => 'https://wordpress.org/support/plugin/toplytics/',
+                'title' => __('Need help? Support is here!', TOPLYTICS_DOMAIN),
+                'target' => 'blank',
                 'icon' => 'businessman',
             ]),
         ];

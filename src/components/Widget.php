@@ -21,6 +21,8 @@ class Widget extends \WP_Widget
      */
     private $frontend;
 
+    private $settings;
+
     /**
      * Main constructor method used to initialize all the basic options and
      * requirmenets for the widget.
@@ -30,7 +32,7 @@ class Widget extends \WP_Widget
      *
      * @return void
      */
-    public function __construct(\Toplytics\Frontend $frontend)
+    public function __construct(\Toplytics\Frontend $frontend, $settings)
     {
         $options = array(
             'classname' => 'toplytics_widget',
@@ -40,6 +42,7 @@ class Widget extends \WP_Widget
         $this->alt_option_name = 'toplytics_widget';
 
         $this->frontend = $frontend;
+        $this->settings = $settings;
     }
 
     /**
@@ -95,9 +98,8 @@ class Widget extends \WP_Widget
         if (!in_array($period, $stats_periods)) {
             $period = $stats_periods[0];
         }
-        $toplytics_results = $this->frontend->getResult($period);
-        $toplytics_results = array_slice($toplytics_results, 0, $numberposts, true);
-        // echo var_export($toplytics_results, true);
+        $posts = $this->frontend->getResult($period);
+        $posts = array_slice($posts, 0, $numberposts, true);
 
         // variables for backward compatibilty
         $widget_period = $period;
@@ -110,53 +112,33 @@ class Widget extends \WP_Widget
         if ($title) {
             echo $before_title . $title . $after_title;
         }
-        $toplytics_args = array(
-            'widget_id' => $widget_id . '-inner',
-            'period' => $period,
-            'numberposts' => $numberposts,
-            'showviews' => $showviews,
-            'loadViaJS' => $loadViaJS,
-            'before_title' => $before_title,
-            'title' => $title,
-            'after_title' => $after_title,
-        );
-        $this->realtimeScriptArgs($toplytics_args);
-        echo "<div id='$widget_id-inner'></div>";
 
-        if ($loadViaJS) {
-            // This functionality is still rudimentary and requires a serious rewrite
-            echo "<script type=\"text/javascript\">jQuery(document).ready(function(){toplytics_results(toplytics_args)});</script>";
-        } else {
-            $template_file = $this->frontend->getCustomTemplateFile();
+        if ($loadViaJS && ($this->frontend->checkSetting('enable_json') || $this->frontend->checkSetting('enable_rest_endpoint'))) {
+            $toplytics_args = array(
+                'widget_id' => $widget_id . '-inner',
+                'period' => $period,
+                'numberposts' => $numberposts,
+                'showviews' => $showviews,
+                'loadViaJS' => $loadViaJS,
+                'before_title' => $before_title,
+                'title' => $title,
+                'after_title' => $after_title,
+                'json_url' => $this->frontend->checkSetting('enable_rest_endpoint') ? esc_url(get_rest_url(null, '/toplytics/results')) : (($this->frontend->checkSetting('enable_json') && $this->checkSetting('json_path')) ? esc_url(home_url('/' . $this->settings['json_path'])) : ''),
+            );
 
-            if ($template_file && pathinfo($template_file, PATHINFO_EXTENSION) == 'php') {
-                // Legacy support, bail fast on it. All logic inside template (bad).
-                include $template_file;
-            } elseif (!empty($toplytics_results)) {
-                // Modern approach using Blade templates. Separated logic and template.
+            $this->realtimeScriptArgs($toplytics_args);
+        }
 
-                $posts_list = get_posts(array(
-                    'posts_per_page' => count($toplytics_results), // the number of posts being displayed
-                    'post__in' => array_keys($toplytics_results),
-                    'orderby' => 'post__in',
-                ));
+        $template_file = $this->frontend->getCustomTemplateFile();
 
-                $posts = [];
+        if ($template_file && pathinfo($template_file, PATHINFO_EXTENSION) == 'php') {
+            // Template inside the theme using default PHP
+            include $template_file;
+        } elseif (!empty($posts)) {
+            // Blade templates inside plugin views folder
+            $template = $this->frontend->window->validateView($template_file) ? $template_file : 'frontend.widget';
 
-                // We get only the items we need from these posts and append
-                // the view count as well, in case we need to display it.
-                foreach ($posts_list as $post) {
-                    $posts[] = (object) [
-                        'permalink' => get_the_permalink($post),
-                        'title' => get_the_title($post),
-                        'views' => isset($toplytics_results[get_the_ID($post)]) ? $toplytics_results[get_the_ID($post)] : 0,
-                    ];
-                }
-
-                $template = $this->frontend->window->validateView($template_file) ? $template_file : 'frontend.widget';
-
-                $this->frontend->window->open($template, compact('posts', 'showviews'), true, false);
-            }
+            $this->frontend->window->open($template, compact('posts', 'showviews', 'loadViaJS', 'widget_id'), true, false);
         }
 
         echo $after_widget;
@@ -170,11 +152,11 @@ class Widget extends \WP_Widget
         $instance['title'] = strip_tags($new_instance['title']);
 
         if (!$widget_numberposts = (int) $new_instance['numberposts']) {
-            $widget_numberposts = DEFAULT_POSTS;
-        } elseif ($widget_numberposts < MIN_POSTS) {
-            $widget_numberposts = MIN_POSTS;
-        } elseif ($widget_numberposts > MAX_POSTS) {
-            $widget_numberposts = MAX_POSTS;
+            $widget_numberposts = TOPLYTICS_DEFAULT_POSTS;
+        } elseif ($widget_numberposts < TOPLYTICS_MIN_POSTS) {
+            $widget_numberposts = TOPLYTICS_MIN_POSTS;
+        } elseif ($widget_numberposts > TOPLYTICS_MAX_POSTS) {
+            $widget_numberposts = TOPLYTICS_MAX_POSTS;
         }
 
         $instance['numberposts'] = $widget_numberposts;
@@ -196,7 +178,7 @@ class Widget extends \WP_Widget
         $widget_title = isset($instance['title']) ? esc_attr($instance['title']) : '';
 
         if (!isset($instance['numberposts']) || !$widget_numberposts = (int) $instance['numberposts']) {
-            $widget_numberposts = DEFAULT_POSTS;
+            $widget_numberposts = TOPLYTICS_DEFAULT_POSTS;
         }
 
         $stats_periods = array_keys($this->frontend->ranges);
@@ -240,10 +222,16 @@ class Widget extends \WP_Widget
         <p>
             <input class="checkbox" type="checkbox"<?php echo $showviews_checked; ?> id="<?php echo $this->get_field_id('showviews'); ?>" name="<?php echo $this->get_field_name('showviews'); ?>" /> <label for="<?php echo $this->get_field_id('showviews'); ?>"><?php echo __('Display post views', 'toplytics'); ?>?</label>
         </p>
-
+        
+        <?php
+        if ($this->frontend->checkSetting('enable_json') || $this->frontend->checkSetting('enable_rest_endpoint')) {
+            ?>
         <p>
-            <input class="checkbox" type="checkbox"<?php echo $loadViaJS_checked; ?> id="<?php echo $this->get_field_id('loadViaJS'); ?>" name="<?php echo $this->get_field_name('loadViaJS'); ?>" /> <label for="<?php echo $this->get_field_id('loadViaJS'); ?>"><?php echo __('Load via Javascript (ignores any custom template)', 'toplytics'); ?>?</label>
+            <input class="checkbox" type="checkbox"<?php echo $loadViaJS_checked; ?> id="<?php echo $this->get_field_id('loadViaJS'); ?>" name="<?php echo $this->get_field_name('loadViaJS'); ?>" /> <label for="<?php echo $this->get_field_id('loadViaJS'); ?>"><?php echo __('Load via Javascript AJAX', 'toplytics'); ?>?</label>
         </p>
+            <?php
+        }
+        ?>
 
         <p><?php _e('Template');?>:<br /><?php echo $this->frontend->getCustomTemplateFile() ?: '<strong>Default.</strong>&nbsp;See docs for more info on how to change this.'; ?></p>
         <?php
