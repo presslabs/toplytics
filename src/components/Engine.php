@@ -54,6 +54,9 @@ class Engine
 
     protected $settings;
 
+    public $frontend;
+    public $backend;
+
     /**
      * Define the core functionality of the plugin.
      *
@@ -133,11 +136,14 @@ class Engine
         $this->loader->addAction('admin_init', $plugin_admin, 'switchProfile');
         $this->loader->addAction('admin_init', $plugin_admin, 'initSettings');
         $this->loader->addAction('admin_init', $plugin_admin, 'forceUpdate');
+        $this->loader->addAction('admin_init', $plugin_admin, 'cleanDirtyAuth');
         
         $this->loader->addAction('admin_menu', $plugin_admin, 'registerPluginSettingsPage');
 
         $this->loader->addFilter('plugin_action_links_' . $this->plugin_basename, $plugin_admin, 'pluginActionLinks');
         $this->loader->addAction('plugin_row_meta', $plugin_admin, 'extraRowMeta', 10, 2);
+
+        $this->backend = $plugin_admin;
     }
 
     /**
@@ -155,15 +161,19 @@ class Engine
          * side of the site.
          */
         $plugin_public = new \Toplytics\Frontend($this->getPluginBasename(), $this->getVersion(), $this->window, $this->settings);
+        $shortcodes = new \Toplytics\Shortcode($plugin_public, $this->settings);
 
         // TODO: We should completely remove these once we make sure everythig is working ok
-        // $this->loader->addAction('wp_loaded', $plugin_public, 'addEndpoint');
-        // $this->loader->addAction('template_redirect', $plugin_public, 'handleEndpoint');
+        $this->loader->addAction('wp_loaded', $plugin_public, 'addEndpoint');
+        $this->loader->addAction('template_redirect', $plugin_public, 'handleEndpoint');
 
+        $this->loader->addAction('init', $shortcodes, 'shortcodeInit');
         $this->loader->addAction('rest_api_init', $plugin_public, 'restApiInit');
         $this->loader->addAction('widgets_init', $plugin_public, 'registerWidget');
         $this->loader->addAction('wp_enqueue_scripts', $plugin_public, 'enqueueStyles');
         $this->loader->addAction('wp_enqueue_scripts', $plugin_public, 'enqueueScripts');
+
+        $this->frontend = $plugin_public;
     }
 
     /**

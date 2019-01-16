@@ -42,9 +42,14 @@ class Deactivator
             'toplytics_settings'
         ];
 
-        foreach ($options as $option_name) {
-            delete_option($option_name);
-        }
+        /**
+         * We should only delete options on deactivation if debugging something.
+         * We should keep options saved for later reactivation.
+         * Google token will get regenerated anyway.
+         */
+        // foreach ($options as $option_name) {
+        //     delete_option($option_name);
+        // }
 
         /**
          * We make sure our CRON job is no longer being executed
