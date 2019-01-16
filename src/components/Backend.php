@@ -191,7 +191,7 @@ class Backend
      * @since   4.0.0
      * @return  void
      */
-    public function serviceDisconnect($programatic = false)
+    public function serviceDisconnect($programatic = false, $silent = false)
     {
         if (empty($_POST['ToplyticsSubmitAccountDisconnect']) && !$programatic) {
             return;
@@ -211,6 +211,10 @@ class Backend
         update_option('toplytics_auth_config', false);
         update_option('toplytics_auth_code', false);
 
+        if ($silent) {
+            return;
+        }
+        
         if (!$programatic) {
             $this->window->successRedirect(__(
                 'Google account successfully disconnected. All authorization settings reseted.',
@@ -1099,9 +1103,10 @@ class Backend
         }
 
         $appRedirectURL = $this->window->getSettingsLink();
+        $isDirtyAuth = $this->isDirtyAuth();
 
         // We are not authenticated if we got here.
-        $this->window->open('backend.authorization', ['appRedirectURL' => $appRedirectURL], true);
+        $this->window->open('backend.authorization', ['appRedirectURL' => $appRedirectURL, 'isDirtyAuth' => $isDirtyAuth], true);
     }
 
     /**
@@ -1235,6 +1240,11 @@ class Backend
             return false;
         }
 
+        // Old style config - backward compatibility
+        if (isset($config->installed) || isset($config->installed->client_id) || isset($config->installed->client_secret)) {
+            return $config->installed;
+        }
+
         if (!isset($config->web) || !isset($config->web->client_id) || !isset($config->web->client_secret)) {
             return false;
         }
@@ -1353,6 +1363,81 @@ class Backend
         return wp_redirect($this->getGoogleAuthLink());
     }
 
+    public function isDirtyAuth()
+    {
+        $dirt = 0;
+
+        $options = [
+            'toplytics_private_auth_config',
+            'toplytics_profile_data',
+            'toplytics_auth_config',
+            'toplytics_google_token',
+            'toplytics_auth_code',
+        ];
+
+        foreach ($options as $option) {
+            if (get_option($option)) {
+                $dirt++;
+            }
+        }
+
+        if ($dirt > 1) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function cleanDirtyAuth()
+    {
+        if (empty($_POST['ToplyticsCleanDirtyAuth'])) {
+            return false;
+        }
+
+        check_admin_referer('toplytics-dirty-cleanup');
+
+        $this->serviceDisconnect(true, true);
+
+        $this->window->successRedirect(__(
+            'Auth config clean-up completed.',
+            TOPLYTICS_DOMAIN
+        ));
+    }
+
+    public function checkBackwardsAuth($googleconfig)
+    {
+        // We try to decode the old-style auth config from the DB option.
+        $googleconfig = $this->decodeGoogleConfig($googleconfig);
+
+        // If we succeed, we'll revalidate and save the option.
+        if ($googleconfig && $this->validateGoogleConfig($googleconfig, true)) {
+            return $googleconfig;
+        }
+
+        return false;
+    }
+
+    public function doBackwardsPrivateAuth($config)
+    {
+
+        // We want this cleaned either way
+        delete_option('toplytics_auth_config');
+        
+        if (!$oauth_token = get_option('toplytics_oauth2_remote_token')) {
+            return false;
+        }
+        
+        // Update the config object in DB for future use
+        update_option('toplytics_private_auth_config', $config);
+        update_option('toplytics_auth_type', 'private');
+        update_option('toplytics_google_token', $oauth_token);
+
+        // Clean old style config settings no matter the below result
+        delete_option('toplytics_oauth2_remote_token');
+
+        return true;
+    }
+
     /**
      * Gets the authorization config based on the user data
      * or based on the remote config for public auth.
@@ -1390,6 +1475,12 @@ class Backend
             return false;
         }
 
+        // We arrive here if we do have set an old style auth in DB on the auth_config option.
+        if ($new_ga_config = $this->checkBackwardsAuth($googleconfig)) {
+            $this->doBackwardsPrivateAuth($new_ga_config);
+            return $new_ga_config;
+        }
+
         if (!$this->validateGoogleConfig($googleconfig)) {
             return false;
         }
@@ -1406,7 +1497,7 @@ class Backend
      *
      * @return bool The config is valid or not
      */
-    public function validateGoogleConfig($googleconfig)
+    public function validateGoogleConfig($googleconfig, $skipUriCheck = false)
     {
         if (!is_object($googleconfig)) {
             return false;
@@ -1424,6 +1515,10 @@ class Backend
             ! $googleconfig->redirect_uris ||
             !is_array($googleconfig->redirect_uris)) {
             return false;
+        }
+
+        if ($skipUriCheck) {
+            return true;
         }
 
         if (!filter_var($googleconfig->redirect_uris[0], FILTER_VALIDATE_URL)) {

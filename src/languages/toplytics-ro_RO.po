@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: toplytics-4.0\n"
-"POT-Creation-Date: 2018-07-13 17:51+0300\n"
-"PO-Revision-Date: 2018-07-13 17:54+0300\n"
+"POT-Creation-Date: 2019-01-15 18:18+0200\n"
+"PO-Revision-Date: 2019-01-15 18:20+0200\n"
 "Last-Translator: \n"
 "Language-Team: Presslabs <support@presslabs.com>\n"
 "Language: ro_RO\n"
@@ -19,84 +19,268 @@ msgstr ""
 "X-Poedit-SearchPath-0: components\n"
 "X-Poedit-SearchPath-1: resources/views\n"
 
-#: components/Activator.php:94 components/Activator.php:95
-#: components/Activator.php:96 components/Backend.php:248
-#: components/Deactivator.php:39 components/Deactivator.php:40
-#: components/Deactivator.php:41
+#: components/Activator.php:110 components/Activator.php:111
+#: components/Activator.php:112 components/Backend.php:836
 msgid "Y-m-d"
 msgstr "d.m.Y"
 
-#: components/Backend.php:131
-msgid "Oops. Something went wrong while initiating the Analytics service."
+#: components/Backend.php:174
+msgid "Something went wrong while initiating the Analytics service."
 msgstr ""
-"Oops. Ceva nu a mers bine în timpul inițializării serviciului de Analytics."
 
-#: components/Backend.php:133
+#: components/Backend.php:179
 msgid ""
-"Oops. Something went wrong with your Authorization process. Try to reset "
-"your connection to get this fixed."
+"Something went wrong with your Authorization process. Try to reset your "
+"connection to get this fixed."
 msgstr ""
-"Oops. Ceva nu a funcționat bine în timpul procesului de autorizare. Încearcă "
-"să te deconectezi dacă această problemă persistă."
 
-#: components/Backend.php:156
+#: components/Backend.php:220
 msgid ""
 "Google account successfully disconnected. All authorization settings reseted."
 msgstr ""
 "Deconectarea de la Google a fost făcută cu success. Toate setările de "
 "autorizare sunt resetate."
 
-#: components/Backend.php:160
+#: components/Backend.php:227
 msgid ""
-"Google account disconnected. Most probaby this is due to an error since you "
-"did not requested it. Please try to login again."
+"Google account disconnected. Most probaby this is due to an error. Please "
+"try again."
 msgstr ""
-"Contul de Google a fost deconectat. Cel mai probabil asta se datoreaza unei "
-"erori din moment ce nu tu ai cerut acest lucru. Te rog încearcă să te "
-"conectezi din nou."
 
-#: components/Backend.php:173
+#: components/Backend.php:253
+msgid "The data has been updated."
+msgstr ""
+
+#: components/Backend.php:255
+msgid "Update failed. Check your logs for more info."
+msgstr ""
+
+#: components/Backend.php:283
+msgid "Global Settings"
+msgstr ""
+
+#: components/Backend.php:288
+msgid "Skip Local Post Discovery"
+msgstr ""
+
+#: components/Backend.php:294
+msgid ""
+"TAKE CARE! This will render a few of the options below useless since it will "
+"skip local post discovery. This will affect the settings below and limit the "
+"amount of data you have available in the JSON output. We'll also try to "
+"generate a human readable title from your URL, this works if you're using "
+"preety permalinks. After you change this setting, you will also need to re-"
+"fetch from Google the data. Default: Disabled"
+msgstr ""
+
+#: components/Backend.php:301
+msgid "Custom Domain"
+msgstr ""
+
+#: components/Backend.php:310
+msgid ""
+"This works together with local post discovery since GA will not give us the "
+"domain in the URL so we need to build it using this custom domain. Enable "
+"\"Skip Local Post Discovery\" and then this will be enabled. The domain "
+"needs to include the protocol but not the final slash. Default: "
+msgstr ""
+
+#: components/Backend.php:317
+msgid "Enable REST API Endpoint"
+msgstr ""
+
+#: components/Backend.php:323
+msgid ""
+"Enables and disables the default WP REST API endpoint. The endpoint is: "
+msgstr ""
+
+#: components/Backend.php:330
+msgid "Enable custom JSON endpoint"
+msgstr ""
+
+#: components/Backend.php:336
+msgid ""
+"Enables and disables the JSON output on a custom endpoint. Use the WP REST "
+"API endpoint for common tasks. The endpoint is: "
+msgstr ""
+
+#: components/Backend.php:343
+msgid "Json Endpoint Path"
+msgstr ""
+
+#: components/Backend.php:351
+msgid ""
+"This is the path where your JSON will be available on the frontend if "
+"enabled. Please don't forget to flush the Permalink cache after you change "
+"this by visiting Settings > Permalink and saving that form with no change. "
+"Default: toplytics.json"
+msgstr ""
+
+#: components/Backend.php:358
+msgid "Fetch monthly data"
+msgstr ""
+
+#: components/Backend.php:364
+msgid ""
+"Enables the fetch of monthly data from Google Analytics in the local DB. "
+"Default: Enabled"
+msgstr ""
+
+#: components/Backend.php:371
+msgid "Fetch weekly data"
+msgstr ""
+
+#: components/Backend.php:377
+msgid ""
+"Enables the fetch of weekly data from Google Analytics in the local DB. "
+"Default: Enabled"
+msgstr ""
+
+#: components/Backend.php:384
+msgid "Fetch daily data"
+msgstr ""
+
+#: components/Backend.php:390
+msgid ""
+"Enables the fetch of daily data from Google Analytics in the local DB. "
+"Default: Enabled"
+msgstr ""
+
+#: components/Backend.php:397
+msgid "Fetch realtime data"
+msgstr ""
+
+#: components/Backend.php:403
+msgid ""
+"Enables the fetch of realtime data from Google Analytics in the local DB. "
+"Default: Disabled"
+msgstr ""
+
+#: components/Backend.php:410
+msgid "Posts to fetch from GA"
+msgstr ""
+
+#: components/Backend.php:418
+msgid ""
+"The maximum number of posts to fetch for each data range set from GA. "
+"Default: 20"
+msgstr ""
+
+#: components/Backend.php:425
+msgid "GA Data Refresh Interval"
+msgstr ""
+
+#: components/Backend.php:434
+msgid "How often do you want your data refreshed for your top? Default: hourly"
+msgstr ""
+
+#: components/Backend.php:441
+msgid "Custom post variables in JSON output"
+msgstr ""
+
+#: components/Backend.php:450
+msgid ""
+"Use commas (,) to separate variable names. For variable names see: <a href="
+"\"https://codex.wordpress.org/Class_Reference/WP_Post\" target=\"_blank\" "
+"title=\"WP Post Class Reference\">WP Codex: WP_POST</a>. Default: Empty"
+msgstr ""
+
+#: components/Backend.php:457
+msgid "Include Featured Image in JSON Output"
+msgstr ""
+
+#: components/Backend.php:464
+msgid ""
+"Adds the featured_image for each post when fetching into JSON output. "
+"Default: Disabled"
+msgstr ""
+
+#: components/Backend.php:471
+msgid "Featured image thumbnail size"
+msgstr ""
+
+#: components/Backend.php:481
+msgid ""
+"The image size name. See <a href=\"https://developer.wordpress.org/reference/"
+"functions/add_image_size/\" target=\"_blank\" title=\"Registering a new "
+"image size.\">Add Image Size docs</a> for the name. Default: post-thumbnail"
+msgstr ""
+
+#: components/Backend.php:488
+msgid "Allowed post types"
+msgstr ""
+
+#: components/Backend.php:497
+msgid ""
+"A comma (,) separated list of allowed post types to allow in the feed. "
+"Default: post"
+msgstr ""
+
+#: components/Backend.php:504
+msgid "Ignore Post IDs"
+msgstr ""
+
+#: components/Backend.php:513
+msgid ""
+"A comma (,) separated list of post ids (any post type including pages) to be "
+"ignored. Default: Empty"
+msgstr ""
+
+#: components/Backend.php:529
+msgid ""
+"Configure your Toplytics the way you want. These settings are global for all "
+"of your widgets."
+msgstr ""
+
+#: components/Backend.php:653
 msgid "Ok. Go ahead and select another profile."
 msgstr "Bine. Continuă și selectează alt profil."
 
-#: components/Backend.php:199
+#: components/Backend.php:685
 msgid "Well done. You have selected your analytics profile."
 msgstr "Super! Ți-ai selectat profilul de analytics."
 
-#: components/Backend.php:308
+#: components/Backend.php:994
 msgid "Google authorization went wrong. Try again."
 msgstr "Autorizarea cu Google nu a eșuat. Încearcă din nou."
 
-#: components/Backend.php:341
+#: components/Backend.php:1031
 msgid "Toplytics Settings"
 msgstr "Setările Toplytics"
 
-#: components/Backend.php:342
+#: components/Backend.php:1032
 msgid "Toplytics"
 msgstr "Toplytics"
 
-#: components/Backend.php:372
+#: components/Backend.php:1075
 msgid "l, d-M-y H:i:s T"
 msgstr "d.m.Y H:i:s T"
 
-#: components/Backend.php:421
+#: components/Backend.php:1085
+msgid ""
+"WARNING! You have modified the default template file. On plugin update you "
+"will lose these changes. Please copy the template and rename it to custom."
+"blade.php to prevent the customization from being lost."
+msgstr ""
+
+#: components/Backend.php:1158
 msgid "You have canceled the auth process."
 msgstr "Ai anulat procesul de autentificare."
 
-#: components/Backend.php:425
+#: components/Backend.php:1162
 msgid "Google sent an error. Authorization faild. Error code: "
 msgstr "Google a răspuns cu o eroare. Autorizarea a eșuat. Cod de eroare:"
 
-#: components/Backend.php:432
+#: components/Backend.php:1176
 msgid "We got your google code. Now select a profile to start."
 msgstr ""
 "Am primit codul tău de autentificare. Acum alege un profil pentru a începe."
 
-#: components/Backend.php:494 components/Backend.php:510
+#: components/Backend.php:1292 components/Backend.php:1324
 msgid "Form expired. Try again."
 msgstr "Formular expirat. Încearcă din nou."
 
-#: components/Backend.php:519
+#: components/Backend.php:1347
 msgid ""
 "Form validation error. Please check the details you have entered below and "
 "try again."
@@ -104,54 +288,95 @@ msgstr ""
 "A apărut o eroare la validarea formularului. Te rog verifică datele "
 "introduse, asigură-te că sunt corecte și mai încearcă odată."
 
-#: components/Widget.php:11
+#: components/Backend.php:1402
+msgid "Auth config clean-up completed."
+msgstr ""
+
+#: components/Backend.php:1699
+msgid "Usage Documentation"
+msgstr ""
+
+#: components/Backend.php:1705
+msgid "Review us!"
+msgstr ""
+
+#: components/Backend.php:1711
+msgid "Need help? Support is here!"
+msgstr ""
+
+#: components/Shortcode.php:74
+#, php-format
+msgid "%d Views"
+msgstr ""
+
+#: components/Widget.php:39
 msgid "The most popular posts on your site from Google Analytics"
 msgstr "Cele mai populare articole de pe site-ul tău din Google Analytics"
 
-#: components/Widget.php:171
+#: components/Widget.php:223
 msgid "Display post views"
 msgstr "Afișează numărul de vizualizări"
 
-#: resources/views/backend/authorization.blade.php:3
+#: components/Widget.php:230
+msgid "Load via Javascript AJAX"
+msgstr ""
+
+#: resources/views/backend/tabs/privateConnect.blade.php:45
+msgid "Private Authorize"
+msgstr "Authentifică-te Privat"
+
+#: resources/views/backend/authorization.blade.php:12
 msgid "Google Account Authorization"
 msgstr "Autorizare Cont Google"
 
-#: resources/views/backend/authorization.blade.php:11
-#: resources/views/backend/tabs/publicConnect.blade.php:1
+#: resources/views/backend/authorization.blade.php:20
+#: resources/views/backend/tabs/publicConnect.blade.php:12
 msgid "Public Authorization"
 msgstr "Autorizare Publică"
 
-#: resources/views/backend/authorization.blade.php:17
+#: resources/views/backend/authorization.blade.php:26
 msgid "Private Authorization (Advanced)"
 msgstr "Autorizare Privată (Avansat)"
 
-#: resources/views/backend/layout.blade.php:10
+#: resources/views/backend/authorization.blade.php:41
+msgid ""
+"We have detected a missconfiguration in your google authorization settings. "
+"If you encounter any issues when you authorize via Google please use the "
+"button below to clean up the settings."
+msgstr ""
+
+#: resources/views/backend/layout.blade.php:18
+#: resources/views/backend/settings.blade.php:29
 msgid "Settings"
 msgstr "Setări"
 
-#: resources/views/backend/settings.blade.php:3
+#: resources/views/backend/settings.blade.php:14
 msgid "Settings & Overview"
 msgstr "Setări & Prezentare Generală"
 
-#: resources/views/backend/settings.blade.php:11
+#: resources/views/backend/settings.blade.php:23
 msgid "Overview"
 msgstr "Prezentare Generală"
 
-#: resources/views/backend/settings.blade.php:20
+#: resources/views/backend/settings.blade.php:35
+msgid "Profile"
+msgstr ""
+
+#: resources/views/backend/tabs/overview.blade.php:34
 msgid "User profile info"
 msgstr "Informațiile de profil ale utilizatorului"
 
-#: resources/views/backend/settings.blade.php:21
+#: resources/views/backend/tabs/overview.blade.php:35
 msgid ""
 "Below is the information regarding your connection and selected profile as "
 "well as quick button controls to change them."
 msgstr "Mai jos sunt afișate informațiile "
 
-#: resources/views/backend/settings.blade.php:27
+#: resources/views/backend/tabs/overview.blade.php:41
 msgid "Connection Information"
 msgstr "Informațiile de conectare"
 
-#: resources/views/backend/settings.blade.php:31
+#: resources/views/backend/tabs/overview.blade.php:45
 msgid ""
 "<span>You are using the <strong>Private</strong> Authorization method. Good "
 "choise.</span>"
@@ -159,61 +384,56 @@ msgstr ""
 "<span>Folosești metoda de autorizare <strong>privată</strong>. Bună alegere."
 "</span>"
 
-#: resources/views/backend/settings.blade.php:33
+#: resources/views/backend/tabs/overview.blade.php:47
 msgid "<span>You are using the Presslabs public authorization method.</span>"
 msgstr "<span>Folosești aplicația publică de autentificare a Presslabs.</span>"
 
-#: resources/views/backend/settings.blade.php:39
+#: resources/views/backend/tabs/overview.blade.php:53
 msgid "Active Profile"
 msgstr "Profil Activ"
 
-#: resources/views/backend/settings.blade.php:45
-msgid "Last Top Update"
-msgstr "Ultima actualizare de top"
+#: resources/views/backend/tabs/overview.blade.php:59
+msgid "Last Data Update"
+msgstr ""
 
-#: resources/views/backend/settings.blade.php:51
-msgid "Updated Items"
-msgstr "Articole Actualizate"
+#: resources/views/backend/tabs/overview.blade.php:65
+msgid "Fetched from Google"
+msgstr ""
 
-#: resources/views/backend/settings.blade.php:59
+#: resources/views/backend/tabs/overview.blade.php:73
+#: resources/views/backend/tabs/profile.blade.php:34
 msgid "User profile selection"
 msgstr "Alegerea profilului de utilizator"
 
-#: resources/views/backend/settings.blade.php:60
+#: resources/views/backend/tabs/overview.blade.php:74
+#: resources/views/backend/tabs/profile.blade.php:35
 msgid "Select from the list of profiles the one you wish to use for this site."
 msgstr ""
 "Alege din lista de profile, pe cel pe care vrei să-l folosești pentru acest "
 "site."
 
-#: resources/views/backend/settings.blade.php:64
-#: resources/views/backend/settings.blade.php:74
+#: resources/views/backend/tabs/overview.blade.php:78
+#: resources/views/backend/tabs/profile.blade.php:39
 msgid "Profile Select"
 msgstr "Alegerea Profilului"
 
-#: resources/views/backend/settings.blade.php:85
+#: resources/views/backend/tabs/overview.blade.php:87
+#: resources/views/backend/tabs/profile.blade.php:48
 msgid ""
-"Oh NO! There are no profiles to select for this account. You might want to "
-"add some or disconnect this Google Account using the button below."
+"Oh NO! There has been an error or there are no profiles to select for this "
+"account. You might want to add some or disconnect this Google Account using "
+"the button below."
 msgstr ""
-"O, nu! Nu am găsit nici un profil pentru acest cont. Poate vrei să adaugi "
-"unul nou sau să te conectezi la alt cont de Google."
 
-#: resources/views/backend/settings.blade.php:94
+#: resources/views/backend/tabs/overview.blade.php:94
 msgid "Widgets Management"
 msgstr "Managementul Pieselor"
 
-#: resources/views/backend/tabs/privateConnect.blade.php:1
+#: resources/views/backend/tabs/privateConnect.blade.php:13
 msgid "Private Authorization"
 msgstr "Autorizare Privată"
 
-#: resources/views/backend/tabs/privateConnect.blade.php:8
-msgid ""
-"This method is not yet available. Check back after the next plugin version."
-msgstr ""
-"Această metodă nu este încă disponibilă. Verifică după următoarea versiune "
-"de plugin."
-
-#: resources/views/backend/tabs/privateConnect.blade.php:29
+#: resources/views/backend/tabs/privateConnect.blade.php:39
 msgid ""
 "This redirect URL is very important when you are using your own keys. Use "
 "the default Redirect URL in most cases. Make sure to only change it if you "
@@ -224,7 +444,7 @@ msgstr ""
 "potrivit. Asigură-te că îl schimbi doar dacă ești sigur pe ce faci.<br /"
 "><strong>Recomandat:</strong> "
 
-#: resources/views/backend/tabs/publicConnect.blade.php:2
+#: resources/views/backend/tabs/publicConnect.blade.php:13
 msgid ""
 "This authorization method is using the Presslabs public API key to "
 "authenticate you to the Google Analytics API.<br />If you are concerned "
@@ -237,7 +457,7 @@ msgstr ""
 "de erori sau autorizarea nu funcționează poți încerca oricând metoda de "
 "autorizare Privată."
 
-#: resources/views/backend/tabs/publicConnect.blade.php:8
+#: resources/views/backend/tabs/publicConnect.blade.php:19
 msgid ""
 "Clicking the button below will redirect you to the Google Authorization "
 "screen and you will be asked for read access to your analytics profiles. If "
@@ -250,9 +470,49 @@ msgstr ""
 "folosii aplicația prin autentificarea Privată folosind aplicația proprie de "
 "Google."
 
-#: resources/views/frontend/widget.blade.php:26
+#: resources/views/frontend/widget.blade.php:115
 msgid " Views"
 msgstr "Afișări"
+
+#~ msgid "Oops. Something went wrong while initiating the Analytics service."
+#~ msgstr ""
+#~ "Oops. Ceva nu a mers bine în timpul inițializării serviciului de "
+#~ "Analytics."
+
+#~ msgid ""
+#~ "Oops. Something went wrong with your Authorization process. Try to reset "
+#~ "your connection to get this fixed."
+#~ msgstr ""
+#~ "Oops. Ceva nu a funcționat bine în timpul procesului de autorizare. "
+#~ "Încearcă să te deconectezi dacă această problemă persistă."
+
+#~ msgid ""
+#~ "Google account disconnected. Most probaby this is due to an error since "
+#~ "you did not requested it. Please try to login again."
+#~ msgstr ""
+#~ "Contul de Google a fost deconectat. Cel mai probabil asta se datoreaza "
+#~ "unei erori din moment ce nu tu ai cerut acest lucru. Te rog încearcă să "
+#~ "te conectezi din nou."
+
+#~ msgid "Last Top Update"
+#~ msgstr "Ultima actualizare de top"
+
+#~ msgid "Updated Items"
+#~ msgstr "Articole Actualizate"
+
+#~ msgid ""
+#~ "Oh NO! There are no profiles to select for this account. You might want "
+#~ "to add some or disconnect this Google Account using the button below."
+#~ msgstr ""
+#~ "O, nu! Nu am găsit nici un profil pentru acest cont. Poate vrei să adaugi "
+#~ "unul nou sau să te conectezi la alt cont de Google."
+
+#~ msgid ""
+#~ "This method is not yet available. Check back after the next plugin "
+#~ "version."
+#~ msgstr ""
+#~ "Această metodă nu este încă disponibilă. Verifică după următoarea "
+#~ "versiune de plugin."
 
 #~ msgid "Weldone. You have selected your analytics profile."
 #~ msgstr "Succes! Ți-ai selectat profilul de analytics."

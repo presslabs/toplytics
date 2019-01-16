@@ -52,12 +52,12 @@ analytics on the last update.
         {{-- We show different submit buttons based on whether the user has chosen a profile or not. --}}
 
         @if (isset($profiles) && $profiles)
-        <input type="submit" name="ToplyticsProfileSelect" class="button-primary" value="{{ __( 'Select Profile', TOPLYTICS_DOMAIN ) }}" />
+        <input type="submit" name="ToplyticsProfileSelect" class="button-primary" value="<?= __( 'Select Profile', TOPLYTICS_DOMAIN ) ?>" />
         @endif
 
         &nbsp;&nbsp;
 
-        <input type="submit" name="ToplyticsSubmitAccountDisconnect" class="button" value="{{   __( 'Disconnect Google Account', TOPLYTICS_DOMAIN ) }}" />
+        <input type="submit" name="ToplyticsSubmitAccountDisconnect" class="button" value="<?=   __( 'Disconnect Google Account', TOPLYTICS_DOMAIN ) ?>" />
     </div>
 
 </form>

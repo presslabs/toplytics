@@ -42,6 +42,6 @@ get the authorization token for your google login.
         </tbody>
     </table>
 
-    <input type="submit" name="ToplyticsSubmitPrivateAuthorization" class="button-primary" value="{{ __( 'Private Authorize', TOPLYTICS_DOMAIN ) }}" />
+    <input type="submit" name="ToplyticsSubmitPrivateAuthorization" class="button-primary" value="<?= __( 'Private Authorize', TOPLYTICS_DOMAIN ) ?>" />
 
 </form>

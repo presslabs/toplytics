@@ -138,7 +138,6 @@ class Frontend
         //     wp_localize_script(TOPLYTICS_DOMAIN, TOPLYTICS_DOMAIN, array( 'json_url' => esc_url(home_url('/' . $this->settings['json_path'])) ));
         //     wp_enqueue_script(TOPLYTICS_DOMAIN);
         // }
-        
     }
 
     /**
@@ -219,6 +218,14 @@ class Frontend
         }
         
         return false;
+    }
+
+    /**
+     * Wrapper function to preserv backwards compatibility.
+     */
+    public function get_result($when = 'today')
+    {
+        return $this->getResult($when);
     }
     
     /**

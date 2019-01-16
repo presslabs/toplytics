@@ -33,4 +33,15 @@ There is no data passed directly to this template.
         @include('backend.tabs.publicConnect')
     @endif
 
+    @if (isset($isDirtyAuth) && $isDirtyAuth)
+        <form action="{{$_SERVER['REQUEST_URI']}}" method="POST">
+
+            {!! wp_nonce_field( 'toplytics-dirty-cleanup' ) !!}
+
+            @include('backend.partials.inlineNotification', ['type' => 'warning', 'message' => __("We have detected a missconfiguration in your google authorization settings. If you encounter any issues when you authorize via Google please use the button below to clean up the settings.", TOPLYTICS_DOMAIN)])
+            
+            <input type="submit" title="Clean-up Auth Config" name="ToplyticsCleanDirtyAuth" class="button-primary" style="margin: 20px;" value="<?= __( 'Clean-up Auth Config', TOPLYTICS_DOMAIN ) ?>" />
+        </form>
+    @endif
+
 @endsection
