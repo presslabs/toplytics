@@ -79,10 +79,25 @@ register_deactivation_hook(__FILE__, 'deactivate_toplytics');
  *
  * @since    4.0.0
  */
-function ready()
+function toplytics_ready()
 {
-
     $engine = new \Toplytics\Engine();
     $engine->start();
+    return $engine;
 }
-ready();
+
+/**
+ * We continue to use the frontend as a global var to be able
+ * to keep backwards compatibility for custom themes.
+ *
+ * @since 3.0.0
+ */
+global $toplytics;
+$toplytics = toplytics_ready()->frontend;
+
+/**
+ * We make sure to include backwardcompatibility functions.
+ *
+ * @since 3.0.0
+ */
+require_once plugin_dir_path(__FILE__) . 'backward-compatibility.php';

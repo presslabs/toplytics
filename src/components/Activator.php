@@ -34,7 +34,7 @@ class Activator
     public static function activate()
     {
         Activator::deleteDeprecatedOptions();
-        Activator::cleanUpAuthOptions();
+        // Activator::cleanUpAuthOptions();
         Activator::addDefaultOptions();
     }
 
@@ -63,7 +63,7 @@ class Activator
         delete_option('toplytics_result_today');
         delete_option('toplytics_result_week');
         delete_option('toplytics_result_month');
-        delete_option('toplytics_oauth2_remote_token');
+        // delete_option('toplytics_oauth2_remote_token');
 
         /**
          * Used in testing and no longer used.
@@ -89,9 +89,9 @@ class Activator
             'toplytics_auth_type',
         ];
 
-        foreach ($options as $option_name) {
-            delete_option($option_name);
-        }
+        // foreach ($options as $option_name) {
+        //     delete_option($option_name);
+        // }
     }
 
     /**

@@ -18,6 +18,8 @@ There is no data passed directly to this template.
 
     @include('backend.partials.inlineNotification', ['type' => 'info', 'message' => __("Clicking the button below will redirect you to the Google Authorization screen and you will be asked for read access to your analytics profiles. If you don't agree with this or you have concerns about privacy, please use the private method.", TOPLYTICS_DOMAIN)])
     
-    <input type="submit" title="Log in with your Google Account" name="ToplyticsSubmitPublicAuthorization" class="button-primary" style="margin: 20px;" value="{{ __( 'Log in with your Google Account via Presslabs.org', TOPLYTICS_DOMAIN ) }}" />
+    <input type="submit" title="Log in with your Google Account" name="ToplyticsSubmitPublicAuthorization" class="button-primary" style="margin: 20px;" value="<?= __( 'Log in with your Google Account via Presslabs.org', TOPLYTICS_DOMAIN ) ?>" />
+
+    
 
 </form>
