@@ -14,13 +14,13 @@ There is no data passed directly to this template.
 @section('content')
 
     <h2 class="nav-tab-wrapper">
-        <a class="nav-tab{{ isset($_GET['tab']) ? ( $_GET['tab'] == 'public' ? ' nav-tab-active' : '' ) : ' nav-tab-active' }}" 
+        <a class="nav-tab{{ isset($_GET['tab']) ? ( $_GET['tab'] == 'public' ? ' nav-tab-active' : '' ) : ' nav-tab-active' }}"
             href="{{admin_url( TOPLYTICS_SUBMENU_PAGE . '?page=' . TOPLYTICS_DOMAIN . '&tab=' . 'public' )}}"
             title="{{ __('This is for the everyday user and small websites.', TOPLYTICS_DOMAIN) }}">
             {{ __('Public Authorization', TOPLYTICS_DOMAIN) }}
         </a>
 
-        <a class="nav-tab{{ isset($_GET['tab']) && $_GET['tab'] == 'private' ? ' nav-tab-active' : '' }}" 
+        <a class="nav-tab{{ isset($_GET['tab']) && $_GET['tab'] == 'private' ? ' nav-tab-active' : '' }}"
             href="{{admin_url( TOPLYTICS_SUBMENU_PAGE . '?page=' . TOPLYTICS_DOMAIN . '&tab=' . 'private' )}}"
             title="{{ __('This is for the the pros that value their privacy.', TOPLYTICS_DOMAIN) }}">
             {{ __('Private Authorization (Advanced)', TOPLYTICS_DOMAIN)}}
@@ -38,8 +38,8 @@ There is no data passed directly to this template.
 
             {!! wp_nonce_field( 'toplytics-dirty-cleanup' ) !!}
 
-            @include('backend.partials.inlineNotification', ['type' => 'warning', 'message' => __("We have detected a missconfiguration in your google authorization settings. If you encounter any issues when you authorize via Google please use the button below to clean up the settings.", TOPLYTICS_DOMAIN)])
-            
+            @include('backend.partials.inlineNotification', ['type' => 'warning', 'message' => __("We have detected a misconfiguration in your Google authorization settings. If you encounter any issues when you authorize via Google, please use the button below to clean up the settings.", TOPLYTICS_DOMAIN)])
+
             <input type="submit" title="Clean-up Auth Config" name="ToplyticsCleanDirtyAuth" class="button-primary" style="margin: 20px;" value="<?= __( 'Clean-up Auth Config', TOPLYTICS_DOMAIN ) ?>" />
         </form>
     @endif
