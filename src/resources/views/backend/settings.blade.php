@@ -1,7 +1,7 @@
 {{--
 
 This is the main settings page template, the one which is being
-displayed after the authorization step. From here we'll
+displayed after the authorization step. From here we will
 display step 2 in activation (the profile selection) and
 the status and stats for the updates of the data.
 
@@ -17,19 +17,19 @@ There is no data passed directly to this template.
 
     <h2 class="nav-tab-wrapper">
         @if ( isset($profile) && $profile )
-            <a class="nav-tab{{ isset($_GET['tab']) ? ( $_GET['tab'] == 'overview' ? ' nav-tab-active' : '' ) : ' nav-tab-active' }}" 
+            <a class="nav-tab{{ isset($_GET['tab']) ? ( $_GET['tab'] == 'overview' ? ' nav-tab-active' : '' ) : ' nav-tab-active' }}"
                 href="{{admin_url( TOPLYTICS_SUBMENU_PAGE . '?page=' . TOPLYTICS_DOMAIN . '&tab=' . 'overview' )}}"
                 title="{{ __('General config for the plugin.', TOPLYTICS_DOMAIN) }}">
                 {{ __('Overview', TOPLYTICS_DOMAIN) }}
             </a>
 
-            <a class="nav-tab{{ isset($_GET['tab']) && $_GET['tab'] == 'settings' ? ' nav-tab-active' : '' }}" 
+            <a class="nav-tab{{ isset($_GET['tab']) && $_GET['tab'] == 'settings' ? ' nav-tab-active' : '' }}"
                 href="{{admin_url( TOPLYTICS_SUBMENU_PAGE . '?page=' . TOPLYTICS_DOMAIN . '&tab=' . 'settings' )}}"
                 title="{{ __('Global plugin settings for all widgets.', TOPLYTICS_DOMAIN) }}">
                 {{ __('Settings', TOPLYTICS_DOMAIN)}}
             </a>
         @else
-            <a class="nav-tab{{ isset($_GET['tab']) ? ( $_GET['tab'] == 'profile' ? ' nav-tab-active' : '' ) : ' nav-tab-active' }}" 
+            <a class="nav-tab{{ isset($_GET['tab']) ? ( $_GET['tab'] == 'profile' ? ' nav-tab-active' : '' ) : ' nav-tab-active' }}"
                 href="{{admin_url( TOPLYTICS_SUBMENU_PAGE . '?page=' . TOPLYTICS_DOMAIN . '&tab=' . 'profile' )}}"
                 title="{{ __('General config for the plugin.', TOPLYTICS_DOMAIN) }}">
                 {{ __('Profile', TOPLYTICS_DOMAIN) }}
@@ -55,4 +55,4 @@ There is no data passed directly to this template.
         @include('backend.tabs.profile')
     @endif
 
-@endsection 
+@endsection

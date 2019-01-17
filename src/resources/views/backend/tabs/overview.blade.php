@@ -32,7 +32,7 @@ analytics on the last update.
     @if ( isset($profile) && $profile )
 
         <h3>{{ __('User profile info', TOPLYTICS_DOMAIN) }}</h3>
-        <p>{{ __('Below is the information regarding your connection and selected profile as well as quick button controls to change them.', TOPLYTICS_DOMAIN) }}</p>
+        <p>{{ __('Below is the information regarding your connection and selected profile, as well as quick button controls to change them.', TOPLYTICS_DOMAIN) }}</p>
 
         {{-- We show the connection details since we are already connected and we chose a profile --}}
         <table class="form-table">

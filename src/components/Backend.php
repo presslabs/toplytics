@@ -214,7 +214,7 @@ class Backend
         if ($silent) {
             return;
         }
-        
+
         if (!$programatic) {
             $this->window->successRedirect(__(
                 'Google account successfully disconnected. All authorization settings reseted.',
@@ -284,35 +284,6 @@ class Backend
 
         // Enable REST API JSON Output
         add_settings_field(
-            'skip_local_post_discovery',
-            $this->getLabel(__('Skip Local Post Discovery', TOPLYTICS_DOMAIN), 'skip_local_post_discovery'),
-            [$this, 'printInput'],
-            'toplytics',
-            'toplytics_settings',
-            [
-                'id' => 'skip_local_post_discovery',
-                'tooltip' => __('TAKE CARE! This will render a few of the options below useless since it will skip local post discovery. This will affect the settings below and limit the amount of data you have available in the JSON output. We\'ll also try to generate a human readable title from your URL, this works if you\'re using preety permalinks. After you change this setting, you will also need to re-fetch from Google the data. Default: Disabled', TOPLYTICS_DOMAIN),
-            ]
-        );
-
-        // Enable REST API JSON Output
-        add_settings_field(
-            'custom_domain',
-            $this->getLabel(__('Custom Domain', TOPLYTICS_DOMAIN), 'custom_domain'),
-            [$this, 'printInput'],
-            'toplytics',
-            'toplytics_settings',
-            [
-                'id' => 'custom_domain',
-                'option' => 'toplytics_settings',
-                'input' => 'text',
-                'disabled' => !$this->checkSetting('skip_local_post_discovery'),
-                'tooltip' => __('This works together with local post discovery since GA will not give us the domain in the URL so we need to build it using this custom domain. Enable "Skip Local Post Discovery" and then this will be enabled. The domain needs to include the protocol but not the final slash. Default: ' . get_home_url(), TOPLYTICS_DOMAIN),
-            ]
-        );
-
-        // Enable REST API JSON Output
-        add_settings_field(
             'enable_rest_endpoint',
             $this->getLabel(__('Enable REST API Endpoint', TOPLYTICS_DOMAIN), 'enable_rest_endpoint'),
             [$this, 'printInput'],
@@ -355,52 +326,52 @@ class Backend
         // Enable Monthly Fetch
         add_settings_field(
             'fetch_month',
-            $this->getLabel(__('Fetch monthly data', TOPLYTICS_DOMAIN), 'fetch_month'),
+            $this->getLabel(__('Monthly Top', TOPLYTICS_DOMAIN), 'fetch_month'),
             [$this, 'printInput'],
             'toplytics',
             'toplytics_settings',
             [
                 'id' => 'fetch_month',
-                'tooltip' => __('Enables the fetch of monthly data from Google Analytics in the local DB. Default: Enabled', TOPLYTICS_DOMAIN),
+                'tooltip' => __('Enables the fetch of the most visited posts per month from Google Analytics in the local DB. Default: Enabled', TOPLYTICS_DOMAIN),
             ]
         );
 
         // Enable Weekly Fetch
         add_settings_field(
             'fetch_week',
-            $this->getLabel(__('Fetch weekly data', TOPLYTICS_DOMAIN), 'fetch_week'),
+            $this->getLabel(__('Weekly Top', TOPLYTICS_DOMAIN), 'fetch_week'),
             [$this, 'printInput'],
             'toplytics',
             'toplytics_settings',
             [
                 'id' => 'fetch_week',
-                'tooltip' => __('Enables the fetch of weekly data from Google Analytics in the local DB. Default: Enabled', TOPLYTICS_DOMAIN),
+                'tooltip' => __('Enables the fetch of the most visited posts per week from Google Analytics in the local DB. Default: Enabled', TOPLYTICS_DOMAIN),
             ]
         );
 
         // Enable Daily Fetch
         add_settings_field(
             'fetch_today',
-            $this->getLabel(__('Fetch daily data', TOPLYTICS_DOMAIN), 'fetch_today'),
+            $this->getLabel(__('Daily Top', TOPLYTICS_DOMAIN), 'fetch_today'),
             [$this, 'printInput'],
             'toplytics',
             'toplytics_settings',
             [
                 'id' => 'fetch_today',
-                'tooltip' => __('Enables the fetch of daily data from Google Analytics in the local DB. Default: Enabled', TOPLYTICS_DOMAIN),
+                'tooltip' => __('Enables the fetch of the most visited posts per day from Google Analytics in the local DB. Default: Enabled', TOPLYTICS_DOMAIN),
             ]
         );
 
         // Enable Realtime Fetch
         add_settings_field(
             'fetch_realtime',
-            $this->getLabel(__('Fetch realtime data', TOPLYTICS_DOMAIN), 'fetch_realtime'),
+            $this->getLabel(__('Realtime Top', TOPLYTICS_DOMAIN), 'fetch_realtime'),
             [$this, 'printInput'],
             'toplytics',
             'toplytics_settings',
             [
                 'id' => 'fetch_realtime',
-                'tooltip' => __('Enables the fetch of realtime data from Google Analytics in the local DB. Default: Disabled', TOPLYTICS_DOMAIN),
+                'tooltip' => __('Enables the fetch of the most visited posts in realtime from Google Analytics in the local DB. Default: Disabled', TOPLYTICS_DOMAIN),
             ]
         );
 
@@ -513,6 +484,35 @@ class Backend
                 'tooltip' => __('A comma (,) separated list of post ids (any post type including pages) to be ignored. Default: Empty', TOPLYTICS_DOMAIN),
             ]
         );
+
+        // Skip local post discovery
+        add_settings_field(
+            'skip_local_post_discovery',
+            $this->getLabel(__('Skip Local Post Discovery', TOPLYTICS_DOMAIN), 'skip_local_post_discovery'),
+            [$this, 'printInput'],
+            'toplytics',
+            'toplytics_settings',
+            [
+                'id' => 'skip_local_post_discovery',
+                'tooltip' => __(' Take care! As the Analytics API only returns the permalink and pageviews, local post discovery searches the database for more post related information, such as post type. If you enable this option, we\'ll try to generate a human readable title from your post URLs, which will work only if you\'re using pretty permalinks. Checking this option affects the settings above and limits the amount of data you have available in the JSON output. After you change this setting, you will also need to re-fetch from Google the data. Default: Disabled', TOPLYTICS_DOMAIN),
+            ]
+        );
+
+        // Set custom domain for local post discovery
+        add_settings_field(
+            'custom_domain',
+            $this->getLabel(__('Custom Domain', TOPLYTICS_DOMAIN), 'custom_domain'),
+            [$this, 'printInput'],
+            'toplytics',
+            'toplytics_settings',
+            [
+                'id' => 'custom_domain',
+                'option' => 'toplytics_settings',
+                'input' => 'text',
+                'disabled' => !$this->checkSetting('skip_local_post_discovery'),
+                'tooltip' => __('This works together with local post discovery, since GA will not give us the domain in the URL and we need to build it using this custom domain. Enable "Skip Local Post Discovery" and then this will be enabled. The domain needs to include the protocol, but not the final slash. Default: ' . get_home_url(), TOPLYTICS_DOMAIN),
+            ]
+        );
     }
 
     /**
@@ -542,7 +542,7 @@ class Backend
         if (!empty($id) && $checkbox) {
             $label = "<label for='" . $id . "'>" . $label . "</label>";
         }
-        
+
         return $label;
     }
 
@@ -558,10 +558,10 @@ class Backend
     {
         $option = 'toplytics_settings';
         $settings = get_option($option);
-    
+
         echo "<div style='display: table; width: 100%;'>";
             echo "<div>";
-    
+
         //Text
         if (!empty($args['input']) && ($args['input'] == 'text' || $args['input'] == 'color')) {
             echo "<input type='text' id='" . $args['id'] . "' name='" . $option . "[" . $args['id'] . "]' value='" . (!empty($settings[$args['id']]) ? $settings[$args['id']] : '') . "' placeholder='" . (!empty($args['placeholder']) ? $args['placeholder'] : '') . "' " . (!empty($args['disabled']) && $args['disabled'] ? 'readonly="readonly"' : '') . " />";
@@ -579,7 +579,7 @@ class Backend
             }
                     echo "</select>";
         }
-    
+
         //Checkbox + Toggle
         else {
             echo "<input type='checkbox' id='" . $args['id'] . "' name='" . $option . "[" . $args['id'] . "]' value='1' style='display: block; margin: 0px;' ";
@@ -588,9 +588,9 @@ class Backend
             }
             echo (!empty($args['disabled']) && $args['disabled'] ? 'disabled' : '') . " >";
         }
-                
+
             echo "</div>";
-    
+
         if (!empty($args['tooltip'])) {
             echo "<div style='display: table; height: 100%; width: 100%;'>";
                 echo "<div style='display: table-cell; vertical-align: middle;'>";
@@ -684,7 +684,7 @@ class Backend
 
         $this->window->successRedirect(__('Well done. You have selected your analytics profile.', TOPLYTICS_DOMAIN));
     }
-    
+
     /**
      * We update our database with the latest data from GA.
      * We do 2 separate data fetchings for normal data and realtime
@@ -754,7 +754,7 @@ class Backend
 
         return $status;
     }
-    
+
     /**
      * We use a separate method to read the Google realtime
      * Analytics data and store them in our options.
@@ -800,7 +800,7 @@ class Backend
 
         return $results;
     }
-    
+
     /**
      * This is the main place where we read the Google
      * Analytics data and store them in our options.
@@ -850,13 +850,13 @@ class Backend
                         $result[ $when ][ $item[0] ] = $item[1];
                     }
                 }
-                
+
                 apply_filters('toplytics_analytics_data_result', $result[ $when ], $when);
             }
         }
         return apply_filters('toplytics_analytics_data_allresults', $result);
     }
-    
+
     /**
      * This is where we convert the data we got from GA and
      * assign it to it's specific post in our DB.
@@ -952,7 +952,7 @@ class Backend
                 }
             }
         }
-        
+
         // sort the results (revert order)
         // arsort($new_data);
 
@@ -974,7 +974,7 @@ class Backend
         if (!$this->client) {
             return false;
         }
-        
+
         $googleToken = get_option('toplytics_google_token');
 
         if (! $googleToken) {
@@ -1065,7 +1065,7 @@ class Backend
             $profile = get_option('toplytics_profile_data');
 
             $profiles = false;
-            
+
             if (!$profile) {
                 $profiles = $this->getProfilesList();
             }
@@ -1082,7 +1082,7 @@ class Backend
             $auth = get_option('toplytics_auth_type') == 'private' ? 'private' : 'public';
 
             if (md5_file(TOPLYTICS_FOLDER_ROOT . 'resources/views/frontend/widget.blade.php') !== TOPLYTICS_WIDGET_TEMPLATE_VERSION) {
-                $this->window->notifyAdmins('warning', __('WARNING! You have modified the default template file. On plugin update you will lose these changes. Please copy the template and rename it to custom.blade.php to prevent the customization from being lost.', TOPLYTICS_DOMAIN), false, '', true);
+                $this->window->notifyAdmins('warning', __('WARNING! You have modified the default template file. On a plugin update you will lose these changes. Please copy the template and rename it to custom.blade.php to prevent the customization from being lost.', TOPLYTICS_DOMAIN), false, '', true);
                 if (defined('WP_DEBUG') && WP_DEBUG) {
                     error_log('Toplytics Debug: The new md5 of the widget file is ' . md5_file(TOPLYTICS_FOLDER_ROOT . 'resources/views/frontend/widget.blade.php'));
                 }
@@ -1157,7 +1157,7 @@ class Backend
                 if ($get_error == 'access_denied') {
                     $this->window->errorRedirect(__('You have canceled the auth process.', TOPLYTICS_DOMAIN));
                 }
-                
+
                 $this->window->errorRedirect(__(
                     'Google sent an error. Authorization faild. Error code: ',
                     TOPLYTICS_DOMAIN
@@ -1165,7 +1165,7 @@ class Backend
             }
 
             $authCode = sanitize_text_field(wp_unslash($_GET['code']));
-            
+
             update_option('toplytics_auth_code', $authCode);
 
             // There is a race condition if the DB is not fast enough
@@ -1173,7 +1173,7 @@ class Backend
             sleep(2);
 
             $this->window->successRedirect(__(
-                'We got your google code. Now select a profile to start.',
+                'We got your Google code. Now select a profile to start.',
                 TOPLYTICS_DOMAIN
             ));
         }
@@ -1422,11 +1422,11 @@ class Backend
 
         // We want this cleaned either way
         delete_option('toplytics_auth_config');
-        
+
         if (!$oauth_token = get_option('toplytics_oauth2_remote_token')) {
             return false;
         }
-        
+
         // Update the config object in DB for future use
         update_option('toplytics_private_auth_config', $config);
         update_option('toplytics_auth_type', 'private');
@@ -1658,7 +1658,7 @@ class Backend
                 'url' => $this->window->getSettingsLink(),
                 'title' => 'Settings',
             ]);
-    
+
             $widgets_link = $this->window->open('backend.partials.url', [
                 'url' => admin_url('widgets.php'),
                 'title' => 'Widgets',
