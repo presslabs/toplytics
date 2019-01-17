@@ -11,7 +11,7 @@ get the authorization token for your google login.
 --}}
 
 <h2>{{ __('Private Authorization', TOPLYTICS_DOMAIN) }}</h2>
-<p>The private authorization is the recommended way for connecting to your Google account, even if it is a bit more difficult and cumbersome. <br />It offers you complete control over the connection by using your very own API keys and application for granting access.</p>
+<p>{!! __('The private authorization is the recommended way for connecting to your Google account, even if it is a bit more difficult and cumbersome. <br />It offers you complete control over the connection by using your very own API keys and application for granting access.', TOPLYTICS_DOMAIN) !!}</p>
 
 <form action="{{$_SERVER['REQUEST_URI']}}" method="POST">
 
@@ -20,23 +20,23 @@ get the authorization token for your google login.
     <table class="form-table">
         <tbody>
             <tr>
-                <th scope="row"><label for="toplytics-private-client-id">Client ID</label></th>
+                <th scope="row"><label for="toplytics-private-client-id">{{ __('Client ID', TOPLYTICS_DOMAIN) }}</label></th>
                 <td>
-                    <input type="text" class="regular-text" id="toplytics-private-client-id" name="toplytics-private-client-id" value="" placeholder="This is where your Client ID is going.">
+                    <input type="text" class="regular-text" id="toplytics-private-client-id" name="toplytics-private-client-id" value="" placeholder="<?=__('This is where your Client ID is going.', TOPLYTICS_DOMAIN)?>">
                 </td>
             </tr>
             <tr>
-                <th scope="row"><label for="toplytics-private-client-secret">Client Secret</label></th>
+            <th scope="row"><label for="toplytics-private-client-secret">{{ __('Client Secret', TOPLYTICS_DOMAIN) }}</label></th>
                 <td>
-                    <input type="text" class="regular-text" id="toplytics-private-client-secret" name="toplytics-private-client-secret" value="" placeholder="This is where your Client Secret is going.">
+                    <input type="text" class="regular-text" id="toplytics-private-client-secret" name="toplytics-private-client-secret" value="" placeholder="<?=__('This is where your Client Secret is going.',TOPLYTICS_DOMAIN)?>">
                 </td>
             </tr>
             <tr>
-                <th scope="row"><label for="toplytics-private-redirect">Redirect URL</label></th>
+            <th scope="row"><label for="toplytics-private-redirect">{{ __('Redirect URL', TOPLYTICS_DOMAIN) }}</label></th>
                 <td>
-                <input type="text" class="regular-text" id="toplytics-private-redirect" name="toplytics-private-redirect" value="{{ $appRedirectURL }}" placeholder="This is where your Redirect URL is going.">
+                <input type="text" class="regular-text" id="toplytics-private-redirect" name="toplytics-private-redirect" value="{{ $appRedirectURL }}" placeholder="<?=__('This is where your Redirect URL is going.', TOPLYTICS_DOMAIN)?>">
 
-                    <p class="description">{!! __('This redirect URL is very important when you are using your own keys. Use the default Redirect URL in most cases. Make sure to only change it if you really know what you\'re doing.<br /><strong>Default:</strong> ', TOPLYTICS_DOMAIN).$appRedirectURL !!}</p>
+                    <p class="description">{!! __('This redirect URL is very important when you are using your own keys. Use the default Redirect URL in most cases. Make sure to only change it if you really know what you\'re doing.<br /><strong>Default:</strong> ', TOPLYTICS_DOMAIN) . $appRedirectURL !!}</p>
                 </td>
             </tr>
         </tbody>

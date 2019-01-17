@@ -1,15 +1,15 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: toplytics-4.0\n"
-"POT-Creation-Date: 2019-01-17 14:44+0200\n"
-"PO-Revision-Date: 2019-01-17 14:45+0200\n"
+"POT-Creation-Date: 2019-01-17 16:32+0200\n"
+"PO-Revision-Date: 2019-01-17 16:32+0200\n"
 "Last-Translator: \n"
 "Language-Team: Presslabs <support@presslabs.com>\n"
 "Language: ro_RO\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 2.2\n"
+"X-Generator: Poedit 1.8.7.1\n"
 "X-Poedit-Basepath: ..\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Poedit-SourceCharset: UTF-8\n"
@@ -18,162 +18,6 @@ msgstr ""
 "translate_nooped_plural\n"
 "X-Poedit-SearchPath-0: components\n"
 "X-Poedit-SearchPath-1: resources/views\n"
-
-#: resources/views/backend/authorization.blade.php:12
-msgid "Google Account Authorization"
-msgstr "Autorizare Cont Google"
-
-#: resources/views/backend/authorization.blade.php:20
-#: resources/views/backend/tabs/publicConnect.blade.php:12
-msgid "Public Authorization"
-msgstr "Autorizare Publică"
-
-#: resources/views/backend/authorization.blade.php:26
-msgid "Private Authorization (Advanced)"
-msgstr "Autorizare Privată (Avansat)"
-
-#: resources/views/backend/authorization.blade.php:41
-msgid ""
-"We have detected a misconfiguration in your Google authorization settings. "
-"If you encounter any issues when you authorize via Google, please use the "
-"button below to clean up the settings."
-msgstr ""
-"Am detectat o configurare greșită în setările tale de autorizare Google. "
-"Dacă întâmpini orice probleme legate de atorizarea via Google, folosește "
-"acest buton pentru a reseta setările."
-
-#: resources/views/backend/layout.blade.php:18
-#: resources/views/backend/settings.blade.php:29
-msgid "Settings"
-msgstr "Setări"
-
-#: resources/views/backend/settings.blade.php:14
-msgid "Settings & Overview"
-msgstr "Setări & Prezentare Generală"
-
-#: resources/views/backend/settings.blade.php:23
-msgid "Overview"
-msgstr "Prezentare Generală"
-
-#: resources/views/backend/settings.blade.php:35
-msgid "Profile"
-msgstr "Profil"
-
-#: resources/views/backend/tabs/overview.blade.php:34
-msgid "User profile info"
-msgstr "Informațiile de profil ale utilizatorului"
-
-#: resources/views/backend/tabs/overview.blade.php:35
-msgid ""
-"Below is the information regarding your connection and selected profile, as "
-"well as quick button controls to change them."
-msgstr ""
-"Mai jos sunt afișate informațiile legate de conexiune și profil selectat, "
-"precum și butoane pentru a le modifica."
-
-#: resources/views/backend/tabs/overview.blade.php:41
-msgid "Connection Information"
-msgstr "Informații de conectare"
-
-#: resources/views/backend/tabs/overview.blade.php:45
-msgid ""
-"<span>You are using the <strong>Private</strong> Authorization method. Good "
-"choise.</span>"
-msgstr ""
-"<span>Folosești metoda de autorizare <strong>privată</strong>. Bună alegere."
-"</span>"
-
-#: resources/views/backend/tabs/overview.blade.php:47
-msgid "<span>You are using the Presslabs public authorization method.</span>"
-msgstr "<span>Folosești aplicația publică de autentificare a Presslabs.</span>"
-
-#: resources/views/backend/tabs/overview.blade.php:53
-msgid "Active Profile"
-msgstr "Profilul Activ"
-
-#: resources/views/backend/tabs/overview.blade.php:59
-msgid "Last Data Update"
-msgstr "Ultima actualizare a datelor"
-
-#: resources/views/backend/tabs/overview.blade.php:65
-msgid "Fetched from Google"
-msgstr "Actualizat din Google"
-
-#: resources/views/backend/tabs/overview.blade.php:73
-#: resources/views/backend/tabs/profile.blade.php:34
-msgid "User profile selection"
-msgstr "Selectarea profilului de utilizator"
-
-#: resources/views/backend/tabs/overview.blade.php:74
-#: resources/views/backend/tabs/profile.blade.php:35
-msgid "Select from the list of profiles the one you wish to use for this site."
-msgstr ""
-"Alege din lista de profile pe cel pe care vrei să-l folosești pentru acest "
-"site."
-
-#: resources/views/backend/tabs/overview.blade.php:78
-#: resources/views/backend/tabs/profile.blade.php:39
-msgid "Profile Select"
-msgstr "Selectarea Profilului"
-
-#: resources/views/backend/tabs/overview.blade.php:87
-#: resources/views/backend/tabs/profile.blade.php:48
-msgid ""
-"Oh NO! There has been an error or there are no profiles to select for this "
-"account. You might want to add some or disconnect this Google Account using "
-"the button below."
-msgstr ""
-"Oh NU! A avut loc o eroare șau nu este nici un profil de selectat pentru "
-"acest cont. Poți adăuga un profil sau te poți deconecta de la contul curent "
-"de Google folosind butonul de mai jos."
-
-#: resources/views/backend/tabs/overview.blade.php:94
-msgid "Widgets Management"
-msgstr "Configurare Componente"
-
-#: resources/views/backend/tabs/privateConnect.blade.php:13
-msgid "Private Authorization"
-msgstr "Autorizare Privată"
-
-#: resources/views/backend/tabs/privateConnect.blade.php:39
-msgid ""
-"This redirect URL is very important when you are using your own keys. Use "
-"the default Redirect URL in most cases. Make sure to only change it if you "
-"really know what you're doing.<br /><strong>Default:</strong> "
-msgstr ""
-"URL-ul de redirecționare este foarte important atunci când folosești cheile "
-"personale. De cele mai multe ori folosirea URL-ului sugerat aici este cea "
-"mai potrivită. Asigură-te că îl schimbi doar dacă ești sigur pe ce faci.<br /"
-"><strong>Recomandat:</strong> "
-
-#: resources/views/backend/tabs/publicConnect.blade.php:13
-msgid ""
-"This authorization method is using the Presslabs public API key to "
-"authenticate you to the Google Analytics API.<br />If you are concerned "
-"about privacy or are having any API related errors using this method, please "
-"use the private method."
-msgstr ""
-"Această metodă de autorizare folosește cheia publică de API a Presslabs "
-"pentru autentificarea in API-ul Google Analytics.<br />Dacă ești îngrijorat "
-"în legătură cu permisiunile aplicației sau întalnești orice fel de erori sau "
-"autorizarea nu funcționează poți încerca oricând metoda de autorizare "
-"Privată."
-
-#: resources/views/backend/tabs/publicConnect.blade.php:19
-msgid ""
-"Clicking the button below will redirect you to the Google Authorization "
-"screen and you will be asked for read access to your Analytics profiles. If "
-"you don't agree with this or you have concerns about privacy, please use the "
-"private method."
-msgstr ""
-"Apăsând pe butonul de mai jos, vei fi redirecționat la ecranul de Autorizare "
-"Google și ți se va cere access de citire pentru profilele tale Analytics. "
-"Dacă nu ești de acord cu această permisiune care este necesară, poți folosi "
-"aplicația prin autentificarea Privată, folosind aplicația proprie de Google."
-
-#: resources/views/frontend/widget.blade.php:115
-msgid " Views"
-msgstr "Afișări"
 
 #: components/Activator.php:110 components/Activator.php:111
 #: components/Activator.php:112 components/Backend.php:836
@@ -232,7 +76,11 @@ msgid ""
 "Enables and disables the default WP REST API endpoint. The endpoint is: "
 msgstr ""
 "Activează și dezactivează WP REST API, ce este folosit implicit. Endpoint-ul "
-"folosit este:"
+"folosit este: "
+
+#: components/Backend.php:294
+msgid " Default: Enabled"
+msgstr " Implicit: Activată"
 
 #: components/Backend.php:301
 msgid "Enable custom JSON endpoint"
@@ -245,6 +93,10 @@ msgid ""
 msgstr ""
 "Activează un endpoint personalizat. Acesta este folosit în special pentru "
 "compatibilitatea cu versiunile anterioare. Endpoint-ul este:"
+
+#: components/Backend.php:307
+msgid " Default: Disabled"
+msgstr " Implicit: Dezactivată"
 
 #: components/Backend.php:314
 msgid "Json Endpoint Path"
@@ -402,16 +254,6 @@ msgid "Skip Local Post Discovery"
 msgstr "Ignorați informațiile locale ale articolelor"
 
 #: components/Backend.php:497
-#, fuzzy
-#| msgid ""
-#| " Take care! As the Analytics API only returns the permalink and "
-#| "pageviews, local post discovery searches the database for more post "
-#| "related information, such as post type. If you enable this option, we'll "
-#| "try to generate a human readable title from your post URLs, which will "
-#| "work only if you're using pretty permalinks. Checking this option affects "
-#| "the settings below and limits the amount of data you have available in "
-#| "the JSON output. After you change this setting, you will also need to re-"
-#| "fetch from Google the data. Default: Disabled"
 msgid ""
 " Take care! As the Analytics API only returns the permalink and pageviews, "
 "local post discovery searches the database for more post related "
@@ -422,7 +264,7 @@ msgid ""
 "After you change this setting, you will also need to re-fetch from Google "
 "the data. Default: Disabled"
 msgstr ""
-" Atenție! Deoarece API-ul Analytics returnează doar un permalink și numărul "
+"Atenție! Deoarece API-ul Analytics returnează doar un permalink și numărul "
 "vizualizărilor, se caută în baza de date alte informații legate de postări, "
 "cum ar fi tipul postării. Dacă activezi această opțiune, Toplytics va "
 "încerca să genereze un titlu din URL-ul articolelor, ceea ce va fi posibil "
@@ -501,8 +343,6 @@ msgid "Google sent an error. Authorization faild. Error code: "
 msgstr "Google a răspuns cu o eroare. Autorizarea a eșuat. Cod de eroare:"
 
 #: components/Backend.php:1176
-#, fuzzy
-#| msgid "We got your google code. Now select a profile to start."
 msgid "We got your Google code. Now select a profile to start."
 msgstr ""
 "Am primit codul tău de autentificare. Acum alege un profil pentru a începe."
@@ -538,7 +378,7 @@ msgstr "Ai nevoie de ajutor? Serviciul nostru de suport îți stă la dispoziți
 #: components/Shortcode.php:74
 #, php-format
 msgid "%d Views"
-msgstr ""
+msgstr "%d Vizualizări"
 
 #: components/Widget.php:39
 msgid "The most popular posts on your site from Google Analytics"
@@ -552,20 +392,233 @@ msgstr "Afișează numărul de vizualizări"
 msgid "Load via Javascript AJAX"
 msgstr "Încarcă via Javascript AJAX"
 
-#~ msgid "Clean-up Auth Config"
-#~ msgstr "Curăță fișierul de configurare a autentificării"
+#: resources/views/backend/authorization.blade.php:43
+msgid "Clean-up Auth Config"
+msgstr "Curăță fișierul de configurare a autentificării"
+
+#: resources/views/backend/tabs/overview.blade.php:94
+msgid "Widgets Management"
+msgstr "Configurare Componente"
+
+#: resources/views/backend/tabs/overview.blade.php:95
+msgid "Update Top"
+msgstr "Actualizează Topul"
+
+#: resources/views/backend/tabs/overview.blade.php:96
+msgid "Switch Analytics Profile"
+msgstr "Schimbă Profilul de Analytics"
+
+#: resources/views/backend/tabs/overview.blade.php:98
+#: resources/views/backend/tabs/profile.blade.php:55
+msgid "Select Profile"
+msgstr "Alege Profilul"
+
+#: resources/views/backend/tabs/overview.blade.php:103
+#: resources/views/backend/tabs/profile.blade.php:60
+msgid "Disconnect Google Account"
+msgstr "Deconectează contul Google"
+
+#: resources/views/backend/tabs/privateConnect.blade.php:25
+msgid "This is where your Client ID is going."
+msgstr "Aici trebuie să introduci ID Client primit de la Google."
+
+#: resources/views/backend/tabs/privateConnect.blade.php:31
+msgid "This is where your Client Secret is going."
+msgstr "Aici trebuie sa introduci Secretul de Client primit de la Google."
+
+#: resources/views/backend/tabs/privateConnect.blade.php:37
+msgid "This is where your Redirect URL is going."
+msgstr "Aici trebuie să introduci URLul tău pentru redirecționare."
+
+#: resources/views/backend/tabs/privateConnect.blade.php:45
+msgid "Private Authorize"
+msgstr "Authentifică-te Privat"
+
+#: resources/views/backend/tabs/publicConnect.blade.php:21
+msgid "Log in with your Google Account via Presslabs.org"
+msgstr "Autentifică-te cu contul tău Google via Presslabs.org"
+
+#: resources/views/backend/authorization.blade.php:12
+msgid "Google Account Authorization"
+msgstr "Autorizare Cont Google"
+
+#: resources/views/backend/authorization.blade.php:20
+#: resources/views/backend/tabs/publicConnect.blade.php:12
+msgid "Public Authorization"
+msgstr "Autorizare Publică"
+
+#: resources/views/backend/authorization.blade.php:26
+msgid "Private Authorization (Advanced)"
+msgstr "Autorizare Privată (Avansat)"
+
+#: resources/views/backend/authorization.blade.php:41
+msgid ""
+"We have detected a misconfiguration in your Google authorization settings. "
+"If you encounter any issues when you authorize via Google, please use the "
+"button below to clean up the settings."
+msgstr ""
+"Am detectat o configurare greșită în setările tale de autorizare Google. "
+"Dacă întâmpini orice probleme legate de atorizarea via Google, folosește "
+"acest buton pentru a reseta setările."
+
+#: resources/views/backend/layout.blade.php:18
+#: resources/views/backend/settings.blade.php:29
+msgid "Settings"
+msgstr "Setări"
+
+#: resources/views/backend/settings.blade.php:14
+msgid "Settings & Overview"
+msgstr "Setări & Prezentare Generală"
+
+#: resources/views/backend/settings.blade.php:23
+msgid "Overview"
+msgstr "Prezentare Generală"
+
+#: resources/views/backend/settings.blade.php:35
+msgid "Profile"
+msgstr "Profil"
+
+#: resources/views/backend/tabs/overview.blade.php:34
+msgid "User profile info"
+msgstr "Informațiile de profil ale utilizatorului"
+
+#: resources/views/backend/tabs/overview.blade.php:35
+msgid ""
+"Below is the information regarding your connection and selected profile, as "
+"well as quick button controls to change them."
+msgstr ""
+"Mai jos sunt afișate informațiile legate de conexiune și profil selectat, "
+"precum și butoane pentru a le modifica."
+
+#: resources/views/backend/tabs/overview.blade.php:41
+msgid "Connection Information"
+msgstr "Informații de conectare"
+
+#: resources/views/backend/tabs/overview.blade.php:45
+msgid ""
+"<span>You are using the <strong>Private</strong> Authorization method. Good "
+"choise.</span>"
+msgstr ""
+"<span>Folosești metoda de autorizare <strong>privată</strong>. Bună alegere."
+"</span>"
+
+#: resources/views/backend/tabs/overview.blade.php:47
+msgid "<span>You are using the Presslabs public authorization method.</span>"
+msgstr "<span>Folosești aplicația publică de autentificare a Presslabs.</span>"
+
+#: resources/views/backend/tabs/overview.blade.php:53
+msgid "Active Profile"
+msgstr "Profilul Activ"
+
+#: resources/views/backend/tabs/overview.blade.php:59
+msgid "Last Data Update"
+msgstr "Ultima actualizare a datelor"
+
+#: resources/views/backend/tabs/overview.blade.php:65
+msgid "Fetched from Google"
+msgstr "Actualizat din Google"
+
+#: resources/views/backend/tabs/overview.blade.php:73
+#: resources/views/backend/tabs/profile.blade.php:34
+msgid "User profile selection"
+msgstr "Selectarea profilului de utilizator"
+
+#: resources/views/backend/tabs/overview.blade.php:74
+#: resources/views/backend/tabs/profile.blade.php:35
+msgid "Select from the list of profiles the one you wish to use for this site."
+msgstr ""
+"Alege din lista de profile pe cel pe care vrei să-l folosești pentru acest "
+"site."
+
+#: resources/views/backend/tabs/overview.blade.php:78
+#: resources/views/backend/tabs/profile.blade.php:39
+msgid "Profile Select"
+msgstr "Selectarea Profilului"
+
+#: resources/views/backend/tabs/overview.blade.php:87
+#: resources/views/backend/tabs/profile.blade.php:48
+msgid ""
+"Oh NO! There has been an error or there are no profiles to select for this "
+"account. You might want to add some or disconnect this Google Account using "
+"the button below."
+msgstr ""
+"Oh NU! A avut loc o eroare șau nu este nici un profil de selectat pentru "
+"acest cont. Poți adăuga un profil sau te poți deconecta de la contul curent "
+"de Google folosind butonul de mai jos."
+
+#: resources/views/backend/tabs/privateConnect.blade.php:13
+msgid "Private Authorization"
+msgstr "Autorizare Privată"
+
+#: resources/views/backend/tabs/privateConnect.blade.php:14
+msgid ""
+"The private authorization is the recommended way for connecting to your "
+"Google account, even if it is a bit more difficult and cumbersome. <br />It "
+"offers you complete control over the connection by using your very own API "
+"keys and application for granting access."
+msgstr ""
+"Metoda de Autorizare Privată este ce-a mai recomandată pentru conectarea la "
+"contul tău de Google Analytics, chiar dacă este mai dificil de realizat.<br /"
+">Aceasta îți oferă controlul complet asupra conexiunii prin folosirea "
+"propriilor chei de API pentru permiterea accesului la date."
+
+#: resources/views/backend/tabs/privateConnect.blade.php:23
+msgid "Client ID"
+msgstr "ID Client"
+
+#: resources/views/backend/tabs/privateConnect.blade.php:29
+msgid "Client Secret"
+msgstr "Secret Client"
+
+#: resources/views/backend/tabs/privateConnect.blade.php:35
+msgid "Redirect URL"
+msgstr "URL pentru Redirecționare"
+
+#: resources/views/backend/tabs/privateConnect.blade.php:39
+msgid ""
+"This redirect URL is very important when you are using your own keys. Use "
+"the default Redirect URL in most cases. Make sure to only change it if you "
+"really know what you're doing.<br /><strong>Default:</strong> "
+msgstr ""
+"URL-ul de redirecționare este foarte important atunci când folosești cheile "
+"personale. De cele mai multe ori folosirea URL-ului sugerat aici este cea "
+"mai potrivită. Asigură-te că îl schimbi doar dacă ești sigur pe ce faci.<br /"
+"><strong>Recomandat:</strong> "
+
+#: resources/views/backend/tabs/publicConnect.blade.php:13
+msgid ""
+"This authorization method is using the Presslabs public API key to "
+"authenticate you to the Google Analytics API.<br />If you are concerned "
+"about privacy or are having any API related errors using this method, please "
+"use the private method."
+msgstr ""
+"Această metodă de autorizare folosește cheia publică de API a Presslabs "
+"pentru autentificarea in API-ul Google Analytics.<br />Dacă ești îngrijorat "
+"în legătură cu permisiunile aplicației sau întalnești orice fel de erori sau "
+"autorizarea nu funcționează poți încerca oricând metoda de autorizare "
+"Privată."
+
+#: resources/views/backend/tabs/publicConnect.blade.php:19
+msgid ""
+"Clicking the button below will redirect you to the Google Authorization "
+"screen and you will be asked for read access to your Analytics profiles. If "
+"you don't agree with this or you have concerns about privacy, please use the "
+"private method."
+msgstr ""
+"Apăsând pe butonul de mai jos, vei fi redirecționat la ecranul de Autorizare "
+"Google și ți se va cere access de citire pentru profilele tale Analytics. "
+"Dacă nu ești de acord cu această permisiune care este necesară, poți folosi "
+"aplicația prin autentificarea Privată, folosind aplicația proprie de Google."
+
+#: resources/views/frontend/widget.blade.php:115
+msgid " Views"
+msgstr "Afișări"
 
 #~ msgid "Update Now"
 #~ msgstr "Actualizează topul"
 
-#~ msgid "Disconnect Google Account"
-#~ msgstr "Deconectează contul Google"
-
-#~ msgid "Private Authorize"
-#~ msgstr "Authentifică-te Privat"
-
-#~ msgid "Log in with your Google Account via Presslabs.org"
-#~ msgstr "Autentifică-te cu contul tău Google via Presslabs.org"
+#~ msgid "Switch Profile"
+#~ msgstr "Schimbă Profilul"
 
 #~ msgid "Fetch realtime data"
 #~ msgstr "Actualizează datele în timp real"

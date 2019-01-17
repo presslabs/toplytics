@@ -291,7 +291,7 @@ class Backend
             'toplytics_settings',
             [
                 'id' => 'enable_rest_endpoint',
-                'tooltip' => __('Enables and disables the default WP REST API endpoint. The endpoint is: ' . esc_url(get_rest_url(null, '/toplytics/results')) . ' Default: Enabled', TOPLYTICS_DOMAIN),
+                'tooltip' => __('Enables and disables the default WP REST API endpoint. The endpoint is: ', TOPLYTICS_DOMAIN) . esc_url(get_rest_url(null, '/toplytics/results')) . __(' Default: Enabled', TOPLYTICS_DOMAIN),
             ]
         );
 
@@ -304,7 +304,7 @@ class Backend
             'toplytics_settings',
             [
                 'id' => 'enable_json',
-                'tooltip' => __('Enables and disables the JSON output on a custom endpoint. Use the WP REST API endpoint for common tasks. The endpoint is: ' . esc_url(home_url('/' . $this->settings['json_path'])) . ' Default: Disabled', TOPLYTICS_DOMAIN),
+                'tooltip' => __('Enables and disables the JSON output on a custom endpoint. Use the WP REST API endpoint for common tasks. The endpoint is: ', TOPLYTICS_DOMAIN) . esc_url(home_url('/' . $this->settings['json_path'])) . __(' Default: Disabled', TOPLYTICS_DOMAIN),
             ]
         );
 
@@ -494,7 +494,7 @@ class Backend
             'toplytics_settings',
             [
                 'id' => 'skip_local_post_discovery',
-                'tooltip' => __(' Take care! As the Analytics API only returns the permalink and pageviews, local post discovery searches the database for more post related information, such as post type. If you enable this option, we\'ll try to generate a human readable title from your post URLs, which will work only if you\'re using pretty permalinks. Checking this option affects the settings above and limits the amount of data you have available in the JSON output. After you change this setting, you will also need to re-fetch from Google the data. Default: Disabled', TOPLYTICS_DOMAIN),
+                'tooltip' => __(" Take care! As the Analytics API only returns the permalink and pageviews, local post discovery searches the database for more post related information, such as post type. If you enable this option, we'll try to generate a human readable title from your post URLs, which will work only if you're using pretty permalinks. Checking this option affects the settings above and limits the amount of data you have available in the JSON output. After you change this setting, you will also need to re-fetch from Google the data. Default: Disabled", TOPLYTICS_DOMAIN),
             ]
         );
 
@@ -510,7 +510,7 @@ class Backend
                 'option' => 'toplytics_settings',
                 'input' => 'text',
                 'disabled' => !$this->checkSetting('skip_local_post_discovery'),
-                'tooltip' => __('This works together with local post discovery, since GA will not give us the domain in the URL and we need to build it using this custom domain. Enable "Skip Local Post Discovery" and then this will be enabled. The domain needs to include the protocol, but not the final slash. Default: ' . get_home_url(), TOPLYTICS_DOMAIN),
+                'tooltip' => __('This works together with local post discovery, since GA will not give us the domain in the URL and we need to build it using this custom domain. Enable "Skip Local Post Discovery" and then this will be enabled. The domain needs to include the protocol, but not the final slash. Default: ', TOPLYTICS_DOMAIN) . get_home_url(),
             ]
         );
     }

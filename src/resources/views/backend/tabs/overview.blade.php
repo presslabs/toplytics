@@ -92,8 +92,8 @@ analytics on the last update.
         {{-- We show different submit buttons based on whether the user has chosen a profile or not. --}}
         @if ( isset($profile) && $profile )
             <a href="{!! admin_url('widgets.php') !!}" class="button-primary"><?= __('Widgets Management', TOPLYTICS_DOMAIN) ?></a>&nbsp;&nbsp;
-            <input type="submit" name="ToplyticsSubmitForceUpdate" class="button" value=" <?= __( 'Update Now', TOPLYTICS_DOMAIN ) ?> " />&nbsp;&nbsp;
-            <input type="submit" name="ToplyticsSubmitProfileSwitch" class="button" value=" <?= __( 'Switch Profile', 'toplytics' ) ?> " />
+            <input type="submit" name="ToplyticsSubmitForceUpdate" class="button" value=" <?= __( 'Update Top', TOPLYTICS_DOMAIN ) ?> " />&nbsp;&nbsp;
+            <input type="submit" name="ToplyticsSubmitProfileSwitch" class="button" value=" <?= __( 'Switch Analytics Profile', 'toplytics' ) ?> " />
         @elseif(isset($profiles) && $profiles)
             <input type="submit" name="ToplyticsProfileSelect" class="button-primary" value=" <?= __( 'Select Profile', TOPLYTICS_DOMAIN ) ?> " />
         @endif
