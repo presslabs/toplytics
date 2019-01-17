@@ -11,7 +11,7 @@ get the authorization token for your google login.
 --}}
 
 <h2>{{ __('Private Authorization', TOPLYTICS_DOMAIN) }}</h2>
-<p>The private authorization is the recommended way for connecting to your Google account, even if it's a bit more difficult and cumbersome. <br />It offers you complete control over the connection by using your very own API keys and application for granting access.</p>
+<p>The private authorization is the recommended way for connecting to your Google account, even if it is a bit more difficult and cumbersome. <br />It offers you complete control over the connection by using your very own API keys and application for granting access.</p>
 
 <form action="{{$_SERVER['REQUEST_URI']}}" method="POST">
 
