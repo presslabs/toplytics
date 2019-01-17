@@ -2,7 +2,8 @@ wp-cli.local.yml
 src/storage/
 node_modules/
 composer.phar
-/phpunit.xml
+phpcs.xml
+phpunit.xml
 .DS_Store
 Thumbs.db
 .vscode/
@@ -11,4 +12,3 @@ vendor/
 .idea/
 *.sql
 *.zip
-
