@@ -5,19 +5,17 @@
 # 1. Clone complete SVN repository to separate directory
 svn co $SVN_REPOSITORY ../svn
 
-# 2. Copy git repository contents to SNV trunk/ directory
-cp -R ./* ../svn/trunk/
+# 2. Copy plugin src contents to SNV trunk/ directory
+cp -R ./src/* ../svn/trunk/
 
-# 3. Switch to SVN repository
+# 3. Copy assets/ to SVN /assets/
+cp -R ./assets/ ../svn/assets/
+
+# 4. Switch to SVN repository
 cd ../svn/trunk/
 
-# 4. Move assets/ to SVN /assets/
-mv ./assets/ ../assets/
-
 # 5. Clean up unnecessary files
-rm -rf .git/
-rm -rf bin/
-rm .travis.yml
+# Nothing to clean for now
 
 # 6. Go to SVN repository root
 cd ../
