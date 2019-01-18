@@ -1,4 +1,4 @@
-# Welcome to Toplytics [![Build Status](https://travis-ci.org/PressLabs/toplytics.svg)](https://travis-ci.org/PressLabs/toplytics) [![Coverage](https://codeclimate.com/github/PressLabs/toplytics/coverage.png)](https://codeclimate.com/github/PressLabs/toplytics) [![Code Climate](https://codeclimate.com/github/PressLabs/toplytics.png)](https://codeclimate.com/github/PressLabs/toplytics)
+# Welcome to Toplytics [![Build Status](https://travis-ci.org/PressLabs/toplytics.svg)](https://travis-ci.org/PressLabs/toplytics)
 
 
 ### About the makers
