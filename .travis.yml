@@ -50,7 +50,7 @@ before_script:
       composer global require wp-coding-standards/wpcs
       phpcs --config-set installed_paths $HOME/.composer/vendor/wp-coding-standards/wpcs
     fi
-  - composer install -qno --prefer-dist --no-dev -d "./src/"
+  - composer install -no --prefer-dist --no-dev -d "./src/"
 
 script:
   - |
