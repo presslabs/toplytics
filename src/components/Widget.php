@@ -123,7 +123,7 @@ class Widget extends \WP_Widget
                 'before_title' => $before_title,
                 'title' => $title,
                 'after_title' => $after_title,
-                'json_url' => $this->frontend->checkSetting('enable_rest_endpoint') ? esc_url(get_rest_url(null, '/toplytics/results')) : (($this->frontend->checkSetting('enable_json') && $this->checkSetting('json_path')) ? esc_url(home_url('/' . $this->settings['json_path'])) : ''),
+                'json_url' => $this->frontend->checkSetting('enable_rest_endpoint') ? esc_url(get_rest_url(null, '/toplytics/results')) : (($this->frontend->checkSetting('enable_json') && $this->frontend->checkSetting('json_path')) ? esc_url(home_url('/' . $this->settings['json_path'])) : ''),
             );
 
             $this->realtimeScriptArgs($toplytics_args);
