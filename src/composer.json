@@ -18,6 +18,7 @@
         "php": "~7.0",
         "google/apiclient": "^2.0",
         "illuminate/view": "5.4.*",
+        "doctrine/inflector": "1.1.*",
         "jenssegers/blade": "^1.1"
     },
     "autoload": {
