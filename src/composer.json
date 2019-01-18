@@ -1,8 +1,8 @@
 {
-	"name": "presslabs/toplytics",
-	"description": "Display top posts in a widget without putting any pressure on your host and database. This plugin helps you achieve this using the Google Analytics API to get the data from there so your server will stay clear of the preasure of monitoring and counting every single page view to display top posts.",
+    "name": "presslabs/toplytics",
+    "description": "Display top posts in a widget without putting any pressure on your host and database. This plugin helps you achieve this using the Google Analytics API to get the data from there so your server will stay clear of the preasure of monitoring and counting every single page view to display top posts.",
     "keywords": ["wordpress", "analytics", "top posts"],
-	"license": "GPL-2.0+",
+    "license": "GPL-2.0+",
     "homepage": "https://presslabs.org",
     "support": {
         "issues": "https://github.com/PressLabs/toplytics/issues",
@@ -17,9 +17,10 @@
     "require": {
         "php": "~7.0",
         "google/apiclient": "^2.0",
-		"jenssegers/blade": "^1.1"
+        "illuminate/view": "5.5.*",
+        "jenssegers/blade": "^1.1"
     },
-	"autoload": {
+    "autoload": {
         "psr-4": {"Toplytics\\": "components"}
     },
     "minimum-stability": "dev",
