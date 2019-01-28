@@ -49,6 +49,14 @@ class Window
         $this->blade = new Blade($this->viewsFolder, $this->cacheFolder);
     }
 
+    public function checkTransientMessage($transientName = 'toplyticsMessage')
+    {
+        if( get_transient( $transientName ) ) {
+            $this->notifyAdmins('success', get_transient( $transientName ), false, '', true);
+            delete_transient( $transientName );
+        }
+    }
+
     /**
      * Simple getter to get the current views folder location
      *
@@ -82,6 +90,9 @@ class Window
         if ($checkQueryMessage) {
             $this->displayQueryMessage();
         }
+
+        // We check for any message inside transients to be displayed.
+        $this->checkTransientMessage();
 
         // This functionality is not yet in use and might
         // be dropped in a future version.
@@ -162,7 +173,7 @@ class Window
                 $tabs .= "<a class='nav-tab$class' href='?page=theme-settings&tab=$tab'>$name</a>";
             }
         }
-        
+
         return $this;
     }
 
@@ -238,20 +249,20 @@ class Window
             wp_safe_redirect(admin_url());
             die();
         }
-        
+
         if (filter_var($message, FILTER_VALIDATE_URL)) {
             wp_safe_redirect(add_query_arg($args, $message));
             die();
         }
-        
+
         $message_id = substr(
             md5(str_shuffle('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789') . time()),
             0,
             8
         );
-    
+
         set_transient('message_' . $message_id, $message, 900);
-        
+
         $url = add_query_arg(
             array_merge([
                 'message' => $message_id,
@@ -259,7 +270,7 @@ class Window
             ], $args),
             $this->getSettingsLink()
         );
-        
+
         wp_safe_redirect($url);
         die();
     }
@@ -270,7 +281,7 @@ class Window
      */
     public function successRedirect($message = '')
     {
-        
+
         $this->redirect($message, 'success');
     }
 
@@ -280,7 +291,7 @@ class Window
      */
     public function errorRedirect($message = '')
     {
-        
+
         $this->redirect($message, 'error');
     }
 

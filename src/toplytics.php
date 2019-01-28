@@ -44,6 +44,14 @@ define('TOPLYTICS_WIDGET_TEMPLATE_VERSION', '1109f5d1bd032ee5088dfe771e78d08d');
 define('TOPLYTICS_FOLDER_ROOT', plugin_dir_path(__FILE__));
 
 /**
+ * We use the following 2 constants to show upgrade messaged after the upgrade is
+ * already performed to the end user. This version needs to be the same with the Toplytics
+ * version for the message to appear. We don't want this to show up for minor hotfixes.
+ */
+define('TOPLYTICS_UPDATE_NOTICE_VERSION', '4.0.0');
+define('TOPLYTICS_UPDATE_NOTICE_MESSAGE', 'Welcome to Toplytics v4. This is a major upgrade. Please test this on development instance, update your template files and read our docs and FAQ here: https://www.presslabs.com/code/toplytics/how-to-use-toplytics/');
+
+/**
  * We load the composer dependencies at this stage and the
  * PSR4 autoloading functionality for the components folder.
  */

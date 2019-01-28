@@ -137,11 +137,14 @@ class Engine
         $this->loader->addAction('admin_init', $plugin_admin, 'initSettings');
         $this->loader->addAction('admin_init', $plugin_admin, 'forceUpdate');
         $this->loader->addAction('admin_init', $plugin_admin, 'cleanDirtyAuth');
-        
+
         $this->loader->addAction('admin_menu', $plugin_admin, 'registerPluginSettingsPage');
 
         $this->loader->addFilter('plugin_action_links_' . $this->plugin_basename, $plugin_admin, 'pluginActionLinks');
         $this->loader->addAction('plugin_row_meta', $plugin_admin, 'extraRowMeta', 10, 2);
+
+        $this->loader->addAction('in_plugin_update_message-toplytics/toplytics.php', $plugin_admin, 'pluginUpgradeNotice', 10, 2);
+        $this->loader->addAction('upgrader_process_complete', $plugin_admin, 'pluginUpgradeComplete', 10, 2);
 
         $this->backend = $plugin_admin;
     }
