@@ -16,7 +16,7 @@ This plugin was developed by the crafty people at Presslabs—the Smart Managed 
 We built this plugin in 2013 to provide a less resource consuming alternative to help our clients that wanted to display a list with the most popular articles on their websites.
 
 == What is Toplytics? ==
-This plugin displays the most visited posts as a widget, using data extracted from Google Analytics. Toplytics is designed to work with high-traffic sites and all types of caching. 
+This plugin displays the most visited posts as a widget, using data extracted from Google Analytics. Toplytics is designed to work with high-traffic sites and all types of caching.
 
 == Why Toplytics? ==
 You can use this plugin if you want to display the most visited posts of your site in a safe and reliable manner, with no risk of downtime or slowness. The plugin is built for high-traffic sites where counting every visitor’s click loads up the DB and presents the potential of crashing the site. Of course, you need an active Google Analytics setup on your site to use this plugin.
@@ -36,11 +36,11 @@ You can use this plugin if you want to display the most visited posts of your si
 == Receiving is nicer when giving ==
 We’ve built Toplytics to make our lives easier and we’re happy to do that for other developers and site owners, too. We’d really appreciate it if you could contribute with code, tests, documentation or just share your experience with Toplytics.
 
-Development of Toplytics happens at http://github.com/PressLabs/toplytics 
-Issues are tracked at http://github.com/PressLabs/toplytics/issues 
-This WordPress plugin can be found at https://wordpress.org/plugins/toplytics/  
+Development of Toplytics happens at http://github.com/PressLabs/toplytics
+Issues are tracked at http://github.com/PressLabs/toplytics/issues
+This WordPress plugin can be found at https://wordpress.org/plugins/toplytics/
 
-For more details about Toplytics, head here: http://docs.presslabs.com/toplytics/usage/  
+For more details about Toplytics, head here: http://docs.presslabs.com/toplytics/usage/
 
 == Installation ==
 1. Upload *toplytics.zip* to the */wp-content/plugins/* directory;
@@ -90,9 +90,9 @@ You should use this plugin if you want to display the most visited posts of your
 The data from GA is refreshed every hour. During this interval, the information is safely stored using transients and options.
 
 = How to use the custom template? =
-To use a custom template you need to create a file named custom.blade.php in /wp-content/plugins/toplytics/resources/views/frontend. You can simply copy the widget.blade.php file found here and rename it custom.blade.php. You can then customize your template.
+To use a custom template you just need to copy the file `toplytics-template.php` from Toplytics' plugin folder to your theme folder.
 
-Toplytics will look for the custom.blade.php file if it exists at the before mentioned path, then for the file toplytics-template.php in the active theme folder (this is to ensure backwards compatibility) and last but not least for the widget.blade.php file found at /wp-content/plugins/toplytics/resources/views/frontend.
+You can then customize your template. The plugin will first search for the file `toplytics-template.php` in the active theme folder, and, if that's not found, it will search for it in the plugin folder. The custom template from the theme folder has priority over the one in the plugin folder.
 
 = How can I use the shortcode? =
 The shortcode has 3 parameters: period -> default=month (today/week/month), numberposts -> default=5 (min=1/max=250), showviews -> default=false (true/false)
@@ -243,10 +243,12 @@ If the site domain is `http://www.example.com/` then the file url is `http://www
 == Changelog ==
 
 = 4.0 =
-Complete rewrite of the plugin for better code management and better maintenability.
-- Improved code structure;
-- Added tests;
-- More bug fixes;
+**Upgrade Notification**: Please TEST this new version of Toplytics on your development site before upgrading! You might need to update your custom template file or change some settings inside the new settings page.
+
+This version is a complete rewrite of the plugin for better code management and better maintenability.
+
+Please read our FAQ: https://www.presslabs.com/code/toplytics/how-to-use-toplytics/
+You can see a list of fixed issues that came with this complete rewrite here: https://github.com/presslabs/toplytics/pull/128
 
 = 3.2 =
 Simplify the auth process using our own API keys.
@@ -340,6 +342,9 @@ action:
 * First version on WP.
 
 == Upgrade Notice ==
+
+= 4.0 =
+This is a complete plugin rewrite. The entire plugin is now OOP and we're using the official Google API together with a new templating engine. There are a lot of changes that can affect backward compatibility. We've strived make it work with old custom templates as well, yet it is highly recommanded for you to switch to the new one. Please read the documentation to get a better idea of how everything works here: https://www.presslabs.com/code/toplytics/installation/ and our FAQ available here: https://www.presslabs.com/code/toplytics/how-to-use-toplytics/
 
 = 3.0 =
 Starting with version 3.0, Toplytics uses Google Analytics API v3.0. This is a major update and you need to re-authenticate with Google Analytics for the plugin to work!

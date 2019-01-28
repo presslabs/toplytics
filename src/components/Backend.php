@@ -120,6 +120,28 @@ class Backend
         );
     }
 
+    public function pluginUpgradeNotice($data, $response ) {
+        if( isset( $data['upgrade_notice'] ) ) {
+            printf(
+                '<div class="update-message">%s</div>',
+                wpautop( $data['upgrade_notice'] )
+            );
+        }
+    }
+
+    public function pluginUpgradeComplete( $upgraderObject, $options ) {
+        // If an update has taken place and the updated type is plugins and the plugins element exists
+        if( $options['action'] == 'update' && $options['type'] == 'plugin' && isset( $options['plugins'] ) ) {
+            // Iterate through the plugins being updated and check if ours is there
+            foreach( $options['plugins'] as $plugin ) {
+                if( $plugin == $this->plugin_basename && version_compare(TOPLYTICS_VERSION, TOPLYTICS_UPDATE_NOTICE_VERSION, '==')) {
+                    // Set a transient to record that our plugin has just been updated
+                    set_transient( 'toplyticsMessage', TOPLYTICS_UPDATE_NOTICE_MESSAGE );
+                }
+            }
+        }
+    }
+
     /**
      * This function is responsible for initializing the Google
      * Client and authorizing us with the credentials we used.
