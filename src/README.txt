@@ -10,13 +10,12 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 Displays the most visited posts as a widget using data from Google Analytics. Designed to be used under high-traffic or low server resources.
 
-For more details check the official Toplytics documentation on https://www.presslabs.com/code/toplytics/.
+For more details check the [official Toplytics documentation](https://www.presslabs.com/code/toplytics/).
 
 == About the makers ==
 This plugin was developed by the crafty people at Presslabs—the Smart Managed WordPress Hosting Platform. Here we bring high-performance hosting and business intelligence for WordPress sites. In our spare time, we contribute to the global open-source community with our plugins.
 
 We built this plugin in 2013 to provide a less resource consuming alternative to help our clients that wanted to display a list with the most popular articles on their websites.
-Find out more on https://www.presslabs.com/code/toplytics/.
 
 == What is Toplytics? ==
 This plugin displays the most visited posts as a widget, using data extracted from Google Analytics. Toplytics is designed to work with high-traffic sites and all types of caching.
@@ -39,11 +38,9 @@ You can use this plugin if you want to display the most visited posts of your si
 == Receiving is nicer when giving ==
 We’ve built Toplytics to make our lives easier and we’re happy to do that for other developers and site owners, too. We’d really appreciate it if you could contribute with code, tests, documentation or just share your experience with Toplytics.
 
-Development of Toplytics happens at http://github.com/PressLabs/toplytics
-Issues are tracked at http://github.com/PressLabs/toplytics/issues
-This WordPress plugin can be found at https://wordpress.org/plugins/toplytics/
-
-For more details about Toplytics, head here: http://docs.presslabs.com/toplytics/usage/
+Development of Toplytics happens at [github.com/PressLabs/toplytics](http://github.com/PressLabs/toplytics).
+Issues are tracked at [github.com/PressLabs/toplytics/issues](http://github.com/PressLabs/toplytics/issues).
+This WordPress plugin can be found at [wordpress.org/plugins/toplytics/](https://wordpress.org/plugins/toplytics/).
 
 == Installation ==
 1. Upload *toplytics.zip* to the */wp-content/plugins/* directory;
@@ -52,7 +49,7 @@ For more details about Toplytics, head here: http://docs.presslabs.com/toplytics
 
 Alternatively, go into your WordPress dashboard and click on *Plugins -> Add Plugin* and search for Toplytics. Then click on *Install*, then on *Activate Now*.
 
-We offer two possibilities to use Toplytics: through **Public Authorization** or the **Private Authorization**, for more configuration details check https://www.presslabs.com/code/toplytics/installation/.
+We offer two possibilities to use Toplytics: through **Public Authorization** or the **Private Authorization**, for more configuration details check [Toplytics installation](https://www.presslabs.com/code/toplytics/installation/).
 
 The **Public Authorization** method is using the Presslabs public API key to authenticate you to the Google Analytics API, and you don't have to set up your own API keys. To use this method, simply press the **Log in with your Google Account via Presslabs.org** button and you will be redirected to the Google Authorization screen where you will be asked for read access to your analytics profiles.
 
