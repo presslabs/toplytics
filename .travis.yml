@@ -55,6 +55,7 @@ script:
 deploy:
   # Use script as a deployment tool
   provider: script
+  skip_cleanup: true
   script: deploy/deploy.sh
   # Restrict deployment only for tags
   on:
