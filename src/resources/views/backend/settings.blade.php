@@ -39,15 +39,11 @@ There is no data passed directly to this template.
 
     @if ( isset($profile) && $profile )
         @if (isset($_GET['tab'] ))
-            @switch($_GET['tab'])
-                @case('overview')
-                    @include('backend.tabs.overview')
-                    @break
-                @case('settings')
-                    @include('backend.tabs.settings')
-                    @break
-                @default
-            @endswitch
+            @if ($_GET['tab'] == 'overview')
+                @include('backend.tabs.overview')
+            @elseif ($_GET['tab'] == 'settings')
+                @include('backend.tabs.settings')
+            @endif
         @else
             @include('backend.tabs.overview')
         @endif
