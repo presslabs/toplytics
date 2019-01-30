@@ -159,9 +159,91 @@ Toplytics fetches from Analytics the number of posts, pages and other post types
 
 However, you may encounter the following situation. Your most viewed content is your pages, and you only fetch 10 "posts" from Google Analytics. By default, Toplytics displays the most viewed posts (articles), but if the results fetched were all pages, it will have nothing to show. In this case, you can set up a higher number of "posts" to be fetched (the default is 20).
 
-== Screenshots ==
+= How can I use the plugin functionality outside the sidebar? =
 
-1. Output of the top most visited posts from last month.
+The plugin offers 2 functions that can be used either in the theme or by another plugin. Please review the complete documentation below.
+
+**1.** `toplytics_results`
+
+**Description**
+
+`mixed toplytics_results( [ array $args ] )`
+
+toplytics_results() prints the toplytics results in `<ol>` format.
+
+**Parameters**
+
+args -> This parameter is a list of toplytics options:
+		period      - represents the statistics period, default=month (today/week/month);
+		numberposts - represents the number of posts to be displayed, default=5 (min=1/max=250);
+		showviews   - set this parameter to true if you want to print out the number of posts views, default=false (true/false);
+
+**Return Values**
+
+If the toplytics results will be printed, then the function returns TRUE, otherwise the return value is FALSE.
+
+**Example**
+
+Here is a simple example that displays the first 7 most visited posts in the past month, toghether with the number of views:
+
+`<?php
+	$toplytics_args = array(
+		'period' => 'month',  // default=month (today/week/month)
+		'numberposts' => 7,   // default=5 (min=1/max=250)
+		'showviews' => true   // default=false (true/false)
+	);
+	if ( function_exists( 'toplytics_results' ) )
+		toplytics_results( $toplytics_args );
+?>`
+
+
+**2.** `toplytics_get_results`
+
+**Description**
+
+`mixed toplytics_get_results( [ array $args ] )`
+
+toplytics_get_results() returns the toplytics results into an array; in this case, the toplytics results' HTML can be formatted according with your needs.
+
+**Parameters**
+
+args -> This parameter is a list of toplytics options:
+		period      - represents the statistics period, default=month (today/week/month);
+		numberposts - represents the number of posts to be displayed, default=5 (min=1/max=250);
+
+**Return Values**
+
+If the toplytics results contains at least one element, the function will return an array with the toplytics results, otherwise the return value is FALSE.
+
+**Example**
+
+`<?php
+	if ( function_exists( 'toplytics_get_results' ) ) {
+		$toplytics_args = array(
+			'period' => 'month',  // default=month (today/week/month)
+			'numberposts' => 3    // default=5 (min=1/max=250)
+		);
+		$toplytics_results = toplytics_get_results( $toplytics_args );
+		if ( $toplytics_results ) {
+			$k = 0;
+			foreach ( $toplytics_results as $post_id => $post_views ) {
+				echo (++$k) . ') <a href="' . get_permalink( $post_id )
+					. '" title="' . esc_attr( get_the_title( $post_id ) ) . '">'
+					. get_the_title( $post_id ) . '</a> - ' . $post_views . ' Views<br />';
+			}
+		}
+	}
+?>`
+
+The outcome will look like this:
+
+1.) This is the most visited post - 123 Views
+
+2.) This is the second most visited post - 99 Views
+
+3.) This is the third most visited post - 12 Views
+
+== Screenshots ==
 
 == Changelog ==
 
