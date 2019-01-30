@@ -10,6 +10,8 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 Displays the most visited posts as a widget using data from Google Analytics. Designed to be used under high-traffic or low server resources.
 
+For more details check the official Toplytics documentation on https://www.presslabs.com/code/toplytics/.
+
 == About the makers ==
 This plugin was developed by the crafty people at Presslabs—the Smart Managed WordPress Hosting Platform. Here we bring high-performance hosting and business intelligence for WordPress sites. In our spare time, we contribute to the global open-source community with our plugins.
 
