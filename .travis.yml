@@ -51,12 +51,14 @@ script:
       WP_MULTISITE=1 phpunit
     fi
 
-# Enable Travis deployment
+# Enable Travis auto-deployment
 deploy:
   # Use script as a deployment tool
   provider: script
   skip_cleanup: true
-  script: deploy/deploy.sh
-  # Restrict deployment only for tags
+  script: sh $TRAVIS_BUILD/deploy/deploy.sh
+  # Restrict deployment to single build and repo and only on new tags
   on:
+    php: 7.3
     tags: true
+    repo: presslabs/toplytics
