@@ -30,6 +30,9 @@ matrix:
     - php: 7.1
       stage: "Test"
       env: WP_VERSION=latest
+    - php: 7.1
+      stage: "Test"
+      env: WP_VERSION=trunk
     - php: 7.0
       stage: "Test"
       env: WP_VERSION=latest
@@ -43,7 +46,11 @@ matrix:
           tags: true
           repo: presslabs/toplytics
   allow_failures:
+    - php: 7.3
+      stage: "Test"
+      env: WP_VERSION=latest
     - php: 7.1
+      stage: "Test"
       env: WP_VERSION=trunk
 
 before_script:
