@@ -2,9 +2,9 @@
 Contributors: PressLabs
 Donate link: http://www.presslabs.com/
 Tags: presslabs, analytics, posts, top, most visited, most viewed posts, top content, toplytics, popular, google analytics, high traffic, popular posts, oauth, server resources, settings, widget, embed code, javascript, json, json file, simple, post views
-Requires at least: 3.9
-Tested up to: 4.9.5
-Stable tag: 3.1
+Requires at least: 4.7.3
+Tested up to: 5.1
+Stable tag: 4.0.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
