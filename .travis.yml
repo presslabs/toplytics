@@ -15,16 +15,33 @@ cache:
   directories:
     - $HOME/.composer/cache
 
+stages:
+  - name: "Test"
+  - name: "Deploy"
+
 matrix:
   include:
     - php: 7.3
+      stage: "Test"
       env: WP_VERSION=latest
     - php: 7.2
+      stage: "Test"
       env: WP_VERSION=latest
     - php: 7.1
+      stage: "Test"
       env: WP_VERSION=latest
     - php: 7.0
+      stage: "Test"
       env: WP_VERSION=latest
+    - php: 7.3
+      stage: "Deploy"
+      deploy:
+        provider: script
+        skip_cleanup: true
+        script: bash bin/deploy.sh
+        on:
+          tags: true
+          repo: presslabs/toplytics
   allow_failures:
     - php: 7.1
       env: WP_VERSION=trunk
@@ -52,13 +69,3 @@ script:
     fi
 
 # Enable Travis auto-deployment
-deploy:
-  # Use script as a deployment tool
-  provider: script
-  skip_cleanup: true
-  script: sh $TRAVIS_BUILD/deploy/deploy.sh
-  # Restrict deployment to single build and repo and only on new tags
-  on:
-    php: 7.3
-    tags: true
-    repo: presslabs/toplytics

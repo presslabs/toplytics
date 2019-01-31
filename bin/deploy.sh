@@ -2,28 +2,25 @@
 
 # This is used by Travis CI to deploy automatically to SVN when a new tag is created!
 
-# 1. Clone complete SVN repository to separate directory
+# Clone complete SVN repository to separate directory
 svn co $SVN_REPOSITORY ../svn
 
-# 2. Copy plugin src contents to SNV trunk/ directory
-cp -R ./src/* ../svn/trunk/
+# Clean-up!
+rm -rf ../svn/trunk/
+rm -rf ../svn/assets/
+rm -rf ../svn/tags/$TRAVIS_TAG/
 
-# 3. Copy assets/ to SVN /assets/
+# Copy plugin src contents to SNV trunk/ directory
+cp -R ./src/ ../svn/trunk/
 cp -R ./assets/ ../svn/assets/
 
-# 4. Switch to SVN repository
-cd ../svn/trunk/
+# Go to SVN repository root
+cd ../svn/
 
-# 5. Clean up unnecessary files
-# Nothing to clean for now
-
-# 6. Go to SVN repository root
-cd ../
-
-# 7. Create SVN tag
+# Create SVN tag
 svn cp trunk tags/$TRAVIS_TAG
 
-# 8. Push SVN tag
+# Push SVN tag
 svn ci  --message "Release $TRAVIS_TAG" \
         --username $SVN_USERNAME \
         --password $SVN_PASSWORD \
