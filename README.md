@@ -2,9 +2,9 @@
 
 
 ### About the makers
-This plugin was developed by the crafty people at Presslabs—the Smart Managed WordPress Hosting Platform. Here we bring high-performance hosting and business intelligence for WordPress sites. In our spare time, we contribute to the global open-source community with our plugins.
+This plugin was developed by the crafty people at Presslabs—the Smart Managed WordPress Hosting Platform. Here we bring high-performance hosting and business intelligence for WordPress sites. In our spare time, we contribute to the global open-source community with our code.
 
-We built this plugin in 2013 to provide a less resource consuming alternative to help our clients that wanted to display a list with the most popular articles on their websites.
+We built this plugin in 2013 to provide a less resource consuming alternative to help our clients that wanted to display a list with the most popular articles on their websites and avoid counting clicks on the site by writing in the WordPress DB.
 
 ### What is Toplytics?
 This plugin displays the most visited posts as a widget, using data extracted from Google Analytics. Toplytics is designed to work with high-traffic sites and all types of caching. 
@@ -27,8 +27,8 @@ provides a widget displaying the most visited posts as simple links (no styling)
 ### Receiving is nicer when giving
 We’ve built Toplytics to make our lives easier and we’re happy to do that for other developers and site owners, too. We’d really appreciate it if you could contribute with code, tests, documentation or just share your experience with Toplytics.
 
-Development of Toplytics happens at http://github.com/PressLabs/toplytics  
-Issues are tracked at http://github.com/PressLabs/toplytics/issues  
+Development of Toplytics happens at http://github.com/presslabs/toplytics  
+Issues are tracked at http://github.com/presslabs/toplytics/issues  
 This WordPress plugin can be found at https://wordpress.org/plugins/toplytics/  
 
-For more details about Toplytics, head here: https://www.presslabs.org/toplytics/
+For more details about Toplytics, head here: https://www.presslabs.com/code/toplytics/
