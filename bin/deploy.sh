@@ -18,7 +18,8 @@ cp -R ./assets/ ../svn/assets/
 cd ../svn/
 
 # Create SVN tag
-svn cp trunk tags/$TRAVIS_TAG
+mkdir ./tags/$TRAVIS_TAG
+svn cp trunk ./tags/$TRAVIS_TAG
 
 # Push SVN tag
 svn ci  --message "Release $TRAVIS_TAG" \
