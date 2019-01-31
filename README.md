@@ -1,4 +1,4 @@
-# Welcome to Toplytics [![Build Status](https://travis-ci.org/PressLabs/toplytics.svg)](https://travis-ci.org/PressLabs/toplytics)
+# Welcome to Toplytics [![Build Status](https://travis-ci.org/presslabs/toplytics.svg)](https://travis-ci.org/presslabs/toplytics)
 
 
 ### About the makers
