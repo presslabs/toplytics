@@ -41,7 +41,7 @@ matrix:
       deploy:
         provider: script
         skip_cleanup: true
-        script: bash bin/deploy.sh
+        script: bash -x bin/deploy.sh
         on:
           tags: true
           repo: presslabs/toplytics

@@ -1,4 +1,7 @@
-#!/usr/bin/env bash
+#!/bin/bash
+
+# We echo the command line and expand variables for easier debuging...
+set -x
 
 # This is used by Travis CI to deploy automatically to SVN when a new tag is created!
 
