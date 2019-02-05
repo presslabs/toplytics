@@ -1,48 +1,50 @@
 #!/bin/bash
 
+# This is used by Travis CI to deploy automatically to SVN when a new tag is created!
+
 # We echo the command line and expand variables for easier debuging...
 set -x
 
-# This is used by Travis CI to deploy automatically to SVN when a new tag is created!
-
-# Get a sense of where we are for debuging
-pwd
+# We make sure tag doesn't already exists
+TAG=$(svn ls "$SVN_REPOSITORY/tags/$TRAVIS_TAG")
+error=$?
+if [ $error == 0 ]; then
+    # Tag exists, don't deploy
+    echo "Tag already exists for version $TRAVIS_TAG, aborting deployment."
+    exit 1
+fi
 
 # Clone complete SVN repository to separate directory
-svn co $SVN_REPOSITORY ../svn
+svn co -q $SVN_REPOSITORY ../svn
 
 # Clean-up!
 rm -rf ../svn/trunk/
 rm -rf ../svn/assets/
-rm -rf ../svn/tags/$TRAVIS_TAG/
 
 # Recreate directories after clean-up
 mkdir -p ../svn/trunk/
 mkdir -p ../svn/assets/
-mkdir -p ../svn/tags/$TRAVIS_TAG/
 
-echo "Listing svn dir after clean-up."
-ls -la ../svn/
-
-# Copy plugin src contents to SNV trunk/ directory
-cp -r ./src/ ../svn/trunk/
-cp -r ./assets/ ../svn/assets/
+# Copy plugin src and assets to SVN
+rsync -r -p ./src/* ../svn/trunk
+rsync -r -p ./assets/* ../svn/assets
 
 # Go to SVN repository root and list
 cd ../svn/
 
-echo "Listing svn dir after copy of trunk and assets."
-ls -la
-
 # Create SVN tag
-cp -r trunk/ tags/$TRAVIS_TAG/
+mkdir -p tags/$TRAVIS_TAG/
+rsync -r -p ./trunk/* .tags/$TRAVIS_TAG
 
-# Add svn tag
-svn add tags/$TRAVIS_TAG/
-svn status
+# Add svn new files and delete files
+svn stat . | grep '^?' | awk '{print $2}' | xargs -I x svn add x@
+svn stat . | grep '^!' | awk '{print $2}' | xargs -I x svn rm --force x@
+svn stat .
 
-# Push SVN tag
-svn ci  --message "Release $TRAVIS_TAG" \
+# Commit & push SVN tag
+svn ci  --no-auth-cache \
+        --non-interactive \
         --username $SVN_USERNAME \
         --password $SVN_PASSWORD \
-        --non-interactive
+        --message "Release $TRAVIS_TAG" \
+        .
