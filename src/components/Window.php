@@ -2,8 +2,6 @@
 
 namespace Toplytics;
 
-use Jenssegers\Blade\Blade;
-
 /**
  * This class is the window we use to display the end output.
  * From here we generate the HTML structure of all pages that
@@ -20,33 +18,16 @@ use Jenssegers\Blade\Blade;
 class Window
 {
 
-    protected $blade;
-
     private $tabbed = false;
     private $tabs = [];
     private $frame = 'layout';
     private $activeTab = '';
     private $viewsFolder;
-    private $cacheFolder;
 
-    public function __construct($viewsFolder = '', $cacheFolder = '')
+    public function __construct( $viewsFolder = '' )
     {
 
         $this->viewsFolder = $viewsFolder ?: plugin_dir_path(__FILE__) . '../resources/views';
-        $this->cacheFolder = $cacheFolder ?: plugin_dir_path(__FILE__) . '../storage/cache';
-
-        /**
-        * We make sure our cache folder exists for Blade to work correctly.
-        * There is no need to check for the views folder as it is required.
-        */
-        if (!file_exists($this->cacheFolder)) {
-            mkdir($this->cacheFolder, 0777, true);
-        }
-
-        /**
-         * Blade package is responsible for parsing our views.
-         */
-        $this->blade = new Blade($this->viewsFolder, $this->cacheFolder);
     }
 
     public function checkTransientMessage($transientName = 'toplyticsMessage')
@@ -70,56 +51,19 @@ class Window
     }
 
     /**
-     * This function is a wrapper over the blade make function. It
-     * will load your view file and return it's contents.
-     *
-     * @param string $view The view file to load.
-     * @param array $content An array containg the content variables to
-     * be used inside the view files.
-     *
-     * @return string The view file content, parsed and cached.
-     */
-    public function open($view, $content, $echo = false, $checkQueryMessage = true)
-    {
-
-        if ($content && !is_array($content)) {
-            return false;
-        }
-
-        //Checks for any query message and display it if it's present
-        if ($checkQueryMessage) {
-            $this->displayQueryMessage();
-        }
-
-        // We check for any message inside transients to be displayed.
-        $this->checkTransientMessage();
-
-        // This functionality is not yet in use and might
-        // be dropped in a future version.
-        $content['frame'] = $this->frame;
-        $content['tabs'] = $this->tabs;
-        $content['activeTab'] = $this->activeTab;
-
-        $output = $this->blade->make($view, $content);
-
-        if ($echo) {
-            echo $output;
-        }
-
-        return $output;
-    }
-
-    /**
-     * Simple wrapper to check if a view exists or not.
+     * Simple getter to get the full path to a view file.
      *
      * @since 4.0.0
-     * @param string $view The view path using the dot (.) syntax
      *
-     * @return bool
+     * @return string The view to fetch
      */
-    public function validateView($view)
-    {
-        return $this->blade->exists($view);
+    public function getView( $view ) {
+        // Add slashes to use in file path.
+        $view = str_replace( '.', '/', $view );
+        // Add PHP file extension.
+        $view .= '.php';
+        // Return the full file path.
+        return $this->viewsFolder . '/' . $view;
     }
 
     /**
@@ -212,14 +156,12 @@ class Window
             return false;
         }
 
-        $notification = $this->open(
-            'backend.partials.notification',
-            compact('type', 'message', 'dismiss', 'style'),
-            false,
-            false
-        );
+        global $toplytics_engine;
+        ob_start();
+        include $toplytics_engine->backend->getWindow()->getView( 'backend.partials.notification' );
+        $notification = ob_get_clean();
 
-        if ($lateLoad) {
+        if ( $lateLoad ) {
             echo $notification;
             return true;
         }

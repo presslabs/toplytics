@@ -35,12 +35,13 @@ define('TOPLYTICS_SUBMENU_PAGE', 'options-general.php');
 define('TOPLYTICS_DEFAULT_POSTS', '5');
 define('TOPLYTICS_MIN_POSTS', '1');
 define('TOPLYTICS_MAX_POSTS', '250');
-define('TOPLYTICS_MAX_RESULTS', '20');
+define('TOPLYTICS_MAX_RESULTS', 20);
+define('TOPLYTICS_NUM_EXTRA_RESULTS', 20);
 define('TOPLYTICS_CUSTOM_TEMPLATE_DEFAULT_NAME', 'toplytics-template');
 define('TOPLYTICS_AUTH_API_VERSION', '1');
 define('TOPLYTICS_AUTH_API_BASE_URL', 'https://toplytics.presslabs.org/toplytics/');
 define('TOPLYTICS_AUTH_API_BASE_CONFIG', 'apiconfig.json');
-define('TOPLYTICS_WIDGET_TEMPLATE_VERSION', '1109f5d1bd032ee5088dfe771e78d08d');
+define('TOPLYTICS_WIDGET_TEMPLATE_VERSION', '2039481e7f61d8ee7f3cdd3dea2b0689');
 define('TOPLYTICS_FOLDER_ROOT', plugin_dir_path(__FILE__));
 
 /**
@@ -100,8 +101,9 @@ function toplytics_ready()
  *
  * @since 3.0.0
  */
-global $toplytics;
-$toplytics = toplytics_ready()->frontend;
+global $toplytics, $toplytics_engine;
+$toplytics_engine = toplytics_ready();
+$toplytics = $toplytics_engine->frontend;
 
 /**
  * We make sure to include backwardcompatibility functions.

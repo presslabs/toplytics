@@ -43,7 +43,7 @@ class Frontend
     public $ranges;
 
     /**
-     * The window to open up Blade templates.
+     * The window to open up templates.
      */
     public $window;
 
@@ -186,16 +186,22 @@ class Frontend
      */
     public function jsonData()
     {
+        // Fetch the lists of posts for each range.
         foreach (array_keys($this->ranges) as $when) {
             $post_data[$when] = $this->getResult($when);
         }
+
+        // Also fetch the list of posts per categories.
+        $post_data['categories'] = $this->getResult( 'categories' );
+        // Also fetch the list of top posts.
+        $post_data['top_posts'] = $this->getResult( 'top_posts' );
 
         $json_data = apply_filters('toplytics_json_all_data', $post_data);
         return $json_data;
     }
 
     /**
-     * Checks to see if any custom template file exists and returns it's location
+     * Checks to see if any custom template file exists and returns its location
      * on disk or otherwise return false so we can load the default one.
      *
      * @since 4.0.0
@@ -211,10 +217,10 @@ class Frontend
             return $theme_template;
         }
 
-        $custom_template = $this->window->getViewsFolder() . '/frontend/custom.blade.php';
+        $custom_template = $this->window->getViewsFolder() . '/frontend/custom.template.php';
 
-        if (file_exists($custom_template)) {
-            return 'frontend.custom';
+        if ( file_exists( $custom_template ) ) {
+            return $custom_template;
         }
         
         return false;
@@ -259,7 +265,6 @@ class Frontend
 
     public function registerWidget()
     {
-        // error_log(var_export($this->settings, true));
         register_widget(new \Toplytics\Widget($this, $this->settings));
     }
 
