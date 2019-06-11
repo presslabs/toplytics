@@ -98,14 +98,14 @@ You can set how often the data is refreshed from the widgets settings: hourly, t
 = How to use the custom template? =
 You also have the possibility to create a custom template. Here it is how.
 
-In `toplytics/resorces/views/frontend/` there is a file named `widget.blade.php`, which is the default template. To create a custom template, copy the `widget.blade.php` file here, rename it to `custom.blade.php` and then customize it as you wish. The file is a typical blade PHP template file, but this does not restrict you from using plain PHP code in it if you are not familiar with the Laravel framework.
+In `toplytics/resorces/views/frontend/` there is a file named `widget.template.php`, which is the default template. To create a custom template, copy the `widget.template.php` file here, rename it to `custom.template.php` and then customize it as you wish. The file is a typical PHP template file.
 
 You can also use the old method of creating a custom template with Toplytics: add a template.php file in your active theme's root folder.
 
 The priority regarding template files is the following:
 
 * Toplytics will look for a template.php file in the root of the active theme folder - this is to ensure backwards compatibility, as this is how you could create a custom template before; you can still use this option too
-* Then it will look for the file `custom.blade.php` in `toplytics/resorces/views/frontend/` folder, and if it does not exist, it will display the default template, which is `widget.blade.php`
+* Then it will look for the file `custom.template.php` in `toplytics/resorces/views/frontend/` folder, and if it does not exist, it will display the default template, which is `widget.template.php`
 
 = How can I use the shortcode? =
 The shortcode has 3 parameters: period -> default=month (today/week/month), numberposts -> default=5 (min=1/max=250), showviews -> default=false (true/false)
@@ -121,7 +121,7 @@ There is a check in the widget Settings for this operation, called **Load via Ja
 
 This can be useful for sites that are using caching, for example. If the top is not loaded dynamically with JavaScript and AJAX, it will not refresh unless someone flushes the page cache.
 
-You can check the JavaScript code on the default template `toplytics/resorces/views/frontend/widget.blade.php`.
+You can check the JavaScript code on the default template `toplytics/resorces/views/frontend/widget.template.php`.
 
 = What is `toplytics.json` file? =
 This file contains the statistics in JSON format, if you have the **custom JSON endpoint** enabled. This option exists to maintain backwards compatibility, the recommend option now is to use the **REST API Endpoint**. This way, your statistics will be retrieved from the endpoint `/wp-json/toplytics/results`.

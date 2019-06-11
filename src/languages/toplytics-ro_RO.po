@@ -331,7 +331,7 @@ msgid ""
 msgstr ""
 "Atenție! Ai modificat șablonul implicit pentru Toplytics. La o actualizare "
 "de plugin o să pierzi toate aceste modificări. Te rugăm să copiezi șablonul "
-"și să îl redenumești custom.blade.php pentru a preveni pierderea "
+"și să îl redenumești custom.template.php pentru a preveni pierderea "
 "modificărilor."
 
 #: components/Backend.php:1158
@@ -610,7 +610,7 @@ msgstr ""
 "Dacă nu ești de acord cu această permisiune care este necesară, poți folosi "
 "aplicația prin autentificarea Privată, folosind aplicația proprie de Google."
 
-#: resources/views/frontend/widget.blade.php:115
+#: resources/views/frontend/widget.template.php:115
 msgid " Views"
 msgstr "Afișări"
 

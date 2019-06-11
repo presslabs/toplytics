@@ -52,6 +52,9 @@ class Backend
     private $service;
     private $settings;
 
+    private $_need_additional_posts_data;
+    private $_widgets;
+
     /**
      * Initialize the backend class and set its properties.
      *
@@ -79,6 +82,18 @@ class Backend
         $this->service = $this->initService();
 
         /**
+         * We start from the assumption there's no need for additional
+         * data to be initialized: latest posts for categories and
+         * top commented posts.
+         */
+        $this->_need_additional_posts_data = false;
+
+        /**
+         * Initialize the list of Toplytics widgets data as null.
+         */
+        $this->_widgets = null;
+
+        /**
          * If the initialization above worked, we then try to schedule
          * the CRON for data retrival.
          */
@@ -86,6 +101,68 @@ class Backend
             add_action('wp', [ $this, 'setupScheduleEvent' ]);
             add_action('toplytics_cron_event', [ $this, 'updateAnalyticsData' ]);
         }
+    }
+
+    /**
+     * Fetch the data regarding Toplytics widgets from the options table.
+     */
+    private function _maybe_fetch_widgets_data()
+    {
+        if ( $this->_widgets === null ) {
+            $this->_widgets = get_option( 'widget_toplytics-widget', array() );
+        }
+    }
+
+    /**
+     * In case there are widgets which need to render
+     * results for a particular category, verify if there
+     * are enough posts fetched for the specified period.
+     *
+     * @param array $posts The array of posts to check
+     * @param boolean $period The period for which to check the post results
+     * @return boolean Flag indicating whether there are enough posts
+     */
+    private function _have_enough_results( $posts, $period )
+    {
+        // Fetch the widgets data from the database, if not already retrieved.
+        $this->_maybe_fetch_widgets_data();
+
+        // Check each widget.
+        foreach ( $this->_widgets as $widget ) {
+            /* Verify that the widget renders posts
+             * from a certain category and if it renders
+             * results for the period of the current check. */
+            if ( ! empty( $widget['category'] ) && ( $widget['period'] == $period ) ) {
+                // There is at least one widget filtering posts by category.
+                $this->_need_additional_posts_data = true;
+                
+                $num_posts_in_category = 0;
+                $category_id = intval( $widget['category'] );
+                foreach ( $posts as $post_id => $post_data ) {
+                    $post = get_post( $post_id );
+                    if ( is_object( $post ) && has_category( $category_id, $post ) ) {
+                        $num_posts_in_category ++;
+                    }
+                }
+                
+                // Stop checking if there aren't enough posts for this category.
+                if ( $num_posts_in_category < $widget['numberposts'] ) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Return the Window property.
+     *
+     * @since    4.0.0
+     */
+    public function getWindow()
+    {
+        return $this->window;
     }
 
     /**
@@ -540,8 +617,6 @@ class Backend
     /**
      * We are outputing the settings header for our settings page.
      *
-     * TODO: This should go in a blade template in the future.
-     *
      * @since 4.0.0
      *
      * @return void
@@ -553,7 +628,6 @@ class Backend
 
     /**
      * We setup the label for each setting if requested.
-     * TODO: This should go in a blade template in the future.
      *
      * @since 4.0.0
      *
@@ -718,42 +792,183 @@ class Backend
      */
     public function updateAnalyticsData()
     {
-        try {
-            $data = $this->getAnalyticsData();
-            $realtime = $this->getAnalyticsRealTimeData();
-        } catch (\Exception $e) {
-            if (401 == $e->getCode()) {
-                $this->serviceDisconnect(true);
-            }
-            error_log('Toplytics: Unexepcted disconnect [' . $e->getCode() . ']: ' . $e->getMessage(), E_USER_ERROR);
-            return false;
-        }
-
         // At this point we get and process the normal Analytics data
         $is_updated = false;
-        foreach ($data as $when => $stats) {
-            if (is_array($stats) && $stats) {
-                $result['result'] = $this->convertDataToPosts($stats, $when);
-                $result['_ts'] = time();
-                update_option("toplytics_result_$when", $result);
-                $is_updated += count($stats);
-            }
+
+        // Do an initial fetch of the regular GA stats and store them in the database.
+        $is_updated += $this->updateAnalyticsDataResults();
+        // Do an initial fetch of the realtime GA stats and store them in the database.
+        $is_updated += $this->updateAnalyticsRealTimeDataResults();
+
+        // Maybe also update category posts data and top posts data.
+        if ( $this->_need_additional_posts_data ) {
+            $this->update_additional_posts_data();
         }
 
-        // Now we get the real time data and process it the same way as the rest
-        if ($realtime) {
-            update_option("toplytics_result_realtime", [
-                'result' => $this->convertDataToPosts($realtime, 'realtime'),
-                '_ts' => time(),
-            ]);
-            $is_updated += count($realtime);
-        }
         update_option('toplytics_last_update_status', [
             'time' => time(),
             'count' => $is_updated,
         ]);
 
         return $is_updated;
+    }
+
+
+
+
+    /**
+     * We update our database with the latest data from GA.
+     * We do 2 separate data fetchings for normal data and realtime
+     * which we parse the same way.
+     *
+     * @since 4.0.0
+     *
+     * @param boolean Flag indicating whether to fetch a higher number of posts.
+     * @return bool The status of the update
+     */
+    public function updateAnalyticsDataResults( $extended_fetch = false )
+    {
+        try {
+            $data = $this->getAnalyticsData( $extended_fetch );
+        } catch (\Exception $e) {
+            if (401 == $e->getCode()) {
+                $this->serviceDisconnect(true);
+            }
+            error_log('Toplytics: Unexepected disconnect [' . $e->getCode() . ']: ' . $e->getMessage(), E_USER_ERROR);
+            return false;
+        }
+
+        $num_stats = 0;
+        foreach ($data as $when => $stats) {
+            $result = [];
+            if (is_array($stats) && $stats) {
+                $result['result'] = $this->convertDataToPosts($stats, $when);
+                // If this is the inital fetch for GA posts, check if there are enough to render in the widgets.
+                if ( ! $extended_fetch && ! $this->_have_enough_results( $result['result'], $when ) ) {
+                    $num_stats = 0;
+                    break;
+                }
+                $result['_ts'] = time();
+                update_option("toplytics_result_$when", $result);
+                $num_stats += count($stats);
+            }
+        }
+
+        if ( $num_stats == 0 ) {
+            // Do another fetch, requesting a higher number of results.
+            $num_stats = $this->updateAnalyticsDataResults( true );
+        }
+
+        return $num_stats;
+    }
+
+    /**
+     * We update our database with the latest data from GA.
+     * We do 2 separate data fetchings for normal data and realtime
+     * which we parse the same way.
+     *
+     * @since 4.0.0
+     *
+     * @param boolean Flag indicating whether to fetch a higher number of posts.
+     * @return bool The status of the update
+     */
+    public function updateAnalyticsRealTimeDataResults( $extended_fetch = false )
+    {
+        try {
+            $realtime = $this->getAnalyticsRealTimeData( $extended_fetch );
+        } catch (\Exception $e) {
+            if (401 == $e->getCode()) {
+                $this->serviceDisconnect(true);
+            }
+            error_log('Toplytics: Unexepected disconnect [' . $e->getCode() . ']: ' . $e->getMessage(), E_USER_ERROR);
+            return false;
+        }
+
+        $num_stats = 0;
+        if ( $realtime ) {
+            $results = $this->convertDataToPosts($realtime, 'realtime');
+            // If this is the inital fetch for GA posts, check if there are enough to render in the widgets.
+            if ( ! $extended_fetch && ! $this->_have_enough_results( $results, 'realtime' ) ) {
+                $num_stats = $this->updateAnalyticsRealTimeDataResults( true );
+            } else {
+                update_option("toplytics_result_realtime", [
+                    'result' => $results,
+                    '_ts' => time(),
+                ]);
+                $num_stats = count( $realtime );
+            }
+        }
+
+        return $num_stats;
+    }
+
+    /**
+     * When called, we update the data regarding the latest posts
+     * for the categories used in the Toplytics widget and the
+     * overall top posts in the database, based on number of comments.
+     */
+    public function update_additional_posts_data()
+    {
+        // Fetch the widgets data from the database, if not already retrieved.
+        $this->_maybe_fetch_widgets_data();
+
+        // Determine the maximum number of posts.
+        $max_num_posts = 0;
+        foreach ( $this->_widgets as $widget ) {
+            if ( ! empty( $widget['category'] ) ) {
+                if ( $max_num_posts < $widget['numberposts'] ) {
+                    $max_num_posts = $widget['numberposts'];
+                }
+            }
+        }
+
+        // Now fetch posts for each category and the latest posts, if needed.
+        if ( $max_num_posts > 0 ) {
+            // Fetch posts for categories.
+            $data = [
+                        'result' => [ 'categories' => [] ],
+                        '_ts' => time(),
+                    ];
+            foreach ( $this->_widgets as $widget ) {
+                if ( $widget['category'] ) {
+                    $posts = get_posts( array(
+                                        'posts_per_page' => $max_num_posts,
+                                        'cat' => $widget['category'],
+                                        'post_status' => 'publish',
+                                    ) );
+                    $data['result']['categories'][ $widget['category'] ] = [];
+                    foreach ( $posts as $cat_post ) {
+                        $data['result']['categories'][ $widget['category'] ][ $cat_post->ID ] = array(
+                                                                                                    'permalink' => get_permalink( $cat_post ),
+                                                                                                    'title' => get_the_title( $cat_post ),
+                                                                                                    'featured_image' => $this->_get_featured_image( $cat_post->ID ),
+                                                                                                );
+                    }
+                }
+            }
+            update_option( 'toplytics_result_categories', $data );
+
+            // Fetch top posts.
+            $data = [
+                        'result' => [ 'top_posts' => [] ],
+                        '_ts' => time(),
+                    ];
+            $posts = get_posts( array(
+                                    'posts_per_page' => $max_num_posts,
+                                    'cat' => $widget['category'],
+                                    'orderby' => 'comment_count',
+                                    'post_status' => 'publish',
+                                ) );
+            foreach ( $posts as $top_post ) {
+                $data['result']['top_posts'][ $top_post->ID ] = array(
+                                                                    'permalink' => get_permalink( $top_post ),
+                                                                    'title' => get_the_title( $top_post ),
+                                                                    'featured_image' => $this->_get_featured_image( $top_post->ID ),
+                                                                );
+            }
+            update_option( 'toplytics_result_top_posts', $data );
+        }
+
     }
 
     /**
@@ -783,9 +998,10 @@ class Backend
      *
      * @since 4.0.0
      *
+     * @param boolean Flag indicating whether to fetch a higher number of posts.
      * @return array The realtime filtered data recived from GA.
      */
-    private function getAnalyticsRealTimeData()
+    private function getAnalyticsRealTimeData( $extended_fetch = false )
     {
         if ($this->checkSetting('fetch_realtime')) {
             return [];
@@ -797,6 +1013,11 @@ class Backend
             'sort'        => '-rt:activeUsers',
             'max-results' => $this->checkSetting('max_posts_fetch_limit') ? (int)$this->settings['max_posts_fetch_limit'] : TOPLYTICS_MAX_RESULTS,
         ];
+
+        if ( $extended_fetch ) {
+            // Retrieve extra posts.
+            $optParams['max-results'] += TOPLYTICS_NUM_EXTRA_RESULTS;
+        }
 
         $results = [];
         $profile_id = get_option('toplytics_profile_data')['profile_id'];
@@ -829,9 +1050,10 @@ class Backend
      *
      * @since 3.0.0
      *
+     * @param boolean Flag indicating whether to fetch a higher number of posts.
      * @return array The filtered data recived from GA.
      */
-    private function getAnalyticsData()
+    private function getAnalyticsData( $extended_fetch = false )
     {
         $optParams = [
             'quotaUser'   => md5(home_url()),
@@ -839,6 +1061,12 @@ class Backend
             'sort'        => '-ga:pageviews',
             'max-results' => $this->checkSetting('max_posts_fetch_limit') ? (int)$this->settings['max_posts_fetch_limit'] : TOPLYTICS_MAX_RESULTS,
         ];
+
+        if ( $extended_fetch ) {
+            // Retrieve extra posts.
+            $optParams['max-results'] += TOPLYTICS_NUM_EXTRA_RESULTS;
+        }
+        
         $result = [];
         $profile_id = get_option('toplytics_profile_data')['profile_id'];
         if ($profile_id) {
@@ -953,13 +1181,11 @@ class Backend
                             $new_data[$when][ $post_id ]['pageviews'] = (int) $pageviews;
                         }
 
+                        // Categories - IDs.
+                        $new_data[$when][ $post_id ]['categories'] = wp_get_post_categories( $post_id, array( 'fields' => 'ids' ) );
+
                         // Featured image
-                        $new_data[$when][$post_id]['featured_image'] = ''; //Sensible default
-                        if ($this->checkSetting('include_featured_image_in_json')) {
-                            $image_size = $this->checkSetting('custom_featured_image_size') ?
-                            $this->settings['custom_featured_image_size'] : 'post-thumbnail';
-                            $new_data[$when][$post_id]['featured_image'] = get_the_post_thumbnail_url($post, $image_size);
-                        }
+                        $new_data[$when][$post_id]['featured_image'] = $this->_get_featured_image( $post_id );
 
                         // Custom Post Variables
                         if ($this->checkSetting('custom_output_post_variables')) {
@@ -970,6 +1196,9 @@ class Backend
                                 }
                             }
                         }
+
+                        // Allow extending the set of post data via filters.
+                        $new_data[$when][ $post_id ] = apply_filters( 'toplytics_post_data', $new_data[$when][ $post_id ], $when, $post_id );
                     }
                 }
             }
@@ -979,6 +1208,23 @@ class Backend
         // arsort($new_data);
 
         return apply_filters('toplytics_convert_data_to_posts', $new_data, $data, $when);
+    }
+
+    /**
+     * Fetch the featured image for the post ID.
+     *
+     * @param integer $post_id The ID of the post
+     * @param string The URL of the featured image
+     */
+    private function _get_featured_image( $post_id )
+    {
+        $featured_image = ''; //Sensible default
+        if ($this->checkSetting('include_featured_image_in_json')) {
+            $image_size = $this->checkSetting('custom_featured_image_size') ?
+            $this->settings['custom_featured_image_size'] : 'post-thumbnail';
+            $featured_image = get_the_post_thumbnail_url($post_id, $image_size);
+        }
+        return $featured_image;
     }
 
     /**
@@ -1103,24 +1349,15 @@ class Backend
 
             $auth = get_option('toplytics_auth_type') == 'private' ? 'private' : 'public';
 
-            if (md5_file(TOPLYTICS_FOLDER_ROOT . 'resources/views/frontend/widget.blade.php') !== TOPLYTICS_WIDGET_TEMPLATE_VERSION) {
-                $this->window->notifyAdmins('warning', __('WARNING! You have modified the default template file. On a plugin update you will lose these changes. Please copy the template and rename it to custom.blade.php to prevent the customization from being lost.', TOPLYTICS_DOMAIN), false, '', true);
+            if (md5_file(TOPLYTICS_FOLDER_ROOT . 'resources/views/frontend/widget.template.php') !== TOPLYTICS_WIDGET_TEMPLATE_VERSION) {
+                $this->window->notifyAdmins('warning', __('WARNING! You have modified the default template file. On a plugin update you will lose these changes. Please copy the template and rename it to custom.template.php to prevent the customization from being lost.', TOPLYTICS_DOMAIN), false, '', true);
                 if (defined('WP_DEBUG') && WP_DEBUG) {
-                    error_log('Toplytics Debug: The new md5 of the widget file is ' . md5_file(TOPLYTICS_FOLDER_ROOT . 'resources/views/frontend/widget.blade.php'));
+                    error_log('Toplytics Debug: The new md5 of the widget file is ' . md5_file(TOPLYTICS_FOLDER_ROOT . 'resources/views/frontend/widget.template.php'));
                 }
             }
 
-            $this->window->open(
-                'backend.settings',
-                compact(
-                    'profile',
-                    'profiles',
-                    'lastUpdateTime',
-                    'lastUpdateCount',
-                    'auth'
-                ),
-                true
-            );
+            include $this->window->getView( 'backend.settings' );
+
             return;
         }
 
@@ -1128,7 +1365,7 @@ class Backend
         $isDirtyAuth = $this->isDirtyAuth();
 
         // We are not authenticated if we got here.
-        $this->window->open('backend.authorization', ['appRedirectURL' => $appRedirectURL, 'isDirtyAuth' => $isDirtyAuth], true);
+        include $this->window->getView( 'backend.authorization' );
     }
 
     /**
@@ -1673,25 +1910,31 @@ class Backend
      */
     public function pluginActionLinks($links)
     {
+        global $toplytics_engine;
 
         // TODO: We should rewrite this entire IF more elegantly
-        if (get_option('toplytics_google_token')) {
-            $settings_link = $this->window->open('backend.partials.url', [
-                'url' => $this->window->getSettingsLink(),
-                'title' => 'Settings',
-            ]);
+        if ( get_option( 'toplytics_google_token' ) ) {
+            $url = $this->window->getSettingsLink();
+            $title = __( 'Settings', TOPLYTICS_DOMAIN );
+            ob_start();
+            include $this->window->getView( 'backend.partials.url' );
+            $settings_link = ob_get_clean();
 
-            $widgets_link = $this->window->open('backend.partials.url', [
-                'url' => admin_url('widgets.php'),
-                'title' => 'Widgets',
-            ]);
-            array_unshift($links, $widgets_link, $settings_link);
+            $url = admin_url( 'widgets.php' );
+            $title = __( 'Widgets', TOPLYTICS_DOMAIN );
+            ob_start();
+            include $this->window->getView( 'backend.partials.url' );
+            $widgets_link = ob_get_clean();
+
+            array_unshift( $links, $widgets_link, $settings_link );
         } else {
-            $settings_link = $this->window->open('backend.partials.url', [
-                'url' => $this->window->getSettingsLink(),
-                'title' => 'Connect Google Analytics',
-            ]);
-            array_unshift($links, $settings_link);
+            $url = $this->window->getSettingsLink();
+            $title = __( 'Connect Google Analytics', TOPLYTICS_DOMAIN );
+            ob_start();
+            include $this->window->getView( 'backend.partials.url' );
+            $settings_link = ob_get_clean();
+
+            array_unshift( $links, $settings_link );
         }
 
         return $links;
@@ -1710,33 +1953,43 @@ class Backend
      */
     public function extraRowMeta($plugin_meta, $plugin_file = null)
     {
+        global $toplytics_engine;
 
-        if (!is_null($plugin_file) && $plugin_file !== $this->plugin_basename) {
+        if ( ! is_null( $plugin_file ) && $plugin_file !== $this->plugin_basename ) {
             return $plugin_meta;
         }
 
+        $url    = 'https://www.presslabs.com/code/toplytics/';
+        $title  = __('Usage Documentation', TOPLYTICS_DOMAIN );
+        $target = 'blank';
+        $icon   = 'media-document';
+        ob_start();
+        include $this->window->getView( 'backend.partials.url' );
+        $documentation_link = ob_get_clean();
+
+        $url    = 'https://wordpress.org/support/plugin/toplytics/reviews/';
+        $title  = __( 'Review us!', TOPLYTICS_DOMAIN );
+        $target = 'blank';
+        $icon   = 'format-status';
+        ob_start();
+        include $this->window->getView( 'backend.partials.url' );
+        $review_link = ob_get_clean();
+
+        $url    = 'https://wordpress.org/support/plugin/toplytics/';
+        $title  = __( 'Need help? Support is here!', TOPLYTICS_DOMAIN );
+        $target = 'blank';
+        $icon   = 'businessman';
+        ob_start();
+        include $this->window->getView( 'backend.partials.url' );
+        $support_link = ob_get_clean();
+
         $links = [
-            $this->window->open('backend.partials.url', [
-                'url' => 'https://www.presslabs.com/code/toplytics/',
-                'title' => __('Usage Documentation', TOPLYTICS_DOMAIN),
-                'target' => 'blank',
-                'icon' => 'media-document',
-            ]),
-            $this->window->open('backend.partials.url', [
-                'url' => 'https://wordpress.org/support/plugin/toplytics/reviews/',
-                'title' => __('Review us!', TOPLYTICS_DOMAIN),
-                'target' => 'blank',
-                'icon' => 'format-status',
-            ]),
-            $this->window->open('backend.partials.url', [
-                'url' => 'https://wordpress.org/support/plugin/toplytics/',
-                'title' => __('Need help? Support is here!', TOPLYTICS_DOMAIN),
-                'target' => 'blank',
-                'icon' => 'businessman',
-            ]),
+            $documentation_link,
+            $review_link,
+            $support_link,
         ];
 
-        $plugin_meta = array_merge($plugin_meta, $links);
+        $plugin_meta = array_merge( $plugin_meta, $links );
 
         return $plugin_meta;
     }
