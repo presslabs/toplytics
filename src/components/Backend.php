@@ -617,6 +617,8 @@ class Backend
     /**
      * We are outputing the settings header for our settings page.
      *
+     * TODO: This should go in a blade template in the future.
+     *
      * @since 4.0.0
      *
      * @return void
@@ -628,6 +630,7 @@ class Backend
 
     /**
      * We setup the label for each setting if requested.
+     * TODO: This should go in a blade template in the future.
      *
      * @since 4.0.0
      *
@@ -834,7 +837,7 @@ class Backend
             if (401 == $e->getCode()) {
                 $this->serviceDisconnect(true);
             }
-            error_log('Toplytics: Unexepected disconnect [' . $e->getCode() . ']: ' . $e->getMessage(), E_USER_ERROR);
+            error_log('Toplytics: Unexepected disconnect [regular] [' . $e->getCode() . ']: ' . $e->getMessage(), E_USER_ERROR);
             return false;
         }
 
@@ -880,7 +883,7 @@ class Backend
             if (401 == $e->getCode()) {
                 $this->serviceDisconnect(true);
             }
-            error_log('Toplytics: Unexepected disconnect [' . $e->getCode() . ']: ' . $e->getMessage(), E_USER_ERROR);
+            error_log('Toplytics: Unexepected disconnect [realtime] [' . $e->getCode() . ']: ' . $e->getMessage(), E_USER_ERROR);
             return false;
         }
 
@@ -1003,7 +1006,7 @@ class Backend
      */
     private function getAnalyticsRealTimeData( $extended_fetch = false )
     {
-        if ($this->checkSetting('fetch_realtime')) {
+        if ( ! $this->checkSetting('fetch_realtime') ) {
             return [];
         }
 
@@ -1126,23 +1129,30 @@ class Backend
         }
 
         // TODO: Improve this IF and explode it in multiple functions to prevent repeated code.
-        if ($this->checkSetting('skip_local_post_discovery') && $this->checkSetting('custom_domain')) {
+        if ( $this->checkSetting( 'skip_local_post_discovery' ) ) {
+            // Fetch the custom domain.
+            $custom_domain = $this->settings['custom_domain'];
+            if ( $custom_domain === '' ) {
+                // By default, use the domain of the current site.
+                $custom_domain = home_url();
+            }
+
             // We bypass the local post discovery and simply use the URL straight from GA.
             $counter = 0;
-            foreach ($data as $rel_path => $pageviews) {
-                $rel_path = apply_filters('toplytics_rel_path', $rel_path, $when);
-                $url = $this->settings['custom_domain'] . $rel_path;
-                if (!isset($new_data[$when][$counter]['permalink'])) {
-                    $new_data[$when][$counter]['permalink'] = $url;
+            foreach ( $data as $rel_path => $pageviews ) {
+                $rel_path = apply_filters( 'toplytics_rel_path', $rel_path, $when );
+                $url = $custom_domain . $rel_path;
+                if ( ! isset( $new_data[ $when ][ $counter ]['permalink'] ) ) {
+                    $new_data[ $when ][ $counter ]['permalink'] = $url;
                 }
-                if (!isset($new_data[$when][$counter]['title'])) {
-                    $new_data[$when][$counter]['title'] = ucwords(str_replace(['/', '-'], ' ', stripslashes($rel_path)));
+                if ( ! isset( $new_data[ $when ][ $counter ]['title'])) {
+                    $new_data[ $when ][ $counter ]['title'] = ucwords( str_replace( ['/', '-'], ' ', stripslashes( $rel_path ) ) );
                 }
                 // Pageviews counting
-                if (isset($new_data[$when][ $counter ]['pageviews'])) {
-                    $new_data[$when][ $counter ]['pageviews'] += (int) $pageviews;
+                if ( isset( $new_data[ $when ][ $counter ]['pageviews'] ) ) {
+                    $new_data[ $when ][ $counter ]['pageviews'] += (int) $pageviews;
                 } else {
-                    $new_data[$when][ $counter ]['pageviews'] = (int) $pageviews;
+                    $new_data[ $when ][ $counter ]['pageviews'] = (int) $pageviews;
                 }
 
                 $counter++;
@@ -1196,9 +1206,6 @@ class Backend
                                 }
                             }
                         }
-
-                        // Allow extending the set of post data via filters.
-                        $new_data[$when][ $post_id ] = apply_filters( 'toplytics_post_data', $new_data[$when][ $post_id ], $when, $post_id );
                     }
                 }
             }
