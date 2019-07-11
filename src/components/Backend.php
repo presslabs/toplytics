@@ -375,7 +375,13 @@ class Backend
             add_option('toplytics_settings', $options);
         }
 
-        register_setting('toplytics', 'toplytics_settings');
+        register_setting(
+            'toplytics',
+            'toplytics_settings',
+            array(
+                'sanitize_callback' => array( $this, 'act_before_settings_update' ),
+            )
+        );
 
         // Below line is for DEBUG ONLY
         // update_option('toplytics_settings', $this->getDefaultSettings());
@@ -784,6 +790,45 @@ class Backend
         }
 
         $this->window->successRedirect(__('Well done. You have selected your analytics profile.', TOPLYTICS_DOMAIN));
+    }
+
+    /**
+     * This function is called upon saving the
+     * Toplytics settings. It allows performing actions
+     * before the settings are updated in the database.
+     *
+     * @since 4.0.1
+     *
+     * @param array $updated_settings The updated set of settings
+     * @return array The updated settings, after processing
+     */
+    public function act_before_settings_update( $updated_settings ) {
+        // Fetch the current set of Toplytics settings from the DB.
+        $current_settings = get_option( 'toplytics_settings' );
+        // If certain settings have changed, trigger an update of the analytics data.
+        if ( ( $updated_settings['include_featured_image_in_json'] != $current_settings['include_featured_image_in_json'] ) ||
+                ( $updated_settings['custom_featured_image_size'] != $current_settings['custom_featured_image_size'] ) ||
+                ( $updated_settings['allowed_post_types'] != $current_settings['allowed_post_types'] ) ||
+                ( $updated_settings['ignore_posts_ids'] != $current_settings['ignore_posts_ids'] ) ) {
+            // Schedule a late call for updating the analytics data.
+            add_action( 'shutdown', array( $this, 'updateAnalyticsDataOnSettingsUpdate' ) );
+        }
+
+        return $updated_settings;
+    }
+
+    /**
+     * Called after updating plugins settings, to
+     * trigger an update of the analytics data, using
+     * the latest version of the settings from the database.
+     *
+     * @since 4.0.1
+     */
+    public function updateAnalyticsDataOnSettingsUpdate() {
+        // First, refetch the latest version of the settings from the database.
+        $this->settings = get_option( 'toplytics_settings' );
+        // Now trigger the update.
+        $this->updateAnalyticsData();
     }
 
     /**
