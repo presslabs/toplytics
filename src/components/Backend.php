@@ -2,6 +2,8 @@
 
 namespace Toplytics;
 
+use \Toplytics\Activator;
+
 /**
  * The admin-specific functionality of the plugin.
  *
@@ -1073,9 +1075,17 @@ class Backend
         $result = [];
         $profile_id = get_option('toplytics_profile_data')['profile_id'];
         if ($profile_id) {
-            foreach (get_option('toplytics_results_ranges') as $when => $start_date) {
+            // Fetch results ranges from option. Create the option, if it does not exist.
+            $results_ranges = get_option( 'toplytics_results_ranges', false );
+            if ( ! $results_ranges ) {
+                Activator::addDefaultOptions();
+                // Fetch the option, once again; it is now initialized.
+                $results_ranges = get_option( 'toplytics_results_ranges' );
+            }
+
+            foreach ( $results_ranges as $when => $start_date ) {
                 // We make sure fetching is enabled in settings
-                if (! $start_date || ! $this->checkSetting('fetch_' . $when)) {
+                if ( ! $start_date || ! $this->checkSetting( 'fetch_' . $when ) ) {
                     continue;
                 }
 
