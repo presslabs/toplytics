@@ -10,7 +10,7 @@
  * Plugin Name:       Toplytics - Popular Posts Widget
  * Plugin URI:        https://www.presslabs.org/toplytics/
  * Description:       Display top posts in a widget without putting any pressure on your host and database. This plugin helps you achieve this using the Google Analytics API to get the data from there so your server will stay clear of the preasure of monitoring and counting every single page view to display top posts.
- * Version:           4.0.0
+ * Version:           4.0.1
  * Author:            Presslabs
  * Author URI:        https://www.presslabs.com/
  * License:           GPL-2.0+
