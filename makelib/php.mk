@@ -67,19 +67,20 @@ build.tools: $(PHPCBF)
 		$(ERR) unsupported PHP version. Please install one of the following supported version: '$(PHP_SUPPORTED_VERSIONS)' ;\
 		exit 1 ;\
 	fi
+$(COMPOSER): .composer.init
 
 COMPOSER_INSTALL_STAMP := $(COMPOSER_VENDOR_DIR)/.composer.install.stamp
 
 # only run "composer" if the composer.json has changed
-$(COMPOSER_INSTALL_STAMP): $(COMPOSER_JSON_FILE) $(COMPOSER_LOCK_FILE)
+$(COMPOSER_INSTALL_STAMP): $(COMPOSER) $(COMPOSER_JSON_FILE) $(COMPOSER_LOCK_FILE)
 	@echo ${TIME} $(BLUE)[TOOL]$(CNone) composer install
 	@cd $(PHP_ROOT_DIR); $(COMPOSER) install --no-interaction || $(FAIL)
 	@touch $(COMPOSER_INSTALL_STAMP)
 	@$(OK) composer install
 
-composer.install: .composer.init $(COMPOSER_INSTALL_STAMP)
+composer.install: $(COMPOSER_INSTALL_STAMP)
 
-composer.update:
+composer.update: $(COMPOSER)
 	@echo ${TIME} $(BLUE)[TOOL]$(CNone) composer update
 	@cd $(PHP_ROOT_DIR); $(COMPOSER) update || $(FAIL)
 	@touch $(COMPOSER_INSTALL_STAMP)
