@@ -1280,11 +1280,23 @@ class Backend
      */
     private function _get_featured_image( $post_id )
     {
-        $featured_image = ''; //Sensible default
-        if ($this->checkSetting('include_featured_image_in_json')) {
-            $image_size = $this->checkSetting('custom_featured_image_size') ?
-            $this->settings['custom_featured_image_size'] : 'post-thumbnail';
-            $featured_image = get_the_post_thumbnail_url($post_id, $image_size);
+        $featured_image = $image_size = ''; // Sensible default.
+        if ( $this->checkSetting( 'include_featured_image_in_json' ) ) {
+            // Check if a value is set for the featured image size.
+            if ( $this->checkSetting('custom_featured_image_size') ) {
+                // Fetch the list of image sizes active for the site - numeric array.
+                $theme_sizes = get_intermediate_image_sizes();
+                // Set the image size if the selected index is in the list of available sizes.
+                if ( isset( $theme_sizes[ $this->settings['custom_featured_image_size'] ] ) ) {
+                    $image_size = $theme_sizes[ $this->settings['custom_featured_image_size'] ];
+                }
+            }
+            // Set "post-thumbnail" as default image size if no other configured.
+            if ( ! $image_size ) {
+                $image_size = 'post-thumbnail';
+            }
+            // Now fetch the URL of the featured image.
+            $featured_image = get_the_post_thumbnail_url( $post_id, $image_size );
         }
         return $featured_image;
     }
