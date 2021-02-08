@@ -43,7 +43,7 @@ HELM_CHART_VERSION := $(VERSION:v%=%)
 # ====================================================================================
 # Tools install targets
 
-HELM_VERSION := 2.16.1
+HELM_VERSION := 2.17.0
 HELM_DOWNLOAD_URL := https://storage.googleapis.com/kubernetes-helm/helm-v$(HELM_VERSION)-$(HOSTOS)-$(HOSTARCH).tar.gz
 $(eval $(call tool.download.tar.gz,helm,$(HELM_VERSION),$(HELM_DOWNLOAD_URL)))
 
