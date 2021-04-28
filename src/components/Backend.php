@@ -1128,6 +1128,14 @@ class Backend
                 $results_ranges = get_option( 'toplytics_results_ranges' );
             }
 
+	    // update dates!
+            $results_ranges = [
+                'month' => date_i18n('Y-m-d', strtotime('-29 days')),
+                'week'  => date_i18n('Y-m-d', strtotime('-6 days')),
+                'today' => date_i18n('Y-m-d', strtotime('today')),
+                'realtime' => 0,
+            ];
+
             foreach ( $results_ranges as $when => $start_date ) {
                 // We make sure fetching is enabled in settings
                 if ( ! $start_date || ! $this->checkSetting( 'fetch_' . $when ) ) {
