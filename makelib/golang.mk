@@ -180,7 +180,7 @@ DEP_VERSION ?= 0.5.4
 DEP_DOWNLOAD_URL ?= https://github.com/golang/dep/releases/download/v$(DEP_VERSION)/dep-$(HOSTOS)-$(HOSTARCH)
 $(eval $(call tool.download,dep,$(DEP_VERSION),$(DEP_DOWNLOAD_URL)))
 
-GOLANGCI_LINT_VERSION ?= 1.21.0
+GOLANGCI_LINT_VERSION ?= 1.41.1
 GOLANGCI_LINT_DOWNLOAD_URL ?= https://github.com/golangci/golangci-lint/releases/download/v$(GOLANGCI_LINT_VERSION)/golangci-lint-$(GOLANGCI_LINT_VERSION)-$(HOSTOS)-$(HOSTARCH).tar.gz
 $(eval $(call tool.download.tar.gz,golangci-lint,$(GOLANGCI_LINT_VERSION),$(GOLANGCI_LINT_DOWNLOAD_URL)))
 
