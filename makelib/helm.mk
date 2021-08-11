@@ -52,7 +52,6 @@ $(eval $(call tool.download.tar.gz,helm,$(HELM_VERSION),$(HELM_DOWNLOAD_URL)))
 
 $(HELM_HOME): $(HELM)
 	@mkdir -p $(HELM_HOME)
-	@$(HELM) init -c
 
 $(HELM_OUTPUT_DIR):
 	@mkdir -p $(HELM_OUTPUT_DIR)
