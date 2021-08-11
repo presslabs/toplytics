@@ -43,8 +43,8 @@ HELM_CHART_VERSION := $(VERSION:v%=%)
 # ====================================================================================
 # Tools install targets
 
-HELM_VERSION := 2.17.0
-HELM_DOWNLOAD_URL := https://storage.googleapis.com/kubernetes-helm/helm-v$(HELM_VERSION)-$(HOSTOS)-$(HOSTARCH).tar.gz
+HELM_VERSION := 3.6.3
+HELM_DOWNLOAD_URL := https://get.helm.sh/helm-v$(HELM_VERSION)-$(HOSTOS)-$(HOSTARCH).tar.gz
 $(eval $(call tool.download.tar.gz,helm,$(HELM_VERSION),$(HELM_DOWNLOAD_URL)))
 
 # ====================================================================================
@@ -64,9 +64,8 @@ $(HELM_OUTPUT_DIR)/$(1)-$(HELM_CHART_VERSION).tgz: $(HELM_HOME) $(HELM_OUTPUT_DI
 	@$(OK) helm package $(1) $(HELM_CHART_VERSION)
 
 .PHONY: .helm.lint.$(1)
-.helm.lint.$(1): $(HELM_HOME)
+.helm.lint.$(1): $(HELM_HOME) .helm.dep.$(1)
 	@$(INFO) helm lint $(1)
-	@rm -rf $(abspath $(HELM_CHARTS_DIR)/$(1)/charts)
 	@$(HELM) lint $(abspath $(HELM_CHARTS_DIR)/$(1)) $(HELM_CHART_LINT_ARGS_$(1)) --strict || $$(FAIL)
 	@$(OK) helm lint $(1)
 
