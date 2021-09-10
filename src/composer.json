@@ -16,7 +16,15 @@
     ],
     "require": {
         "php": "~7.0",
-        "google/apiclient": "^2.0"
+        "google/apiclient": "^2.10"
+    },
+    "scripts": {
+        "pre-autoload-dump": "Google\\Task\\Composer::cleanup"
+    },
+    "extra": {
+        "google/apiclient-services": [
+            "Analytics"
+        ]
     },
     "autoload": {
         "psr-4": {"Toplytics\\": "components"}
