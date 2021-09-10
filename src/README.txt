@@ -1,10 +1,10 @@
 === Toplytics ===
-Contributors: PressLabs
+Contributors: PressLabs, cristianuibar
 Donate link: http://www.presslabs.com/
 Tags: presslabs, analytics, posts, top, most visited, most viewed posts, top content, toplytics, popular, google analytics, high traffic, popular posts, oauth, server resources, settings, widget, embed code, javascript, json, json file, simple, post views
 Requires at least: 4.7.3
 Tested up to: 5.8.1
-Stable tag: 4.0.5
+Stable tag: 4.0.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -245,6 +245,24 @@ The outcome will look like this:
 == Screenshots ==
 
 == Changelog ==
+
+= 4.0.6 =
+
+* Optimized vendor dependencies for a smaller package footprint
+
+= 4.0.5 =
+
+* Updating vendor dependencies
+* Fix updating date ranges before every update
+
+= 4.0.4 =
+
+* Fix #150 - set proper size for featured image
+* Fix #146 - Update analytics data on saving plugin settings
+* Fix #145 - Create option toplytics_results_ranges, if not exists
+* Fix Skip local post discovery with no domain provided
+* Remove Blade templating engine from view files
+* Add support for rendering posts per category.
 
 = 4.0 =
 **Upgrade Notification**: Please TEST this new version of Toplytics on your development site before upgrading! You might need to update your custom template file or change some settings inside the new settings page.
