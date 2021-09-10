@@ -34,7 +34,7 @@ cd ../svn/
 
 # Create SVN tag
 mkdir -p tags/$TRAVIS_TAG/
-rsync -r -p ./trunk/* .tags/$TRAVIS_TAG
+rsync -r -p ./trunk/* ./tags/$TRAVIS_TAG
 
 # Add svn new files and delete files
 svn stat . | grep '^?' | awk '{print $2}' | xargs -I x svn add x@
