@@ -12,14 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-ifndef __KUBEBUILDERV2_MAKEFILE__
-__KUBEBUILDERV2_MAKEFILE__ := included
+ifndef __KUBEBUILDER_MAKEFILE__
+__KUBEBUILDER_MAKEFILE__ := included
 
 # ====================================================================================
 # Options
 
-KUBEBUILDER_VERSION ?= 2.3.2
+KUBEBUILDER_VERSION ?= 3.1.0
 KUBEBUILDER := $(TOOLS_HOST_DIR)/kubebuilder-$(KUBEBUILDER_VERSION)
+
+K8S_VERSION := 1.19.2
 
 CRD_DIR ?= config/crds
 API_DIR ?= pkg/apis
@@ -45,13 +47,22 @@ include $(COMMON_SELF_DIR)/golang.mk
 # kubebuilder download and install
 $(KUBEBUILDER):
 	@echo ${TIME} ${BLUE}[TOOL]${CNone} installing kubebuilder $(KUBEBUILDER_VERSION)
+
+	@mkdir -p $(KUBEBUILDER)
 	@mkdir -p $(TOOLS_HOST_DIR)/tmp || $(FAIL)
-	@curl -fsSL https://github.com/kubernetes-sigs/kubebuilder/releases/download/v$(KUBEBUILDER_VERSION)/kubebuilder_$(KUBEBUILDER_VERSION)_$(GOHOSTOS)_$(GOHOSTARCH).tar.gz | tar -xz -C $(TOOLS_HOST_DIR)/tmp  || $(FAIL)
-	@mv $(TOOLS_HOST_DIR)/tmp/kubebuilder_$(KUBEBUILDER_VERSION)_$(GOHOSTOS)_$(GOHOSTARCH)/bin $(KUBEBUILDER) || $(FAIL)
-	@rm -fr $(TOOLS_HOST_DIR)/tmp
+
+	@# kubebuilder
+	@curl -sL -o $(KUBEBUILDER)/kubebuilder https://github.com/kubernetes-sigs/kubebuilder/releases/download/v$(KUBEBUILDER_VERSION)/kubebuilder_$(GOHOSTOS)_$(GOHOSTARCH) || $(FAIL)
+	@chmod +x $(KUBEBUILDER)/kubebuilder || $(FAIL)
+
+	@# kubebuilder-tools
+	@curl -fsSL https://storage.googleapis.com/kubebuilder-tools/kubebuilder-tools-$(K8S_VERSION)-$(GOHOSTOS)-$(GOHOSTARCH).tar.gz | tar -xz -C $(TOOLS_HOST_DIR)/tmp || $(FAIL)
+	@mv $(TOOLS_HOST_DIR)/tmp/kubebuilder/bin/* $(KUBEBUILDER) || $(FAIL)
+	@rm -rf $(TOOLS_HOST_DIR)/tmp
+
 	@$(OK) installing kubebuilder $(KUBEBUILDER_VERSION)
 
-$(eval $(call tool.go.install,controller-gen,v0.2.4,sigs.k8s.io/controller-tools/cmd/controller-gen))
+$(eval $(call tool.go.install,controller-gen,v0.6.1,sigs.k8s.io/controller-tools/cmd/controller-gen))
 
 # ====================================================================================
 # Kubebuilder Targets
@@ -65,7 +76,7 @@ $(eval $(call common.target,kubebuilder.manifests))
 	@rm -rf $(CRD_DIR)
 
 	@$(CONTROLLER_GEN) $(CRD_OPTIONS) rbac:roleName=manager-role webhook paths="./..." output:crd:artifacts:config=$(CRD_DIR)
-	$(CONTROLLER_GEN) object:headerFile=$(BOILERPLATE_FILE) paths="./..."
+	@$(CONTROLLER_GEN) object:headerFile=$(BOILERPLATE_FILE) paths="./..."
 
 	@$(OK) Generating Kubebuilder manifests
 
@@ -97,4 +108,4 @@ export KUBEBULDERV2_HELPTEXT
 
 .PHONY: .kubebuilder.help kubebuilder.manifests
 
-endif # __KUBEBUILDERV2_MAKEFILE__
+endif # __KUBEBUILDER_MAKEFILE__
