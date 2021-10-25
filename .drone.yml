@@ -15,10 +15,16 @@ steps:
     depth: 0
     tags: true
 
+- name: install dependencies
+  image: docker.io/bitpoke/build:v0.6.0
+  commands:
+  - make -j4 build.tools
+
 - name: build
   pull: true
   image: quay.io/presslabs/build:latest
   commands:
+  - dockerize -wait http://docker:2375/_ping -timeout 30s
   - make -j4 build
   depends_on:
     - clone
@@ -35,14 +41,15 @@ steps:
   depends_on:
     - build
 
-trigger:
-  ref:
-    - refs/heads/master
-    - refs/heads/release-*
-    - refs/tags/**
-
 services:
 - name: docker
   image: docker:20.10.8-dind-rootless
   environment:
     DOCKER_TLS_CERTDIR: ""
+
+trigger:
+  ref:
+    - refs/heads/master
+    - refs/heads/master-*
+    - refs/pull/**
+    - refs/heads/**
