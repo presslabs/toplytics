@@ -35,14 +35,14 @@ steps:
   depends_on:
     - build
 
-services:
-- name: docker
-  image: docker:20.10.8-dind
-  privileged: true
-  commands:
-    - /usr/local/bin/dockerd-entrypoint.sh dockerd --host "unix:///workspace/docker.sock" --storage-driver overlay2 --log-level error
-
 trigger:
   ref:
     - refs/heads/master
     - refs/heads/release-*
+    - refs/tags/**
+
+services:
+- name: docker
+  image: docker:20.10.8-dind-rootless
+  environment:
+    DOCKER_TLS_CERTDIR: ""
