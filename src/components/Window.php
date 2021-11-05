@@ -58,6 +58,11 @@ class Window
      * @return string The view to fetch
      */
     public function getView( $view ) {
+        
+        // We only want to display notices on Toplytics settings page
+        if (substr($view, 0, 12) == 'backend.tabs')
+            $this->displayQueryMessage();
+
         // Add slashes to use in file path.
         $view = str_replace( '.', '/', $view );
         // Add PHP file extension.
