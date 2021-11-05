@@ -246,6 +246,10 @@ The outcome will look like this:
 
 == Changelog ==
 
+= 4.0.7 =
+
+* Fixed: Status messages were not being displayed on the admin settings pages
+
 = 4.0.6 =
 
 * Optimized vendor dependencies for a smaller package footprint
