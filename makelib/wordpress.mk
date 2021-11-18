@@ -81,6 +81,9 @@ $(eval $(call common.target,wordpress.build))
 # Common Targets
 
 .php.test.init: $(WP_TESTS_DIR)/wp-tests-config.php
+	@# run composer install to fix: Error: The PHPUnit Polyfills library is a requirement
+	cd $(WP_TESTS_DIR) && composer install
+
 .build.artifacts: wordpress.build
 
 endif # __WORDPRESS_MAKEFILE__
