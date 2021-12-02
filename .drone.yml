@@ -6,7 +6,7 @@ clone:
 
 workspace:
   base: /workspace
-  path: src/github.com/bitpoke/build
+  path: src/github.com/presslabs/build
 
 steps:
 - name: clone
@@ -17,19 +17,19 @@ steps:
 
 - name: build
   pull: true
-  image: docker.io/bitpoke/build:v0.3.0
+  image: quay.io/presslabs/build:latest
   commands:
   - make -j4 build
   depends_on:
     - clone
 
 - name: publish
-  image: docker.io/bitpoke/build:v0.3.0
+  image: quay.io/presslabs/build:latest
   commands:
   - /usr/local/bin/setup-credentials-helper.sh
   - make publish
   environment:
-    DOCKER_USERNAME: bitpokebot
+    DOCKER_USERNAME: presslabsbot
     DOCKER_PASSWORD:
       from_secret: DOCKER_PASSWORD
   depends_on:

@@ -66,7 +66,7 @@ RUN sh -c 'echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" > /
 
 # ------------------------------------------------------------------------------------------------
 # git config
-RUN git config --global user.email "bot@bitpoke.cloud" \
+RUN git config --global user.email "bot@presslabs.com" \
     && git config --global user.name "RoBot"
 
 # ------------------------------------------------------------------------------------------------

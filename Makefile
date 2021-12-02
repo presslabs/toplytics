@@ -11,6 +11,6 @@ ROOT_DIR := $(abspath $(shell cd ./ && pwd -P))
 include makelib/common.mk
 
 IMAGES ?= build
-DOCKER_REGISTRY ?= docker.io/bitpoke
+DOCKER_REGISTRY ?= quay.io/presslabs
 
 include makelib/image.mk

@@ -68,8 +68,8 @@ if [ -n "$SSH_KEY" ] ; then
 fi
 
 if [[ -n "${GIT_USER}" && -n "${GIT_PASSWORD}" ]] ; then
-    git config --global user.email "${GIT_EMAIL:-bot@bitpoke.cloud}"
-    git config --global user.name "$GIT_USER"
+    git config --global user.email "${GIT_EMAIL:-bot@presslabs.com}"
+    git config --global user.name "${GIT_USER:-presslabs-bot}"
 
     cat <<EOF >> ~/.netrc
 machine ${GIT_HOST:-github.com}
