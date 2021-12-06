@@ -35,6 +35,7 @@ HELM_INDEX := $(HELM_OUTPUT_DIR)/index.yaml
 
 # helm home
 HELM_HOME := $(abspath $(WORK_DIR)/helm)
+HELM_CHARTS_WORK_DIR := $(abspath $(WORK_DIR)/charts)
 export HELM_HOME
 
 # remove the leading `v` for helm chart versions
@@ -43,8 +44,8 @@ HELM_CHART_VERSION := $(VERSION:v%=%)
 # ====================================================================================
 # Tools install targets
 
-HELM_VERSION := 2.16.1
-HELM_DOWNLOAD_URL := https://storage.googleapis.com/kubernetes-helm/helm-v$(HELM_VERSION)-$(HOSTOS)-$(HOSTARCH).tar.gz
+HELM_VERSION := 3.6.3
+HELM_DOWNLOAD_URL := https://get.helm.sh/helm-v$(HELM_VERSION)-$(HOSTOS)-$(HOSTARCH).tar.gz
 $(eval $(call tool.download.tar.gz,helm,$(HELM_VERSION),$(HELM_DOWNLOAD_URL)))
 
 # ====================================================================================
@@ -52,16 +53,31 @@ $(eval $(call tool.download.tar.gz,helm,$(HELM_VERSION),$(HELM_DOWNLOAD_URL)))
 
 $(HELM_HOME): $(HELM)
 	@mkdir -p $(HELM_HOME)
-	@$(HELM) init -c
 
 $(HELM_OUTPUT_DIR):
 	@mkdir -p $(HELM_OUTPUT_DIR)
 
+$(HELM_CHARTS_WORK_DIR):
+	@mkdir -p $(HELM_CHARTS_WORK_DIR)
+
 define helm.chart
-$(HELM_OUTPUT_DIR)/$(1)-$(HELM_CHART_VERSION).tgz: $(HELM_HOME) $(HELM_OUTPUT_DIR) $(shell find $(HELM_CHARTS_DIR)/$(1) -type f)
+
+.helm.package.init.$(1): $(HELM_CHARTS_WORK_DIR)
+	@rm -rf $(HELM_CHARTS_WORK_DIR)/$(1)
+	@cp -a $(abspath $(HELM_CHARTS_DIR)/$(1)) $(HELM_CHARTS_WORK_DIR)/$(1)
+.helm.package.run.$(1): $(HELM_OUTPUT_DIR) $(HELM_HOME)
 	@$(INFO) helm package $(1) $(HELM_CHART_VERSION)
-	@$(HELM) package --version $(HELM_CHART_VERSION) --app-version $(HELM_CHART_VERSION) -d $(HELM_OUTPUT_DIR) $(abspath $(HELM_CHARTS_DIR)/$(1))
+	@$(HELM) package --version $(HELM_CHART_VERSION) --app-version $(HELM_CHART_VERSION) -d $(HELM_OUTPUT_DIR) $(HELM_CHARTS_WORK_DIR)/$(1)
 	@$(OK) helm package $(1) $(HELM_CHART_VERSION)
+.helm.package.done.$(1): ; @:
+.helm.package.$(1):
+	@$(MAKE) .helm.package.init.$(1)
+	@$(MAKE) .helm.package.run.$(1)
+	@$(MAKE) .helm.package.done.$(1)
+
+.PHONY: .helm.package.init.$(1) .helm.package.run.$(1) .helm.package.done.$(1) .helm.package.$(1)
+
+$(HELM_OUTPUT_DIR)/$(1)-$(HELM_CHART_VERSION).tgz: $(HELM_HOME) $(HELM_OUTPUT_DIR) $(shell find $(HELM_CHARTS_DIR)/$(1) -type f)
 
 .PHONY: .helm.lint.$(1)
 .helm.lint.$(1): $(HELM_HOME)
@@ -80,7 +96,7 @@ helm.lint: .helm.lint.$(1)
 
 helm.dep: .helm.dep.$(1)
 
-$(HELM_INDEX): $(HELM_OUTPUT_DIR)/$(1)-$(HELM_CHART_VERSION).tgz
+$(HELM_INDEX): .helm.package.$(1)
 endef
 $(foreach p,$(HELM_CHARTS),$(eval $(call helm.chart,$(p))))
 

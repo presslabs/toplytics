@@ -16,14 +16,15 @@ steps:
     tags: true
 
 - name: build
-  image: docker.io/presslabs/build:v0.2.0
+  pull: true
+  image: quay.io/presslabs/build:latest
   commands:
   - make -j4 build
   depends_on:
     - clone
 
 - name: publish
-  image: docker.io/presslabs/build:v0.2.0
+  image: quay.io/presslabs/build:latest
   commands:
   - /usr/local/bin/setup-credentials-helper.sh
   - make publish
@@ -36,11 +37,12 @@ steps:
 
 services:
 - name: docker
-  image: docker:19.03.5-dind
+  image: docker:20.10.8-dind
   privileged: true
   commands:
     - /usr/local/bin/dockerd-entrypoint.sh dockerd --host "unix:///workspace/docker.sock" --storage-driver overlay2 --log-level error
 
 trigger:
   ref:
-    - refs/tags/**
+    - refs/heads/master
+    - refs/heads/release-*

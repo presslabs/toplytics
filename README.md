@@ -15,8 +15,8 @@ git subtree add -P build https://github.com/presslabs/build.git
 
 cat <<EOF > Makefile
 # Project Setup
-PROJECT_NAME := presslabs-dashboard
-PROJECT_REPO := github.com/presslabs/dashboard
+PROJECT_NAME := mysql-operator
+PROJECT_REPO := github.com/presslabs/mysql-operator
 
 include build/makelib/common.mk
 ```
@@ -43,4 +43,5 @@ Common Targets:
 
 ## Acknowledgement
 
+This work is based on https://github.com/bitpoke/build
 This work is based on https://github.com/upbound/build.
