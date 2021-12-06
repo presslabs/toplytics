@@ -15,10 +15,21 @@ git subtree add -P build https://github.com/presslabs/build.git
 
 cat <<EOF > Makefile
 # Project Setup
-PROJECT_NAME := presslabs-dashboard
-PROJECT_REPO := github.com/presslabs/dashboard
+PROJECT_NAME := mysql-operator
+PROJECT_REPO := github.com/presslabs/mysql-operator
 
 include build/makelib/common.mk
+```
+
+### Push back changes
+
+An [workaround](https://github.com/rust-lang/rust-clippy/issues/5565#issuecomment-623489754) on how
+to bypass the segfault of git subtree command on repose with more commits.
+
+```sh
+ulimit -s 60000  # workaround to fix segfault
+
+git subtree push -P build/ git@github.com:presslabs/build.git <a branch name>
 ```
 
 ## Usage
@@ -43,4 +54,5 @@ Common Targets:
 
 ## Acknowledgement
 
+This work is based on https://github.com/bitpoke/build
 This work is based on https://github.com/upbound/build.

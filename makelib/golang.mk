@@ -210,7 +210,7 @@ endif
 
 # we use a consistent version of gofmt even while running different go compilers.
 # see https://github.com/golang/go/issues/26397 for more details
-GOFMT_VERSION ?= 1.13
+GOFMT_VERSION ?= 1.16.6
 GOFMT_DOWNLOAD_URL ?= https://dl.google.com/go/go$(GOFMT_VERSION).$(HOSTOS)-$(HOSTARCH).tar.gz
 ifneq ($(findstring $(GOFMT_VERSION),$(GO_VERSION)),)
 GOFMT := $(shell which gofmt)
@@ -218,12 +218,12 @@ else
 $(eval $(call tool.download.tar.gz,gofmt,$(GOFMT_VERSION),$(GOFMT_DOWNLOAD_URL),bin/gofmt))
 endif
 
-GOIMPORTS_VERSION ?= v0.0.0-20191111154804-8cb0d02132ec
+GOIMPORTS_VERSION ?= v0.1.5
 GOIMPORTS_URL ?= golang.org/x/tools/cmd/goimports
 $(eval $(call tool.go.install,goimports,$(GOIMPORTS_VERSION),$(GOIMPORTS_URL)))
 
 ifeq ($(GO_TEST_TOOL),ginkgo)
-GINKGO_VERSION ?= v1.10.3
+GINKGO_VERSION ?= v1.16.4
 GINKGO_URL ?= github.com/onsi/ginkgo/ginkgo
 $(eval $(call tool.go.install,ginkgo,$(GINKGO_VERSION),$(GINKGO_URL)))
 else # GO_TEST_TOOL != ginkgo
@@ -259,7 +259,7 @@ go.test.unit: $(GINKGO)
 	@CGO_ENABLED=0 $(GINKGO) $(GO_TEST_FLAGS) $(GO_STATIC_FLAGS) $(patsubst $(ROOT_DIR)/%,./%,$(shell go list -f '{{ .Dir }}' $(GO_TEST_PACKAGES))) || $(FAIL)
 	@$(OK) go test unit-tests
 
-go.test.integration:
+go.test.integration: $(GINKGO)
 	@$(INFO) ginkgo integration-tests
 	@mkdir -p $(GO_TEST_OUTPUT) || $(FAIL)
 	@CGO_ENABLED=0 $(GINKGO) $(GO_TEST_FLAGS) $(GO_STATIC_FLAGS) $(foreach t,$(GO_INTEGRATION_TESTS_SUBDIRS),./$(t)/...) $(TEST_FILTER_PARAM) || $(FAIL)
