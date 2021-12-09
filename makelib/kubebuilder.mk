@@ -68,7 +68,10 @@ $(KUBEBUILDER):
 
 	@$(OK) installing kubebuilder $(KUBEBUILDER_VERSION)
 
-$(eval $(call tool.go.install,controller-gen,v0.6.1,sigs.k8s.io/controller-tools/cmd/controller-gen))
+
+CONTROLLER_GEN_VERSION ?= 0.6.1
+CONTROLLER_GEN_URL ?= sigs.k8s.io/controller-tools/cmd/controller-gen
+$(eval $(call tool.go.install,controller-gen,v$(CONTROLLER_GEN_VERSION),$(CONTROLLER_GEN_URL)))
 
 # ====================================================================================
 # Kubebuilder Targets
@@ -80,8 +83,7 @@ $(eval $(call common.target,kubebuilder.manifests))
 	@$(INFO) Generating Kubebuilder manifests
 	@# first delete the CRD_DIR, to remove the CRDs of types that no longer exist
 
-	@$(CONTROLLER_GEN) $(CRD_OPTIONS) rbac:roleName=manager-role webhook paths="./..." output:crd:artifacts:config=$(CRD_DIR)
-	@$(CONTROLLER_GEN) object:headerFile=$(BOILERPLATE_FILE) paths="./..."
+	@$(CONTROLLER_GEN) paths="./pkg/..." $(GEN_CRD_OPTIONS) $(GEN_RBAC_OPTIONS) $(GEN_WEBHOOK_OPTIONS) $(GEN_OBJECT_OPTIONS) $(GEN_OUTPUTS_OPTIONS)
 
 	@$(OK) Generating Kubebuilder manifests
 
