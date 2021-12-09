@@ -67,7 +67,7 @@ RUN sh -c 'echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" > /
 # ------------------------------------------------------------------------------------------------
 # git config
 RUN git config --global user.email "bot@presslabs.com" \
-    && git config --global user.name "RoBot"
+    && git config --global user.name "RoBot" \
     && git config --global diff.tar-filelist.binary true \
     && git config --global diff.tar-filelist.textconv 'tar -tvf' \
     && git config --global diff.tar.binary true \
