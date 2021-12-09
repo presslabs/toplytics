@@ -80,9 +80,8 @@ define helm.chart
 $(HELM_OUTPUT_DIR)/$(1)-$(HELM_CHART_VERSION).tgz: $(HELM_HOME) $(HELM_OUTPUT_DIR) $(shell find $(HELM_CHARTS_DIR)/$(1) -type f)
 
 .PHONY: .helm.lint.$(1)
-.helm.lint.$(1): $(HELM_HOME)
+.helm.lint.$(1): $(HELM_HOME) .helm.dep.$(1)
 	@$(INFO) helm lint $(1)
-	@rm -rf $(abspath $(HELM_CHARTS_DIR)/$(1)/charts)
 	@$(HELM) lint $(abspath $(HELM_CHARTS_DIR)/$(1)) $(HELM_CHART_LINT_ARGS_$(1)) --strict || $$(FAIL)
 	@$(OK) helm lint $(1)
 

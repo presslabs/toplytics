@@ -19,7 +19,7 @@ __K8S_TOOLS_MAKEFILE__ := included
 # tools
 
 # kubectl download and install
-KUBECTL_VERSION ?= 1.19.13
+KUBECTL_VERSION ?= 1.22.4
 KUBECTL_DOWNLOAD_URL ?= https://storage.googleapis.com/kubernetes-release/release/v$(KUBECTL_VERSION)/bin/$(HOSTOS)/$(HOSTARCH)/kubectl
 $(eval $(call tool.download,kubectl,$(KUBECTL_VERSION),$(KUBECTL_DOWNLOAD_URL)))
 

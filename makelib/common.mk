@@ -214,7 +214,12 @@ HOSTNAME := $(shell hostname)
 endif
 
 YQ_VERSION ?= 4.11.2
+ifeq ($(patsubst 4.%,,$(YQ_VERSION)),)
+# after 4.1.0 they changed the URL to include v
 YQ_DOWNLOAD_URL ?= https://github.com/mikefarah/yq/releases/download/v$(YQ_VERSION)/yq_$(HOST_PLATFORM)
+else
+YQ_DOWNLOAD_URL ?= https://github.com/mikefarah/yq/releases/download/$(YQ_VERSION)/yq_$(HOST_PLATFORM)
+endif
 $(eval $(call tool.download,yq,$(YQ_VERSION),$(YQ_DOWNLOAD_URL)))
 
 GIT_SEMVER_VERSION ?= 6.1.1
