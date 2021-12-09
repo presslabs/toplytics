@@ -194,7 +194,7 @@ endef # tool.go.vendor.install
 # ====================================================================================
 # Tools install targets
 
-ifeq ($(GO111MODULE),on)
+ifneq ($(GO111MODULE),on)
 DEP_VERSION ?= 0.5.4
 DEP_DOWNLOAD_URL ?= https://github.com/golang/dep/releases/download/v$(DEP_VERSION)/dep-$(HOSTOS)-$(HOSTARCH)
 $(eval $(call tool.download,dep,$(DEP_VERSION),$(DEP_DOWNLOAD_URL)))
