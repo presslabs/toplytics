@@ -15,13 +15,18 @@ steps:
     depth: 0
     tags: true
 
+- name: install dependencies
+  image: quay.io/presslabs/build:latest
+  commands:
+  - make -j4 build.tools
+
 - name: build
   pull: true
   image: quay.io/presslabs/build:latest
+  environment:
+    DOCKER_HOST: "unix:///workspace/docker.sock"
   commands:
   - make -j4 build
-  depends_on:
-    - clone
 
 - name: publish
   image: quay.io/presslabs/build:latest
@@ -29,20 +34,24 @@ steps:
   - /usr/local/bin/setup-credentials-helper.sh
   - make publish
   environment:
+    DOCKER_HOST: "unix:///workspace/docker.sock"
     DOCKER_USERNAME: presslabsbot
     DOCKER_PASSWORD:
       from_secret: DOCKER_PASSWORD
-  depends_on:
-    - build
+  when:
+    ref:
+    - refs/heads/master-*
+    - refs/heads/release-*
 
 services:
 - name: docker
-  image: docker:20.10.8-dind
+  image: docker:dind
   privileged: true
   commands:
     - /usr/local/bin/dockerd-entrypoint.sh dockerd --host "unix:///workspace/docker.sock" --storage-driver overlay2 --log-level error
 
+
 trigger:
   ref:
-    - refs/heads/master
-    - refs/heads/release-*
+    - refs/pull/**
+    - refs/heads/**
