@@ -40,6 +40,7 @@ steps:
       from_secret: DOCKER_PASSWORD
   when:
     ref:
+    - refs/heads/master
     - refs/heads/master-*
     - refs/heads/release-*
 
