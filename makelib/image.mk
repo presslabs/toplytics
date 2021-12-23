@@ -259,6 +259,12 @@ ifneq ($(filter master release-%,$(BRANCH_NAME)),)
 .publish.run: img.publish
 endif
 
+# publish images at tag also
+ifneq ($(TAGS),)
+.publish.run: img.publish
+endif
+
+
 .promote.run: $(addprefix .img.release.manifest.promote.,$(IMAGES))
 
 else # assume this .mk file is being included to build a single image
