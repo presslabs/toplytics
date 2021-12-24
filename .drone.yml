@@ -35,9 +35,10 @@ steps:
   - make publish
   environment:
     DOCKER_HOST: "unix:///workspace/docker.sock"
-    DOCKER_USERNAME: presslabsbot
+    DOCKER_USERNAME: presslabs+drone
+    PLUGIN_DOCKER_REGISTRY: quay.io
     DOCKER_PASSWORD:
-      from_secret: DOCKER_PASSWORD
+      from_secret: QUAY_TOKEN
   when:
     ref:
     - refs/heads/master
