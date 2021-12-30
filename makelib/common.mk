@@ -267,10 +267,11 @@ BUILD_DATE ?= $(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
 # set a semantic version number from git if VERSION is undefined.
 ifeq ($(origin VERSION), undefined)
 ifeq ($(GIT_TREE_STATE),clean)
-VERSION := $(shell $(GIT_SEMVER) -prefix v)
+VERSION := $(shell $(GIT_SEMVER) -prefix v $(ROOT_DIR))
 else
-VERSION := $(shell $(GIT_SEMVER) -prefix v -set-meta $(shell echo "$(COMMIT_HASH)" | head -c8)-dirty)
+VERSION := $(shell $(GIT_SEMVER) -prefix v -set-meta $(shell echo "$(COMMIT_HASH)" | head -c8)-dirty $(ROOT_DIR))
 endif
+else
 endif
 export VERSION
 
