@@ -114,7 +114,7 @@ RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add - && \
 # ------------------------------------------------------------------------------------------------
 # rclone
 RUN set -ex \
-    && export RCLONE_VERSION=1.56.0 \
+    && export RCLONE_VERSION=1.57.0 \
     && curl -sL -o rclone-v${RCLONE_VERSION}-linux-amd64.deb https://github.com/rclone/rclone/releases/download/v${RCLONE_VERSION}/rclone-v${RCLONE_VERSION}-linux-amd64.deb \
     && dpkg -i rclone-v${RCLONE_VERSION}-linux-amd64.deb \
     && rm rclone-v${RCLONE_VERSION}-linux-amd64.deb \
