@@ -75,8 +75,8 @@ RUN git config --global user.email "bot@presslabs.com" \
 
 # ------------------------------------------------------------------------------------------------
 # Go support
-RUN GO_VERSION=1.16.7 && \
-    GO_HASH=7fe7a73f55ba3e2285da36f8b085e5c0159e9564ef5f63ee0ed6b818ade8ef04 && \
+RUN GO_VERSION=1.17.5 && \
+    GO_HASH=bd78114b0d441b029c8fe0341f4910370925a4d270a6a590668840675b0c653e && \
     curl -fsSL https://golang.org/dl/go${GO_VERSION}.linux-amd64.tar.gz -o golang.tar.gz && \
     echo "${GO_HASH}  golang.tar.gz" | sha256sum -c - && \
     tar -C /usr/local -xzf golang.tar.gz && \
