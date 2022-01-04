@@ -15,104 +15,102 @@
 ifndef __KUBEBUILDER_MAKEFILE__
 __KUBEBUILDER_MAKEFILE__ := included
 
+include $(COMMON_SELF_DIR)/golang.mk
+
 # ====================================================================================
 # Options
 
-KUBEBUILDER_VERSION ?= 3.1.0
-KUBEBUILDER := $(TOOLS_HOST_DIR)/kubebuilder-$(KUBEBUILDER_VERSION)
-
-K8S_VERSION := 1.19.2
-
-CRD_DIR ?= config/crds
-API_DIR ?= pkg/apis
+CRD_DIR ?= config/crd/bases
 RBAC_DIR ?= config/rbac
 
-BOILERPLATE_FILE ?= ./hack/boilerplate.go.txt
+BOILERPLATE_FILE ?= hack/boilerplate.go.txt
 
-GEN_CRD_OPTIONS ?= crd:trivialVersions=true
-GEN_RBAC_OPTIONS ?= rbac:roleName=manager-role
-GEN_WEBHOOK_OPTIONS ?=
-GEN_OBJECT_OPTIONS ?= object:headerFile=$(BOILERPLATE_FILE)
-GEN_OUTPUTS_OPTIONS ?= output:crd:artifacts:config=$(CRD_DIR) output:rbac:artifacts:config=$(RBAC_DIR)
+CONTROLLER_GEN_CRD_OPTIONS ?= crd output:crd:artifacts:config=$(CRD_DIR)
+CONTROLLER_GEN_RBAC_OPTIONS ?= rbac:roleName=manager-role output:rbac:artifacts:config=$(RBAC_DIR)
+CONTROLLER_GEN_WEBHOOK_OPTIONS ?= webhook
+CONTROLLER_GEN_OBJECT_OPTIONS ?= object:headerFile=$(BOILERPLATE_FILE)
+CONTROLLER_GEN_PATHS ?= $(foreach t,$(GO_SUBDIRS),paths=./$(t)/...)
 
-# these are use by the kubebuilder test harness
-
-TEST_ASSET_KUBE_APISERVER := $(KUBEBUILDER)/kube-apiserver
-TEST_ASSET_ETCD := $(KUBEBUILDER)/etcd
-TEST_ASSET_KUBECTL := $(KUBEBUILDER)/kubectl
-export TEST_ASSET_KUBE_APISERVER TEST_ASSET_ETCD TEST_ASSET_KUBECTL
-
-# ====================================================================================
-# Setup environment
-
-include $(COMMON_SELF_DIR)/golang.mk
+KUBEBUILDER_ASSETS_VERSION ?= 1.19.2
+KUBEBUILDER_ASSETS = $(CACHE_DIR)/kubebuilder/k8s/$(KUBEBUILDER_ASSETS_VERSION)-$(HOSTOS)-$(HOSTARCH)
+export KUBEBUILDER_ASSETS
 
 # ====================================================================================
 # tools
 
+# setup-envtest download and install
+SETUP_ENVTEST_VERSION ?= 0.0.0-20211206022232-3ffc700bc2a3
+SETUP_ENVTEST_DOWNLOAD_URL ?= sigs.k8s.io/controller-runtime/tools/setup-envtest
+$(eval $(call tool.go.install,setup-envtest,v$(SETUP_ENVTEST_VERSION),$(SETUP_ENVTEST_DOWNLOAD_URL)))
+
 # kubebuilder download and install
-$(KUBEBUILDER):
-	@echo ${TIME} ${BLUE}[TOOL]${CNone} installing kubebuilder $(KUBEBUILDER_VERSION)
+KUBEBUILDER_VERSION ?= 3.2.0
+KUBEBUILDER_DOWNLOAD_URL ?= https://github.com/kubernetes-sigs/kubebuilder/releases/download/v$(KUBEBUILDER_VERSION)/kubebuilder_$(HOST_PLATFORM)
+$(eval $(call tool.download,kubebuilder,$(KUBEBUILDER_VERSION),$(KUBEBUILDER_DOWNLOAD_URL)))
 
-	@mkdir -p $(KUBEBUILDER)
-	@mkdir -p $(TOOLS_HOST_DIR)/tmp || $(FAIL)
+# controller-gen download and install
+CONTROLLER_GEN_VERSION ?= 0.7.0
+CONTROLLER_GEN_DOWNLOAD_URL ?= sigs.k8s.io/controller-tools/cmd/controller-gen
+$(eval $(call tool.go.install,controller-gen,v$(CONTROLLER_GEN_VERSION),$(CONTROLLER_GEN_DOWNLOAD_URL)))
 
-	@# kubebuilder
-	@curl -sL -o $(KUBEBUILDER)/kubebuilder https://github.com/kubernetes-sigs/kubebuilder/releases/download/v$(KUBEBUILDER_VERSION)/kubebuilder_$(GOHOSTOS)_$(GOHOSTARCH) || $(FAIL)
-	@chmod +x $(KUBEBUILDER)/kubebuilder || $(FAIL)
-
-	@# kubebuilder-tools
-	@curl -fsSL https://storage.googleapis.com/kubebuilder-tools/kubebuilder-tools-$(K8S_VERSION)-$(GOHOSTOS)-$(GOHOSTARCH).tar.gz | tar -xz -C $(TOOLS_HOST_DIR)/tmp || $(FAIL)
-	@mv $(TOOLS_HOST_DIR)/tmp/kubebuilder/bin/* $(KUBEBUILDER) || $(FAIL)
-	@rm -rf $(TOOLS_HOST_DIR)/tmp
-
-	@$(OK) installing kubebuilder $(KUBEBUILDER_VERSION)
-
-
-CONTROLLER_GEN_VERSION ?= 0.6.2
-CONTROLLER_GEN_URL ?= sigs.k8s.io/controller-tools/cmd/controller-gen
-$(eval $(call tool.go.install,controller-gen,v$(CONTROLLER_GEN_VERSION),$(CONTROLLER_GEN_URL)))
+build.tools: |$(KUBEBUILDER_ASSETS)
+$(KUBEBUILDER_ASSETS): $(SETUP_ENVTEST)
+	@echo ${TIME} ${BLUE}[TOOL]${CNone} installing kubebuilder assets for Kubernetes $(KUBEBUILDER_ASSETS_VERSION)
+	@$(SETUP_ENVTEST) --bin-dir=$(CACHE_DIR)/kubebuilder --os=$(HOSTOS) --arch=$(HOSTARCH) use $(KUBEBUILDER_ASSETS_VERSION)
+	@$(OK) installing kubebuilder assets for Kubernetes $(KUBEBUILDER_ASSETS_VERSION)
 
 # ====================================================================================
 # Kubebuilder Targets
 
 $(eval $(call common.target,kubebuilder.manifests))
-
 # Generate manifests e.g. CRD, RBAC etc.
 .do.kubebuilder.manifests: $(CONTROLLER_GEN)
-	@$(INFO) Generating Kubebuilder manifests
-	@# first delete the CRD_DIR, to remove the CRDs of types that no longer exist
-
-	@$(CONTROLLER_GEN) paths="$(call list-join,;,$(foreach p,$(GO_SUBDIRS),./$(p)/... ))" $(GEN_CRD_OPTIONS) $(GEN_RBAC_OPTIONS) $(GEN_WEBHOOK_OPTIONS) $(GEN_OBJECT_OPTIONS) $(GEN_OUTPUTS_OPTIONS)
-
-	@$(OK) Generating Kubebuilder manifests
-
+	@$(INFO) Generating Kubernetes \(CRDs, RBAC, WebhookConfig, etc.\) manifests
+	@$(CONTROLLER_GEN) \
+		$(CONTROLLER_GEN_CRD_OPTIONS) \
+		$(CONTROLLER_GEN_RBAC_OPTIONS) \
+		$(CONTROLLER_CONTROLLER_GEN_WEBHOOK_OPTIONS) \
+		$(CONTROLLER_GEN_PATHS)
+	@$(OK) Generating Kubernetes \(CRDs, RBAC, WebhookConfig, etc.\) manifests
 .PHONY: .do.kubebuilder.manifests
 .kubebuilder.manifests.run: .do.kubebuilder.manifests
+
+$(eval $(call common.target,kubebuilder.code))
+# Generate code containing DeepCopy, DeepCopyInto, and DeepCopyObject method implementations.
+.do.kubebuilder.code: $(CONTROLLER_GEN)
+	@$(INFO) Generating DeepCopy, DeepCopyInto, and DeepCopyObject code
+	@$(CONTROLLER_GEN) \
+		$(CONTROLLER_GEN_OBJECT_OPTIONS) \
+		$(CONTROLLER_GEN_PATHS)
+	@$(OK) Generating DeepCopy, DeepCopyInto, and DeepCopyObject code
+.PHONY: .do.kubebuilder.code
+.kubebuilder.code.run: .do.kubebuilder.code
 
 # ====================================================================================
 # Common Targets
 
-build.tools: $(KUBEBUILDER)
-.test.init: $(KUBEBUILDER)
-go.test.unit: $(KUBEBUILDER)
+.test.init: |$(KUBEBUILDER_ASSETS)
+go.test.unit: |$(KUBEBUILDER_ASSETS)
+go.generate: kubebuilder.code
+.generate.init: .kubebuilder.manifests.init
+.generate.run: .kubebuilder.manifests.run
+.generate.done: .kubebuilder.manifests.done
 
 # ====================================================================================
 # Special Targets
 
-define KUBEBULDERV2_HELPTEXT
+define KUBEBULDER_HELPTEXT
 Kubebuilder Targets:
     kubebuilder.manifests   Generates Kubernetes custom resources manifests (e.g. CRDs RBACs, ...)
+    kubebuilder.code        Generates DeepCopy, DeepCopyInto, and DeepCopyObject code
 
 endef
-export KUBEBULDERV2_HELPTEXT
+export KUBEBULDER_HELPTEXT
 
 .kubebuilder.help:
-	@echo "$$KUBEBULDERV2_HELPTEXT"
+	@echo "$$KUBEBULDER_HELPTEXT"
 
 .help: .kubebuilder.help
-go.generate: kubebuilder.manifests
-
-.PHONY: .kubebuilder.help kubebuilder.manifests
+.PHONY: .kubebuilder.help
 
 endif # __KUBEBUILDER_MAKEFILE__
