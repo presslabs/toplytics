@@ -213,7 +213,9 @@ $(foreach r,$(REGISTRIES), $(foreach i,$(IMAGES), $(foreach a,$(IMAGE_ARCHS),$(e
 
 .PHONY: .img.release.manifest.publish.%
 .img.release.manifest.publish.%: .img.release.publish
-	@docker buildx imagetools create --tag $(DOCKER_REGISTRY)/$*:$(IMAGE_TAG) $(patsubst %,$(DOCKER_REGISTRY)/$*:$(IMAGE_TAG)-%,$(IMAGE_ARCHS))
+	@$(INFO) docker buildx imagetools create --tag $(DOCKER_REGISTRY)/$*:$(IMAGE_TAG) $(patsubst %,$(DOCKER_REGISTRY)/$*:$(IMAGE_TAG)-%,$(IMAGE_ARCHS))
+	@docker buildx imagetools create --tag $(DOCKER_REGISTRY)/$*:$(IMAGE_TAG) $(patsubst %,$(DOCKER_REGISTRY)/$*:$(IMAGE_TAG)-%,$(IMAGE_ARCHS)) || $(FAIL)
+	@$(OK) docker buildx imagetools create --tag $(DOCKER_REGISTRY)/$*:$(IMAGE_TAG) $(patsubst %,$(DOCKER_REGISTRY)/$*:$(IMAGE_TAG)-%,$(IMAGE_ARCHS))
 
 .PHONY: .img.release.manifest.promote.%
 .img.release.manifest.promote.%: .img.release.promote
