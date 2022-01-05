@@ -194,11 +194,15 @@ define repo.targets
 .PHONY: .img.release.promote.$(1).$(2).$(3)
 .img.release.promote.$(1).$(2).$(3):
 	@$(INFO) docker promote $(1)/$(2):$(IMAGE_TAG)-$(3) to $(1)/$(2)-$(3):$(CHANNEL)
+
 	@docker pull $(1)/$(2):$(IMAGE_TAG)-$(3) || $(FAIL)
-	@[ "$(CHANNEL)" = "master" ] || docker tag $(1)/$(2):$(IMAGE_TAG)-$(3) $(1)/$(2):$(IMAGE_TAG)-$(3)-$(CHANNEL) || $(FAIL)
-	@docker tag $(1)/$(2):$(IMAGE_TAG)-$(3) $(1)/$(2)-$(3):$(CHANNEL) || $(FAIL)
-	@[ "$(CHANNEL)" = "master" ] || docker push $(1)/$(2):$(IMAGE_TAG)-$(3)-$(CHANNEL)
-	@docker push $(1)/$(2)-$(3):$(CHANNEL) || $(FAIL)
+
+	@[ "$(CHANNEL)" = "master" ] || docker tag $(1)/$(2):$(IMAGE_TAG)-$(3) $(1)/$(2):$(CHANNEL)-$(IMAGE_TAG)-$(3) || $(FAIL)
+	@[ "$(CHANNEL)" = "master" ] || docker push $(1)/$(2):$(CHANNEL)-$(IMAGE_TAG)-$(3) || $(FAIL)
+
+	@docker tag $(1)/$(2):$(IMAGE_TAG)-$(3) $(1)/$(2):$(CHANNEL) || $(FAIL)
+	@docker push $(1)/$(2):$(CHANNEL) || $(FAIL)
+
 	@$(OK) docker promote $(1)/$(2):$(IMAGE_TAG)-$(3) to $(1)/$(2)-$(3):$(CHANNEL) || $(FAIL)
 .img.release.promote: .img.release.promote.$(1).$(2).$(3)
 
@@ -215,12 +219,14 @@ $(foreach r,$(REGISTRIES), $(foreach i,$(IMAGES), $(foreach a,$(IMAGE_ARCHS),$(e
 .img.release.manifest.publish.%: .img.release.publish
 	@$(INFO) docker buildx imagetools create --tag $(DOCKER_REGISTRY)/$*:$(IMAGE_TAG) $(patsubst %,$(DOCKER_REGISTRY)/$*:$(IMAGE_TAG)-%,$(IMAGE_ARCHS))
 	@docker buildx imagetools create --tag $(DOCKER_REGISTRY)/$*:$(IMAGE_TAG) $(patsubst %,$(DOCKER_REGISTRY)/$*:$(IMAGE_TAG)-%,$(IMAGE_ARCHS)) || $(FAIL)
-	@$(OK) docker buildx imagetools create --tag $(DOCKER_REGISTRY)/$*:$(IMAGE_TAG) $(patsubst %,$(DOCKER_REGISTRY)/$*:$(IMAGE_TAG)-%,$(IMAGE_ARCHS))
+	@$(OK) docker buildx imagetools create
 
 .PHONY: .img.release.manifest.promote.%
 .img.release.manifest.promote.%: .img.release.promote
-	@[ "$(CHANNEL)" = "master" ] || docker buildx imagetools create --tag $(DOCKER_REGISTRY)/$*:$(IMAGE_TAG)-$(CHANNEL) $(patsubst %,$(DOCKER_REGISTRY)/$*:$(IMAGE_TAG)-%,$(IMAGE_ARCHS)) || $(FAIL)
-	@docker buildx imagetools create --tag $(DOCKER_REGISTRY)/$*:$(CHANNEL) $(patsubst %,$(DOCKER_REGISTRY)/$*:$(IMAGE_TAG)-%,$(IMAGE_ARCHS))
+	@$(INFO) docker buildx imagetools create --tag $(DOCKER_REGISTRY)/$*:$(CHANNEL) $(patsubst %,$(DOCKER_REGISTRY)/$*:$(IMAGE_TAG)-%,$(IMAGE_ARCHS))
+	@[ "$(CHANNEL)" = "master" ] || docker buildx imagetools create --tag $(DOCKER_REGISTRY)/$*:$(CHANNEL)-$(IMAGE_TAG) $(patsubst %,$(DOCKER_REGISTRY)/$*:$(IMAGE_TAG)-%,$(IMAGE_ARCHS)) || $(FAIL)
+	@docker buildx imagetools create --tag $(DOCKER_REGISTRY)/$*:$(CHANNEL) $(patsubst %,$(DOCKER_REGISTRY)/$*:$(IMAGE_TAG)-%,$(IMAGE_ARCHS)) || $(FAIL)
+	@$(OK) docker buildx imagetools create
 
 .img.release.build: ;@
 .img.release.publish: ;@
