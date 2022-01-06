@@ -81,6 +81,7 @@ IMAGE_PLATFORMS := $(call dockerify-platform,$(subst _,/,$(filter linux_%,$(PLAT
 IMAGE_PLATFORM = $(call dockerify-platform,linux/$(ARCH))
 
 IMAGE_TAG ?= $(subst +,-,$(VERSION))
+PROMOTE_TAG := $(if  $(PROMOTE_IMAGE_TAG),$(PROMOTE_IMAGE_TAG),$(IMAGE_TAG))
 
 # if set to 1 docker image caching will not be used.
 CACHEBUST ?= 0
@@ -197,11 +198,8 @@ define repo.targets
 
 	@docker pull $(1)/$(2):$(IMAGE_TAG)-$(3) || $(FAIL)
 
-	@[ "$(CHANNEL)" = "master" ] || docker tag $(1)/$(2):$(IMAGE_TAG)-$(3) $(1)/$(2):$(CHANNEL)-$(IMAGE_TAG)-$(3) || $(FAIL)
-	@[ "$(CHANNEL)" = "master" ] || docker push $(1)/$(2):$(CHANNEL)-$(IMAGE_TAG)-$(3) || $(FAIL)
-
-	@docker tag $(1)/$(2):$(IMAGE_TAG)-$(3) $(1)/$(2):$(CHANNEL) || $(FAIL)
-	@docker push $(1)/$(2):$(CHANNEL) || $(FAIL)
+	@[ "$(CHANNEL)" = "master" ] || docker tag $(1)/$(2):$(IMAGE_TAG)-$(3) $(1)/$(2):$(CHANNEL)-$(PROMOTE_TAG)-$(3) || $(FAIL)
+	@[ "$(CHANNEL)" = "master" ] || docker push $(1)/$(2):$(CHANNEL)-$(PROMOTE_TAG)-$(3) || $(FAIL)
 
 	@$(OK) docker promote $(1)/$(2):$(IMAGE_TAG)-$(3) to $(1)/$(2)-$(3):$(CHANNEL) || $(FAIL)
 .img.release.promote: .img.release.promote.$(1).$(2).$(3)
@@ -209,8 +207,8 @@ define repo.targets
 .PHONY: .img.release.clean.$(1).$(2).$(3)
 .img.release.clean.$(1).$(2).$(3):
 	@[ -z "$$$$(docker images -q $(1)/$(2):$(IMAGE_TAG)-$(3))" ] || docker rmi $(1)/$(2):$(IMAGE_TAG)-$(3)
-	@[ -z "$$$$(docker images -q $(1)/$(2):$(IMAGE_TAG)-$(3)-$(CHANNEL))" ] || docker rmi $(1)/$(2):$(IMAGE_TAG)-$(3)-$(CHANNEL)
-	@[ -z "$$$$(docker images -q $(1)/$(2)-$(3):$(CHANNEL))" ] || docker rmi $(1)/$(2)-$(3):$(CHANNEL)
+	@[ -z "$$$$(docker images -q $(1)/$(2):$(CHANNEL)-$(PROMOTE_TAG)-$(3))" ] || docker rmi $(1)/$(2):$(CHANNEL)-$(PROMOTE_TAG)-$(3)
+	@[ -z "$$$$(docker images -q $(1)/$(2):$(CHANNEL))" ] || docker rmi $(1)/$(2):$(CHANNEL)
 .img.release.clean: .img.release.clean.$(1).$(2).$(3)
 endef
 $(foreach r,$(REGISTRIES), $(foreach i,$(IMAGES), $(foreach a,$(IMAGE_ARCHS),$(eval $(call repo.targets,$(r),$(i),$(a))))))
@@ -224,7 +222,10 @@ $(foreach r,$(REGISTRIES), $(foreach i,$(IMAGES), $(foreach a,$(IMAGE_ARCHS),$(e
 .PHONY: .img.release.manifest.promote.%
 .img.release.manifest.promote.%: .img.release.promote
 	@$(INFO) docker buildx imagetools create --tag $(DOCKER_REGISTRY)/$*:$(CHANNEL) $(patsubst %,$(DOCKER_REGISTRY)/$*:$(IMAGE_TAG)-%,$(IMAGE_ARCHS))
-	@[ "$(CHANNEL)" = "master" ] || docker buildx imagetools create --tag $(DOCKER_REGISTRY)/$*:$(CHANNEL)-$(IMAGE_TAG) $(patsubst %,$(DOCKER_REGISTRY)/$*:$(IMAGE_TAG)-%,$(IMAGE_ARCHS)) || $(FAIL)
+	@[ "$(CHANNEL)" = "master" ] || docker buildx imagetools create --tag $(DOCKER_REGISTRY)/$*:$(CHANNEL)-$(PROMOTE_TAG) $(patsubst %,$(DOCKER_REGISTRY)/$*:$(IMAGE_TAG)-%,$(IMAGE_ARCHS)) || $(FAIL)
+	@# Republish images to the PROMOTE_TAG when promoting on stable
+	@[ "$(CHANNEL)" = "stable" ] && [ "$(PROMOTE_TAG)" != "$(IMAGE_TAG)" ] && docker buildx imagetools create --tag $(DOCKER_REGISTRY)/$*:$(PROMOTE_TAG) $(patsubst %,$(DOCKER_REGISTRY)/$*:$(IMAGE_TAG)-%,$(IMAGE_ARCHS)) || $(FAIL)
+
 	@docker buildx imagetools create --tag $(DOCKER_REGISTRY)/$*:$(CHANNEL) $(patsubst %,$(DOCKER_REGISTRY)/$*:$(IMAGE_TAG)-%,$(IMAGE_ARCHS)) || $(FAIL)
 	@$(OK) docker buildx imagetools create
 

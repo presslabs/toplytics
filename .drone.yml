@@ -81,7 +81,8 @@ steps:
   image: presslabs/build:stable
   commands:
   - /usr/local/bin/setup-credentials-helper.sh
-  - make promote CHANNEL=${DRONE_DEPLOY_TO}
+  - make promote CHANNEL=${DRONE_DEPLOY_TO} PROMOTE_IMAGE_TAG=${PUBLISH_TAG}
+  - '[ "$PUBLISH_TAG" = "" ] || make .publish.tag VERSION=${PUBLISH_TAG}'
   environment:
     DOCKER_HOST: "unix:///workspace/docker.sock"
     DOCKER_USERNAME: presslabsbot
