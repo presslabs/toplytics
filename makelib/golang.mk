@@ -58,7 +58,7 @@ GO_LDFLAGS += -s -w
 endif
 
 # supported go versions
-GO_SUPPORTED_VERSIONS ?= 1.16|1.17
+GO_SUPPORTED_VERSIONS ?= 1.17
 
 # set GOOS and GOARCH
 GOOS := $(OS)
@@ -212,7 +212,7 @@ endif
 
 # we use a consistent version of gofmt even while running different go compilers.
 # see https://github.com/golang/go/issues/26397 for more details
-GOFMT_VERSION ?= 1.16.6
+GOFMT_VERSION ?= 1.17.5
 GOFMT_DOWNLOAD_URL ?= https://dl.google.com/go/go$(GOFMT_VERSION).$(HOSTOS)-$(HOSTARCH).tar.gz
 ifneq ($(findstring $(GOFMT_VERSION),$(GO_VERSION)),)
 GOFMT := $(shell which gofmt)
@@ -220,12 +220,12 @@ else
 $(eval $(call tool.download.tar.gz,gofmt,$(GOFMT_VERSION),$(GOFMT_DOWNLOAD_URL),bin/gofmt))
 endif
 
-GOIMPORTS_VERSION ?= v0.1.7
+GOIMPORTS_VERSION ?= v0.1.8
 GOIMPORTS_URL ?= golang.org/x/tools/cmd/goimports
 $(eval $(call tool.go.install,goimports,$(GOIMPORTS_VERSION),$(GOIMPORTS_URL)))
 
 ifeq ($(GO_TEST_TOOL),ginkgo)
-GINKGO_VERSION ?= v1.16.4
+GINKGO_VERSION ?= v1.16.5
 GINKGO_URL ?= github.com/onsi/ginkgo/ginkgo
 $(eval $(call tool.go.install,ginkgo,$(GINKGO_VERSION),$(GINKGO_URL)))
 else # GO_TEST_TOOL != ginkgo
