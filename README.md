@@ -32,6 +32,22 @@ ulimit -s 60000  # workaround to fix segfault
 git subtree push -P build/ git@github.com:presslabs/build.git <a branch name>
 ```
 
+## Development workflow
+
+The image publishing will work as follows:
+
+On a feature branch (e.g. `feat-*`):
+ * Drone build runs without image publishing
+ * Can't trigger a promotion (it will fail)
+
+On a release branch (e.i. `release-*` or `master`):
+ * Drone build will publish images using git-semver using the following tags: `$(git-semver)`, `$(git-semver)-$ARCH`
+ * Manually can promote to the following channels (`$CHANNEL`): `stable`, `beta`, `alpha`, `master`
+ * *On promote*: the images are published with the following tags:  `$CHANNEL`, `$CHANNEL-$(git-semver)`, `$(git-semver)`, `$(git-semver)-$ARCH`
+ * *On promote* and parameter `PUBLISH_TAG` is set: a new git tag will be created and images will be published under the following tags: `$CHANNEL`, `$CHANNEL-$PUBLISH_TAG`, `$PUBLISH_TAG` (if channel is `stable`).
+
+On git tag event the CI will not run.
+
 ## Usage
 
 ```
