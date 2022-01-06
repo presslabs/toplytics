@@ -58,6 +58,7 @@ trigger:
   event:
     exclude:
       - promote
+      - tag
 
 ---
 kind: pipeline
@@ -82,19 +83,12 @@ steps:
   commands:
   - /usr/local/bin/setup-credentials-helper.sh
   - make promote CHANNEL=${DRONE_DEPLOY_TO} PROMOTE_IMAGE_TAG=${PUBLISH_TAG}
-  - '[ "$PUBLISH_TAG" = "" ] || make .publish.tag VERSION=${PUBLISH_TAG}'
+  - '[ "$PUBLISH_TAG" = "" ] || make tag VERSION=${PUBLISH_TAG}'
   environment:
     DOCKER_HOST: "unix:///workspace/docker.sock"
     DOCKER_USERNAME: presslabsbot
     DOCKER_PASSWORD:
       from_secret: DOCKERHUB_TOKEN
-
-services:
-- name: docker
-  image: docker:dind
-  privileged: true
-  commands:
-    - /usr/local/bin/dockerd-entrypoint.sh dockerd --host "unix:///workspace/docker.sock" --storage-driver overlay2 --log-level error
 
 trigger:
   event:

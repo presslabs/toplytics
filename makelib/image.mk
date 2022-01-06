@@ -176,6 +176,7 @@ debug.nuke:
 		docker rmi -f $$i > /dev/null 2>&1; \
 	done
 
+
 # 1: registry 2: image, 3: arch
 define repo.targets
 .PHONY: .img.release.build.$(1).$(2).$(3)
@@ -194,39 +195,54 @@ define repo.targets
 
 .PHONY: .img.release.promote.$(1).$(2).$(3)
 .img.release.promote.$(1).$(2).$(3):
-	@$(INFO) docker promote $(1)/$(2):$(IMAGE_TAG)-$(3) to $(1)/$(2)-$(3):$(CHANNEL)
+	@$(INFO) docker promote $(1)/$(2):$(IMAGE_TAG)-$(3) to $(1)/$(2):$(CHANNEL)-$(PROMOTE_TAG)-$(3)
 
-	@docker pull $(1)/$(2):$(IMAGE_TAG)-$(3) || $(FAIL)
+	@[ "$(CHANNEL)" = "master" ] ||\
+		docker buildx imagetools create \
+			--tag $(1)/$(2):$(CHANNEL)-$(PROMOTE_TAG)-$(3) \
+			$(1)/$(2):$(IMAGE_TAG)-$(3) || $(FAIL)
 
-	@[ "$(CHANNEL)" = "master" ] || docker tag $(1)/$(2):$(IMAGE_TAG)-$(3) $(1)/$(2):$(CHANNEL)-$(PROMOTE_TAG)-$(3) || $(FAIL)
-	@[ "$(CHANNEL)" = "master" ] || docker push $(1)/$(2):$(CHANNEL)-$(PROMOTE_TAG)-$(3) || $(FAIL)
-
-	@$(OK) docker promote $(1)/$(2):$(IMAGE_TAG)-$(3) to $(1)/$(2)-$(3):$(CHANNEL) || $(FAIL)
+	@$(OK) docker promote
 .img.release.promote: .img.release.promote.$(1).$(2).$(3)
 
 .PHONY: .img.release.clean.$(1).$(2).$(3)
 .img.release.clean.$(1).$(2).$(3):
 	@[ -z "$$$$(docker images -q $(1)/$(2):$(IMAGE_TAG)-$(3))" ] || docker rmi $(1)/$(2):$(IMAGE_TAG)-$(3)
-	@[ -z "$$$$(docker images -q $(1)/$(2):$(CHANNEL)-$(PROMOTE_TAG)-$(3))" ] || docker rmi $(1)/$(2):$(CHANNEL)-$(PROMOTE_TAG)-$(3)
-	@[ -z "$$$$(docker images -q $(1)/$(2):$(CHANNEL))" ] || docker rmi $(1)/$(2):$(CHANNEL)
 .img.release.clean: .img.release.clean.$(1).$(2).$(3)
 endef
 $(foreach r,$(REGISTRIES), $(foreach i,$(IMAGES), $(foreach a,$(IMAGE_ARCHS),$(eval $(call repo.targets,$(r),$(i),$(a))))))
 
+
 .PHONY: .img.release.manifest.publish.%
 .img.release.manifest.publish.%: .img.release.publish
-	@$(INFO) docker buildx imagetools create --tag $(DOCKER_REGISTRY)/$*:$(IMAGE_TAG) $(patsubst %,$(DOCKER_REGISTRY)/$*:$(IMAGE_TAG)-%,$(IMAGE_ARCHS))
-	@docker buildx imagetools create --tag $(DOCKER_REGISTRY)/$*:$(IMAGE_TAG) $(patsubst %,$(DOCKER_REGISTRY)/$*:$(IMAGE_TAG)-%,$(IMAGE_ARCHS)) || $(FAIL)
+	@$(INFO) docker buildx imagetools create \
+		--tag $(DOCKER_REGISTRY)/$*:$(IMAGE_TAG) \
+		$(patsubst %,$(DOCKER_REGISTRY)/$*:$(IMAGE_TAG)-%,$(IMAGE_ARCHS))
+
+	@docker buildx imagetools create \
+		--tag $(DOCKER_REGISTRY)/$*:$(IMAGE_TAG) \
+		$(patsubst %,$(DOCKER_REGISTRY)/$*:$(IMAGE_TAG)-%,$(IMAGE_ARCHS)) || $(FAIL)
+
 	@$(OK) docker buildx imagetools create
 
 .PHONY: .img.release.manifest.promote.%
 .img.release.manifest.promote.%: .img.release.promote
 	@$(INFO) docker buildx imagetools create --tag $(DOCKER_REGISTRY)/$*:$(CHANNEL) $(patsubst %,$(DOCKER_REGISTRY)/$*:$(IMAGE_TAG)-%,$(IMAGE_ARCHS))
-	@[ "$(CHANNEL)" = "master" ] || docker buildx imagetools create --tag $(DOCKER_REGISTRY)/$*:$(CHANNEL)-$(PROMOTE_TAG) $(patsubst %,$(DOCKER_REGISTRY)/$*:$(IMAGE_TAG)-%,$(IMAGE_ARCHS)) || $(FAIL)
-	@# Republish images to the PROMOTE_TAG when promoting on stable
-	@[ "$(CHANNEL)" = "stable" ] && [ "$(PROMOTE_TAG)" != "$(IMAGE_TAG)" ] && docker buildx imagetools create --tag $(DOCKER_REGISTRY)/$*:$(PROMOTE_TAG) $(patsubst %,$(DOCKER_REGISTRY)/$*:$(IMAGE_TAG)-%,$(IMAGE_ARCHS)) || $(FAIL)
+	@[ "$(CHANNEL)" = "master" ] ||\
+		docker buildx imagetools create \
+			--tag $(DOCKER_REGISTRY)/$*:$(CHANNEL)-$(PROMOTE_TAG) \
+			$(patsubst %,$(DOCKER_REGISTRY)/$*:$(IMAGE_TAG)-%,$(IMAGE_ARCHS)) || $(FAIL)
 
-	@docker buildx imagetools create --tag $(DOCKER_REGISTRY)/$*:$(CHANNEL) $(patsubst %,$(DOCKER_REGISTRY)/$*:$(IMAGE_TAG)-%,$(IMAGE_ARCHS)) || $(FAIL)
+	@# Republish images to the PROMOTE_TAG when promoting on stable channel
+	@[ "$(CHANNEL)" != "stable" ] || [ "$(PROMOTE_TAG)" = "$(IMAGE_TAG)" ] ||\
+		docker buildx imagetools create \
+			--tag $(DOCKER_REGISTRY)/$*:$(PROMOTE_TAG) \
+			$(patsubst %,$(DOCKER_REGISTRY)/$*:$(IMAGE_TAG)-%,$(IMAGE_ARCHS)) || $(FAIL)
+
+	@docker buildx imagetools create \
+		--tag $(DOCKER_REGISTRY)/$*:$(CHANNEL) \
+		$(patsubst %,$(DOCKER_REGISTRY)/$*:$(IMAGE_TAG)-%,$(IMAGE_ARCHS)) || $(FAIL)
+
 	@$(OK) docker buildx imagetools create
 
 .img.release.build: ;@
