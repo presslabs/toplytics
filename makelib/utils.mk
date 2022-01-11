@@ -16,8 +16,8 @@ ifndef __UTILS_MAKEFILE__
 __UTILS_MAKEFILE__ := included
 
 COMMA := ,
-SPACE :=
-SPACE +=
+noop=
+SPACE = $(noop) $(noop)
 
 # define a newline
 define \n
