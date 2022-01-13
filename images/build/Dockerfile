@@ -181,6 +181,15 @@ RUN set -ex \
     && curl -sL -o /tini https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini-${ARCH} \
     && chmod +x /tini
 
+# ------------------------------------------------------------------------------------------------
+# yq
+
+RUN set -ex \
+    && export YQ_VERSION=4.11.2 \
+    && curl -sL -o /usr/local/bin/yq "https://github.com/mikefarah/yq/releases/download/v${YQ_VERSION}/yq_linux_amd64" \
+    && chmod 0755 /usr/local/bin/yq \
+    && chown root:root /usr/local/bin/yq
+
 COPY root /
 
 ENTRYPOINT [ "/tini", "-g", "--", "/build/run.sh" ]
