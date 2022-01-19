@@ -96,7 +96,7 @@ global $toplytics_engine;
     <div class="submit">
         <?php // We show different submit buttons based on whether the user has chosen a profile or not. ?>
         <?php if ( isset( $profile ) && $profile ) : ?>
-            <a href="{!! admin_url('widgets.php') !!}" class="button-primary"><?php _e( 'Widgets Management', TOPLYTICS_DOMAIN ); ?></a>&nbsp;&nbsp;
+            <a href="<?php echo admin_url('widgets.php'); ?>" class="button-primary"><?php _e( 'Widgets Management', TOPLYTICS_DOMAIN ); ?></a>&nbsp;&nbsp;
             <input type="submit" name="ToplyticsSubmitForceUpdate" class="button" value="<?php esc_attr_e( 'Update Top', TOPLYTICS_DOMAIN ); ?>" />&nbsp;&nbsp;
             <input type="submit" name="ToplyticsSubmitProfileSwitch" class="button" value="<?php esc_attr_e( 'Switch Analytics Profile', TOPLYTICS_DOMAIN ); ?>" />
         <?php elseif ( isset( $profiles ) && $profiles ) : ?>
