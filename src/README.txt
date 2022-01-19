@@ -3,8 +3,8 @@ Contributors: PressLabs, cristianuibar
 Donate link: http://www.presslabs.com/
 Tags: presslabs, analytics, posts, top, most visited, most viewed posts, top content, toplytics, popular, google analytics, high traffic, popular posts, oauth, server resources, settings, widget, embed code, javascript, json, json file, simple, post views
 Requires at least: 4.7.3
-Tested up to: 5.8.1
-Stable tag: 4.0.6
+Tested up to: 5.8.3
+Stable tag: 4.0.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -245,6 +245,10 @@ The outcome will look like this:
 == Screenshots ==
 
 == Changelog ==
+
+= 4.0.8 =
+
+* Fixed: Not retrieving the list of GA profiles when empty property present in account. Thanks to @bapman for finding this problem: https://wordpress.org/support/topic/not-retrieving-the-list-of-ga-profiles/
 
 = 4.0.7 =
 

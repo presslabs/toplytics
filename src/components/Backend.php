@@ -1927,8 +1927,6 @@ class Backend
                         $profiles[ $item->getId() ]['property_id']   = $web_prop_id;
                         $profiles[ $item->getId() ]['property_name'] = $web_prop_name;
                     }
-                } else {
-                    return [];
                 }
             }
         }
