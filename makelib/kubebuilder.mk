@@ -25,7 +25,7 @@ RBAC_DIR ?= config/rbac
 
 BOILERPLATE_FILE ?= hack/boilerplate.go.txt
 
-CONTROLLER_GEN_CRD_OPTIONS ?= crd output:crd:artifacts:config=$(CRD_DIR)
+CONTROLLER_GEN_CRD_OPTIONS ?= crd:generateEmbeddedObjectMeta=true output:crd:artifacts:config=$(CRD_DIR)
 CONTROLLER_GEN_RBAC_OPTIONS ?= rbac:roleName=manager-role output:rbac:artifacts:config=$(RBAC_DIR)
 CONTROLLER_GEN_WEBHOOK_OPTIONS ?= webhook
 CONTROLLER_GEN_OBJECT_OPTIONS ?= object:headerFile=$(BOILERPLATE_FILE)
