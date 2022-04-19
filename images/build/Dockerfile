@@ -141,7 +141,7 @@ RUN set -ex \
 # ------------------------------------------------------------------------------------------------
 # helm
 RUN set -ex \
-    && export HELM_VERSION="3.6.3" \
+    && export HELM_VERSION="3.8.2" \
     && curl -sL -o helm.tar.gz "https://get.helm.sh/helm-v${HELM_VERSION}-linux-amd64.tar.gz" \
     && tar -C /usr/local/bin -xzvf helm.tar.gz --strip-components 1 linux-amd64/helm \
     && rm helm.tar.gz \

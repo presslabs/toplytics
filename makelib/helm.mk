@@ -45,7 +45,7 @@ HELM_APP_VERSION ?= $(VERSION)
 # ====================================================================================
 # Tools install targets
 
-HELM_VERSION := 3.7.2
+HELM_VERSION := 3.8.2
 HELM_DOWNLOAD_URL := https://get.helm.sh/helm-v$(HELM_VERSION)-$(HOSTOS)-$(HOSTARCH).tar.gz
 $(eval $(call tool.download.tar.gz,helm,$(HELM_VERSION),$(HELM_DOWNLOAD_URL)))
 
