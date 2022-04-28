@@ -58,7 +58,7 @@ GO_LDFLAGS += -s -w
 endif
 
 # supported go versions
-GO_SUPPORTED_VERSIONS ?= 1.17
+GO_SUPPORTED_VERSIONS ?= 1.17|1.18
 
 # set GOOS and GOARCH
 GOOS := $(OS)
@@ -212,7 +212,7 @@ endif
 
 # we use a consistent version of gofmt even while running different go compilers.
 # see https://github.com/golang/go/issues/26397 for more details
-GOFMT_VERSION ?= 1.17.5
+GOFMT_VERSION ?= 1.18.1
 GOFMT_DOWNLOAD_URL ?= https://dl.google.com/go/go$(GOFMT_VERSION).$(HOSTOS)-$(HOSTARCH).tar.gz
 ifneq ($(findstring $(GOFMT_VERSION),$(GO_VERSION)),)
 GOFMT := $(shell which gofmt)
