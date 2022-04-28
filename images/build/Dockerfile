@@ -157,7 +157,7 @@ RUN set -ex \
 # ------------------------------------------------------------------------------------------------
 # kustomize
 RUN set -ex \
-    && export KUSTOMIZE_VERSION="4.2.0" \
+    && export KUSTOMIZE_VERSION="4.5.4" \
     && curl -sL -o kustomize.tar.gz "https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize/v${KUSTOMIZE_VERSION}/kustomize_v${KUSTOMIZE_VERSION}_linux_amd64.tar.gz" \
     && tar -C /usr/local/bin -xzvf kustomize.tar.gz \
     && rm kustomize.tar.gz \
@@ -185,7 +185,7 @@ RUN set -ex \
 # yq
 
 RUN set -ex \
-    && export YQ_VERSION=4.11.2 \
+    && export YQ_VERSION=4.24.5 \
     && curl -sL -o /usr/local/bin/yq "https://github.com/mikefarah/yq/releases/download/v${YQ_VERSION}/yq_linux_amd64" \
     && chmod 0755 /usr/local/bin/yq \
     && chown root:root /usr/local/bin/yq

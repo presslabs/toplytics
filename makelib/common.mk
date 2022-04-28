@@ -218,7 +218,6 @@ YQ_DOWNLOAD_URL ?= https://github.com/mikefarah/yq/releases/download/v$(YQ_VERSI
 $(eval $(call tool.download,yq,$(YQ_VERSION),$(YQ_DOWNLOAD_URL)))
 
 GIT_SEMVER_VERSION ?= 6.1.1
-GIT_SEMVER_DOWNLOAD_URL ?= https://github.com/mdomke/git-semver/releases/download/v6.2.0/git-semver_6.2.0_Linux_arm64.tar.gz
 GIT_SEMVER_DOWNLOAD_URL ?= https://github.com/mdomke/git-semver/releases/download/v$(GIT_SEMVER_VERSION)/git-semver_$(GIT_SEMVER_VERSION)_$(HOST_PLATFORM).tar.gz
 $(eval $(call tool.download.tar.gz,git-semver,$(GIT_SEMVER_VERSION),$(GIT_SEMVER_DOWNLOAD_URL),git-semver,0))
 
