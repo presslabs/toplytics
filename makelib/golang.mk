@@ -226,7 +226,7 @@ $(eval $(call tool.go.install,goimports,$(GOIMPORTS_VERSION),$(GOIMPORTS_URL)))
 
 ifeq ($(GO_TEST_TOOL),ginkgo)
 GINKGO_VERSION ?= v2.1.4
-GINKGO_URL ?= github.com/onsi/ginkgo/ginkgo
+GINKGO_URL ?= github.com/onsi/ginkgo/v2/ginkgo
 $(eval $(call tool.go.install,ginkgo,$(GINKGO_VERSION),$(GINKGO_URL)))
 else # GO_TEST_TOOL != ginkgo
 GO_JUNIT_REPORT_VERSION ?= v0.9.2-0.20191008195320-984a47ca6b0a
