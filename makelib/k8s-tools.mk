@@ -24,12 +24,12 @@ KUBECTL_DOWNLOAD_URL ?= https://storage.googleapis.com/kubernetes-release/releas
 $(eval $(call tool.download,kubectl,$(KUBECTL_VERSION),$(KUBECTL_DOWNLOAD_URL)))
 
 # kind download and install
-KIND_VERSION ?= 0.11.1
+KIND_VERSION ?= 0.12.0
 KIND_DOWNLOAD_URL ?= https://github.com/kubernetes-sigs/kind/releases/download/v$(KIND_VERSION)/kind-$(HOSTOS)-$(HOSTARCH)
 $(eval $(call tool.download,kind,$(KIND_VERSION),$(KIND_DOWNLOAD_URL)))
 
 # kind download and install
-KUSTOMIZE_VERSION ?= 4.4.0
+KUSTOMIZE_VERSION ?= 4.5.4
 KUSTOMIZE_DOWNLOAD_URL ?=https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize/v$(KUSTOMIZE_VERSION)/kustomize_v$(KUSTOMIZE_VERSION)_$(HOST_PLATFORM).tar.gz
 $(eval $(call tool.download.tar.gz,kustomize,$(KUSTOMIZE_VERSION),$(KUSTOMIZE_DOWNLOAD_URL),kustomize,0))
 
