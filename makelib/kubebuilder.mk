@@ -39,12 +39,12 @@ export KUBEBUILDER_ASSETS
 # tools
 
 # setup-envtest download and install
-SETUP_ENVTEST_VERSION ?= 0.0.0-20211206022232-3ffc700bc2a3
+SETUP_ENVTEST_VERSION ?= 0.0.0-20220330034025-bf71fc56485f
 SETUP_ENVTEST_DOWNLOAD_URL ?= sigs.k8s.io/controller-runtime/tools/setup-envtest
 $(eval $(call tool.go.install,setup-envtest,v$(SETUP_ENVTEST_VERSION),$(SETUP_ENVTEST_DOWNLOAD_URL)))
 
 # kubebuilder download and install
-KUBEBUILDER_VERSION ?= 3.2.0
+KUBEBUILDER_VERSION ?= 3.4.1
 KUBEBUILDER_DOWNLOAD_URL ?= https://github.com/kubernetes-sigs/kubebuilder/releases/download/v$(KUBEBUILDER_VERSION)/kubebuilder_$(HOST_PLATFORM)
 $(eval $(call tool.download,kubebuilder,$(KUBEBUILDER_VERSION),$(KUBEBUILDER_DOWNLOAD_URL)))
 
