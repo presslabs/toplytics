@@ -2,6 +2,13 @@
 
 namespace Toplytics;
 
+use Toplytics\Loader;
+use Toplytics\Window;
+use Toplytics\Backend;
+use Toplytics\Frontend;
+use Toplytics\Shortcode;
+use Toplytics\Internationalization;
+
 /**
  * The core plugin class.
  *
@@ -79,8 +86,8 @@ class Engine
          * The class that is responsible for orchestrating the actions and
          * filters of the plugin.
          */
-        $this->loader = new \Toplytics\Loader();
-        $this->window = new \Toplytics\Window();
+        $this->loader = new Loader();
+        $this->window = new Window();
 
         $this->settings = get_option('toplytics_settings', null);
 
@@ -123,7 +130,7 @@ class Engine
         /**
          * The class responsible for defining all actions that occur in the admin area.
          */
-        $plugin_admin = new \Toplytics\Backend($this->getPluginBasename(), $this->getVersion(), $this->window, $this->settings);
+        $plugin_admin = new Backend($this->getPluginBasename(), $this->getVersion(), $this->window, $this->settings);
 
         $this->loader->addAction('admin_enqueue_scripts', $plugin_admin, 'enqueueStyles');
         $this->loader->addAction('admin_enqueue_scripts', $plugin_admin, 'enqueueScripts');
@@ -163,8 +170,8 @@ class Engine
          * The class responsible for defining all actions that occur in the public-facing
          * side of the site.
          */
-        $plugin_public = new \Toplytics\Frontend($this->getPluginBasename(), $this->getVersion(), $this->window, $this->settings);
-        $shortcodes = new \Toplytics\Shortcode($plugin_public, $this->settings);
+        $plugin_public = new Frontend($this->getPluginBasename(), $this->getVersion(), $this->window, $this->settings);
+        $shortcodes = new Shortcode($plugin_public, $this->settings);
 
         // TODO: We should completely remove these once we make sure everythig is working ok
         $this->loader->addAction('wp_loaded', $plugin_public, 'addEndpoint');

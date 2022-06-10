@@ -2,7 +2,11 @@
 
 namespace Toplytics;
 
-use \Toplytics\Activator;
+use Exception;
+use Google\Client;
+use Toplytics\Activator;
+use Google\Service\Analytics;
+use Google\Service\Exception as GoogleServiceException;
 
 /**
  * The admin-specific functionality of the plugin.
@@ -93,7 +97,7 @@ class Backend
         /**
          * Initialize the list of Toplytics widgets data as null.
          */
-        $this->_widgets = null;
+        $this->_widgets = (object)[];
 
         /**
          * If the initialization above worked, we then try to schedule
@@ -110,7 +114,7 @@ class Backend
      */
     private function _maybe_fetch_widgets_data()
     {
-        if ( $this->_widgets === null ) {
+        if ( $this->_widgets == (object)[] ) {
             $this->_widgets = get_option( 'widget_toplytics-widget', array() );
         }
     }
@@ -161,6 +165,7 @@ class Backend
      * Return the Window property.
      *
      * @since    4.0.0
+     * @return    Window    The window instance.
      */
     public function getWindow()
     {
@@ -171,6 +176,7 @@ class Backend
      * Register the stylesheets for the admin area.
      *
      * @since    4.0.0
+     * @return    void
      */
     public function enqueueStyles()
     {
@@ -226,6 +232,7 @@ class Backend
      * Client and authorizing us with the credentials we used.
      *
      * @since   4.0.0
+     * @return  Google_Client
      */
     protected function initClient()
     {
@@ -243,7 +250,7 @@ class Backend
             'retries' => 10
         ]];
 
-        $client = new \Google_Client($clientConfig);
+        $client = new Client($clientConfig);
         $client->setApplicationName(TOPLYTICS_APP_NAME);
         $client->setClientId($remoteConfig->client_id);
         $client->setClientSecret($remoteConfig->client_secret);
@@ -259,6 +266,7 @@ class Backend
      * we are authenticated.
      *
      * @since   4.0.0
+     * @return  \Google\Service\Analytics|false
      */
     protected function initService()
     {
@@ -268,16 +276,11 @@ class Backend
 
         try {
             if ($this->serviceConnect()) {
-                return new \Google_Service_Analytics($this->client);
+                return new Analytics($this->client);
             }
-        } catch (\Google_Service_Exception $e) {
+        } catch (GoogleServiceException $e) {
             $this->window->notifyAdmins('error', __(
                 'Something went wrong while initiating the Analytics service.',
-                TOPLYTICS_DOMAIN
-            ));
-        } catch (\Google_Auth_Exception $e) {
-            $this->window->notifyAdmins('error', __(
-                'Something went wrong with your Authorization process. Try to reset your connection to get this fixed.',
                 TOPLYTICS_DOMAIN
             ));
         }
@@ -880,7 +883,7 @@ class Backend
     {
         try {
             $data = $this->getAnalyticsData( $extended_fetch );
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             if (401 == $e->getCode()) {
                 $this->serviceDisconnect(true);
             }
@@ -926,7 +929,7 @@ class Backend
     {
         try {
             $realtime = $this->getAnalyticsRealTimeData( $extended_fetch );
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             if (401 == $e->getCode()) {
                 $this->serviceDisconnect(true);
             }
@@ -1050,6 +1053,8 @@ class Backend
      *
      * @param boolean Flag indicating whether to fetch a higher number of posts.
      * @return array The realtime filtered data recived from GA.
+     * @throws \Google\Service\Exception on server side error (ie: not authenticated,
+     *  invalid or malformed post body, invalid url)
      */
     private function getAnalyticsRealTimeData( $extended_fetch = false )
     {
@@ -1085,7 +1090,7 @@ class Backend
                         $results[ $item[0] ] = $item[1];
                     }
                 }
-            } catch (apiServiceException $e) {
+            } catch (GoogleServiceException $e) {
               // Handle API service exceptions.
                 error_log($e->getMessage());
             }
@@ -1350,7 +1355,7 @@ class Backend
 
                 $googleToken = $this->client->getAccessToken();
                 update_option('toplytics_google_token', $googleToken);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 return false;
             }
         }
@@ -1493,7 +1498,7 @@ class Backend
     {
         if (isset($_GET['code']) && $_GET['page'] === 'toplytics') {
             if (isset($_GET['status']) && $_GET['status'] && $_GET['status'] == 'error') {
-                $get_error = filter_input(INPUT_GET, 'code', FILTER_SANITIZE_STRING);
+                $get_error = filter_input(INPUT_GET, 'code', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 
                 if ($get_error == 'access_denied') {
                     $this->window->errorRedirect(__('You have canceled the auth process.', TOPLYTICS_DOMAIN));
@@ -1669,12 +1674,12 @@ class Backend
         $clientID = filter_input(
             INPUT_POST,
             'toplytics-private-client-id',
-            FILTER_SANITIZE_STRING
+            FILTER_SANITIZE_FULL_SPECIAL_CHARS
         );
         $clientSecret = filter_input(
             INPUT_POST,
             'toplytics-private-client-secret',
-            FILTER_SANITIZE_STRING
+            FILTER_SANITIZE_FULL_SPECIAL_CHARS
         );
         $redirectURI = filter_var(
             filter_input(INPUT_POST, 'toplytics-private-redirect', FILTER_SANITIZE_URL),
@@ -1785,7 +1790,7 @@ class Backend
      *
      * @since 4.0.0
      *
-     * @return array The valid (at this point) auth config
+     * @return object The valid (at this point) auth config
      */
     public function getAuthConfig()
     {
@@ -1898,7 +1903,7 @@ class Backend
                     ') > ' . $profile_data['profile_name'];
             }
             return $profiles_list;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return false;
         }
     }

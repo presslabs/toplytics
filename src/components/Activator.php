@@ -2,8 +2,6 @@
 
 namespace Toplytics;
 
-use \Toplytics\Activator;
-
 /**
  * Fired during plugin activation.
  *

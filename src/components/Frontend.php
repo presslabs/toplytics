@@ -2,6 +2,8 @@
 
 namespace Toplytics;
 
+use Toplytics\Widget;
+
 /**
  * The public-facing functionality of the plugin.
  *
@@ -265,7 +267,7 @@ class Frontend
 
     public function registerWidget()
     {
-        register_widget(new \Toplytics\Widget($this, $this->settings));
+        register_widget(new Widget($this, $this->settings));
     }
 
     /**

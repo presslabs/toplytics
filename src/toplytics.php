@@ -1,5 +1,9 @@
 <?php
 
+use Toplytics\Engine;
+use Toplytics\Activator;
+use Toplytics\Deactivator;
+
 /**
  *
  * @link              https://github.com/PressLabs/toplytics
@@ -64,7 +68,7 @@ require_once plugin_dir_path(__FILE__) . 'vendor/autoload.php';
  */
 function activate_toplytics()
 {
-    \Toplytics\Activator::activate();
+    Activator::activate();
 }
 
 /**
@@ -73,7 +77,7 @@ function activate_toplytics()
  */
 function deactivate_toplytics()
 {
-    \Toplytics\Deactivator::deactivate();
+    Deactivator::deactivate();
 }
 
 register_activation_hook(__FILE__, 'activate_toplytics');
@@ -90,7 +94,7 @@ register_deactivation_hook(__FILE__, 'deactivate_toplytics');
  */
 function toplytics_ready()
 {
-    $engine = new \Toplytics\Engine();
+    $engine = new Engine();
     $engine->start();
     return $engine;
 }

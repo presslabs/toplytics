@@ -82,13 +82,13 @@ class Window
     protected function displayQueryMessage()
     {
 
-        $message = filter_input(INPUT_GET, 'message', FILTER_SANITIZE_STRING) ?: false;
+        $message = filter_input(INPUT_GET, 'message', FILTER_SANITIZE_FULL_SPECIAL_CHARS) ?: false;
 
         if (! $message) {
             return false;
         }
 
-        $status = filter_input(INPUT_GET, 'status', FILTER_SANITIZE_STRING) ?: 'info';
+        $status = filter_input(INPUT_GET, 'status', FILTER_SANITIZE_FULL_SPECIAL_CHARS) ?: 'info';
         $message = get_transient('message_' . $message);
         delete_transient('message_' . $message);
 
@@ -116,6 +116,9 @@ class Window
     public function setTabs($tabs = [])
     {
         // $tabs = array( 'homepage' => 'Home Settings', 'general' => 'General', 'footer' => 'Footer' );
+
+        $current = filter_input(INPUT_GET, 'tab', FILTER_SANITIZE_FULL_SPECIAL_CHARS) ?: 'overview';
+
         if ($tabs) {
             foreach ($tabs as $tab => $name) {
                 $class = ( $tab == $current ) ? ' nav-tab-active' : '';
