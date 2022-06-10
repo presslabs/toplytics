@@ -47,6 +47,7 @@ define('TOPLYTICS_AUTH_API_BASE_URL', 'https://toplytics.presslabs.org/toplytics
 define('TOPLYTICS_AUTH_API_BASE_CONFIG', 'apiconfig.json');
 define('TOPLYTICS_WIDGET_TEMPLATE_VERSION', '2039481e7f61d8ee7f3cdd3dea2b0689');
 define('TOPLYTICS_FOLDER_ROOT', plugin_dir_path(__FILE__));
+define('TOPLYTICS_MAX_API_ERRORS_COUNT', 20);
 
 /**
  * We use the following 2 constants to show upgrade messaged after the upgrade is

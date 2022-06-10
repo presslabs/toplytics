@@ -60,6 +60,7 @@ class Backend
 
     private $_need_additional_posts_data;
     private $_widgets;
+    private $_gapi_errors_count;
 
     /**
      * Initialize the backend class and set its properties.
@@ -99,6 +100,8 @@ class Backend
          */
         $this->_widgets = (object)[];
 
+        $this->_gapi_errors_count = get_option('toplytics_gapi_errors_count', 0);
+
         /**
          * If the initialization above worked, we then try to schedule
          * the CRON for data retrival.
@@ -107,6 +110,21 @@ class Backend
             add_action('wp', [ $this, 'setupScheduleEvent' ]);
             add_action('toplytics_cron_event', [ $this, 'updateAnalyticsData' ]);
         }
+    }
+
+    private function _increment_gapi_errors_count() {
+        update_option('toplytics_gapi_errors_count', $this->_gapi_errors_count++);
+        return $this;
+    }
+
+    private function _check_gapi_errors_threshold() {
+        if (apply_filters('toplytics_max_api_errors_count', TOPLYTICS_MAX_API_ERRORS_COUNT) > $this->_gapi_errors_count) {
+            $this->_gapi_errors_count = 0;
+            update_option('toplytics_gapi_errors_count', 0);
+            $this->serviceDisconnect(true);
+        }
+
+        return $this;
     }
 
     /**
@@ -885,7 +903,7 @@ class Backend
             $data = $this->getAnalyticsData( $extended_fetch );
         } catch (Exception $e) {
             if (401 == $e->getCode()) {
-                $this->serviceDisconnect(true);
+                $this->_increment_gapi_errors_count()->_check_gapi_errors_threshold();
             }
             error_log('Toplytics: Unexepected disconnect [regular] [' . $e->getCode() . ']: ' . $e->getMessage(), E_USER_ERROR);
             return false;
@@ -931,7 +949,7 @@ class Backend
             $realtime = $this->getAnalyticsRealTimeData( $extended_fetch );
         } catch (Exception $e) {
             if (401 == $e->getCode()) {
-                $this->serviceDisconnect(true);
+                $this->_increment_gapi_errors_count()->_check_gapi_errors_threshold();
             }
             error_log('Toplytics: Unexepected disconnect [realtime] [' . $e->getCode() . ']: ' . $e->getMessage(), E_USER_ERROR);
             return false;
