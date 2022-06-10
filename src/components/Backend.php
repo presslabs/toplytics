@@ -118,10 +118,17 @@ class Backend
     }
 
     private function _check_gapi_errors_threshold() {
-        if (apply_filters('toplytics_max_api_errors_count', TOPLYTICS_MAX_API_ERRORS_COUNT) > $this->_gapi_errors_count) {
+        if ($this->_gapi_errors_count > apply_filters('toplytics_max_api_errors_count', TOPLYTICS_MAX_API_ERRORS_COUNT)) {
+            $this->_reset_gapi_errors_count()->serviceDisconnect(true);
+        }
+
+        return $this;
+    }
+
+    private function _reset_gapi_errors_count() {
+        if ( $this->_gapi_errors_count > 0 ) {
             $this->_gapi_errors_count = 0;
             update_option('toplytics_gapi_errors_count', 0);
-            $this->serviceDisconnect(true);
         }
 
         return $this;
@@ -909,6 +916,8 @@ class Backend
             return false;
         }
 
+        $this->_reset_gapi_errors_count();
+
         $num_stats = 0;
         foreach ($data as $when => $stats) {
             $result = [];
@@ -954,6 +963,8 @@ class Backend
             error_log('Toplytics: Unexepected disconnect [realtime] [' . $e->getCode() . ']: ' . $e->getMessage(), E_USER_ERROR);
             return false;
         }
+
+        $this->_reset_gapi_errors_count();
 
         $num_stats = 0;
         if ( $realtime ) {
