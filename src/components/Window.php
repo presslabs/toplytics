@@ -68,7 +68,7 @@ class Window
         // Add PHP file extension.
         $view .= '.php';
         // Return the full file path.
-        return $this->viewsFolder . '/' . $view;
+        return $this->getViewsFolder() . '/' . $view;
     }
 
     /**
@@ -156,17 +156,19 @@ class Window
 
         /**
          * We should only display notifications to admin users
-         * and make sure we already started initialization
          */
-        if (!function_exists('wp_get_current_user') ||
-            !current_user_can('activate_plugins') ||
-            !is_admin()) {
+        if (!is_admin()) {
             return false;
         }
 
-        global $toplytics_engine;
+        /**
+         * We override the $lateLoad variable in case we are not yet initialized
+         */
+        if ($lateLoad && (!function_exists('wp_get_current_user') ||
+            !current_user_can('activate_plugins'))) $lateLoad = false;
+
         ob_start();
-        include $toplytics_engine->backend->getWindow()->getView( 'backend.partials.notification' );
+        include $this->getView( 'backend.partials.notification' );
         $notification = ob_get_clean();
 
         if ( $lateLoad ) {

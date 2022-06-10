@@ -6,6 +6,7 @@ use Exception;
 use Google\Client;
 use Toplytics\Activator;
 use Google\Service\Analytics;
+use GuzzleHttp\Exception\RequestException;
 use Google\Service\Exception as GoogleServiceException;
 
 /**
@@ -331,7 +332,11 @@ class Backend
         }
 
         if ($this->client) {
-            $this->client->revokeToken();
+            try {
+                $this->client->revokeToken();
+            } catch (RequestException $e) {
+                error_log('Toplytics: Something went wrong while revoking the token. Details: ' . $e->getMessage());
+            }
         }
 
         update_option('toplytics_private_auth_config', false);
@@ -439,7 +444,7 @@ class Backend
             'toplytics_settings',
             [
                 'id' => 'enable_json',
-                'tooltip' => __('Enables and disables the JSON output on a custom endpoint. Use the WP REST API endpoint for common tasks. The endpoint is: ', TOPLYTICS_DOMAIN) . esc_url(home_url('/' . $this->settings['json_path'])) . __(' Default: Disabled', TOPLYTICS_DOMAIN),
+                'tooltip' => __('Enables and disables the JSON output on a custom endpoint. Use the WP REST API endpoint for common tasks. The endpoint is: ', TOPLYTICS_DOMAIN) . esc_url(home_url('/' . $this->checkSetting('json_path') ? $this->settings['json_path'] : '')) . __(' Default: Disabled', TOPLYTICS_DOMAIN),
             ]
         );
 
@@ -1385,6 +1390,8 @@ class Backend
                 $googleToken = $this->client->getAccessToken();
                 update_option('toplytics_google_token', $googleToken);
             } catch (Exception $e) {
+                $this->window->notifyAdmins('warning', "Toplytics error: " . $e->getMessage());
+
                 return false;
             }
         }

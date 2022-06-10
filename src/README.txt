@@ -250,8 +250,10 @@ The outcome will look like this:
 
 * Tweek: Added an error count threshold to prevent "sudden disconenct sindrome"
 * Tweek: Improved classes handling by importing the required ones where needed
+* Improved: Exception handling and display of cURL errors
 * Fixed: Replaced deprecated Google Exception class with the correct one
 * Fixed: Few code fixes like deprecated filters, undefined var
+* Fixed: Array offset warning on first activation (#156)
 
 = 4.0.9 =
 
