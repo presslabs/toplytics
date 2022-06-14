@@ -248,11 +248,11 @@ The outcome will look like this:
 
 = 4.0.10 =
 
-* Tweek: Added an error count threshold to prevent "sudden disconenct sindrome"
-* Tweek: Improved classes handling by importing the required ones where needed
+* Tweek: Added an error count threshold to prevent "sudden disconnect syndrome"
+* Tweek: Improved class handling by importing the required ones where needed
 * Improved: Exception handling and display of cURL errors
 * Fixed: Replaced deprecated Google Exception class with the correct one
-* Fixed: Few code fixes like deprecated filters, undefined var
+* Fixed: Small code fixes like deprecated filters, undefined vars in templates, etc.
 * Fixed: Array offset warning on first activation (#156)
 
 = 4.0.9 =
