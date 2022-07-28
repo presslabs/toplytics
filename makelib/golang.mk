@@ -104,7 +104,7 @@ GO_OUT_EXT := .exe
 endif
 
 ifeq ($(GO_TEST_TOOL),ginkgo)
-GO_TEST_FLAGS += -randomizeAllSpecs -randomizeSuites
+GO_TEST_FLAGS += -randomize-all -randomize-suites
 endif
 
 # NOTE: the install suffixes are matched with the build container to speed up the
