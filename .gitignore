@@ -12,3 +12,8 @@ vendor/
 .idea/
 *.sql
 *.zip
+
+.cache/
+.work/
+_output/
+bin/

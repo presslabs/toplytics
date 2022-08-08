@@ -1,0 +1,42 @@
+---
+clone:
+  disable: true
+kind: pipeline
+name: php-8.0
+services:
+- environment:
+    MYSQL_DATABASE: wordpress_test
+    MYSQL_PASSWORD: wordpress
+    MYSQL_ROOT_PASSWORD: test
+    MYSQL_USER: wordpress
+  image: percona:5.7
+  name: database
+  pull: always
+steps:
+- image: plugins/git
+  name: git
+  pull: default
+  settings:
+    depth: 0
+    tags: true
+- commands:
+  - make build.tools
+  - make wordpress.build WP_VERSION=latest
+  environment:
+    WP_CORE_DIR: /workspace/presslabs/toplytics/wordpress
+    WP_TEST_DIR: /workspace/presslabs/toplytics/wordpress-test-lib
+  image: quay.io/presslabs/build:latest
+  name: install deps
+- commands:
+  - make test
+  image: docker.io/presslabs/php-runtime:8.0
+  name: test
+- commands:
+  - /usr/local/bin/setup-credentials-helper.sh
+  group: publish
+  image: quay.io/presslabs/build:latest
+  name: publish
+  when:
+    event:
+      include:
+      - tag
