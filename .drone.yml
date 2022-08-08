@@ -20,25 +20,17 @@ steps:
     depth: 0
     tags: true
 - commands:
-  - pwd
-  - apt update
-  - apt install -y subversion
-  - bash bin/install-wp-tests.sh wordpress_test wordpress wordpress database latest
-  environment:
-    WP_CORE_DIR: /drone/src/wordpress
-    WP_TEST_DIR: /drone/src/wordpress-test-lib
-  image: debian:latest
-  name: prepare wordpress
-- commands:
-  - composer global require "phpunit/phpunit=4.8.*|5.7.*"
+  - make build.tools
+  - make wordpress.build W,P_VERSION=latest
+  - composer require "phpunit/phpunit=4.8.*|5.7.*"
   - composer install -no --prefer-dist --no-dev -d ./src/
   environment:
     WP_CORE_DIR: /workspace/presslabs/toplytics/wordpress
     WP_TEST_DIR: /workspace/presslabs/toplytics/wordpress-test-lib
-  image: docker.io/presslabs/php-runtime:8.0
+  image: quay.io/presslabs/build:latest
   name: prepare php
 - commands:
-  - phpunit
+  - make test
   image: docker.io/presslabs/php-runtime:8.0
   name: test
 - commands:

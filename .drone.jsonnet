@@ -19,30 +19,16 @@ local Pipeline(php_version, wp_version = "latest") =
         }
       },
       {
-        name: "prepare wordpress",
-        image: "debian:latest",
-environment: {
-          WP_CORE_DIR: "/drone/src/wordpress",
-          WP_TEST_DIR: "/drone/src/wordpress-test-lib",
-        },
-        commands: [
-          "pwd",
-          "apt update",
-          "apt install -y subversion",
-
-          "bash bin/install-wp-tests.sh wordpress_test wordpress wordpress database %s" % wp_version,
-
-        ],
-      },
-      {
         name: "prepare php",
-        image: "docker.io/presslabs/php-runtime:%s" % php_version,
+        image: "quay.io/presslabs/build:latest",
         environment: {
           WP_CORE_DIR: "/workspace/presslabs/toplytics/wordpress",
           WP_TEST_DIR: "/workspace/presslabs/toplytics/wordpress-test-lib",
         },
         commands: [
-          "composer global require \"phpunit/phpunit=4.8.*|5.7.*\"",
+          "make build.tools",
+          "make wordpress.build W,P_VERSION=%s" % wp_version,
+          "composer require \"phpunit/phpunit=4.8.*|5.7.*\"",
           "composer install -no --prefer-dist --no-dev -d ./src/"
         ],
       },
@@ -50,7 +36,7 @@ environment: {
         name: "test",
         image: "docker.io/presslabs/php-runtime:%s" % php_version,
         commands: [
-          "phpunit",
+          "make test",
           //"WP_MULTISITE=1 phpunit",
         ],
       },
