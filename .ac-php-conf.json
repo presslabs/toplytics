@@ -1,0 +1,22 @@
+{
+  "use-cscope": null,
+  "tag-dir": null,
+  "filter": {
+    "php-file-ext-list": [
+      "php"
+    ],
+    "php-path-list": [
+      "."
+    ],
+    "ignore-ruleset": [
+      "# like .gitignore file ",
+      "/vendor/**/[tT]ests/**/*.php",
+      "/vendor/**/[Ee]xamples/**/*.php",
+      "/vendor/composer/*.php",
+      "/vendor/*.php",
+      "# not need php_codesniffer",
+      "/vendor/squizlabs/php_codesniffer/**/*.php",
+      "#  -- end -- "
+    ]
+  }
+}

@@ -19,17 +19,17 @@ local Pipeline(php_version, wp_version = "latest") =
         }
       },
       {
-        name: "prepare php",
+        name: "install deps",
         image: "quay.io/presslabs/build:latest",
         environment: {
           WP_CORE_DIR: "/workspace/presslabs/toplytics/wordpress",
           WP_TEST_DIR: "/workspace/presslabs/toplytics/wordpress-test-lib",
         },
         commands: [
+          // install build deps
           "make build.tools",
-          "make wordpress.build W,P_VERSION=%s" % wp_version,
-          "composer require \"phpunit/phpunit=4.8.*|5.7.*\"",
-          "composer install -no --prefer-dist --no-dev -d ./src/"
+          // install wordpress
+          "make wordpress.build WP_VERSION=%s" % wp_version,
         ],
       },
       {
