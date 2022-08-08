@@ -80,7 +80,9 @@ $(eval $(call common.target,wordpress.build))
 # ====================================================================================
 # Common Targets
 
-.php.test.init: $(WP_TESTS_DIR)/wp-tests-config.php
+.php.test.init: $(WP_TESTS_DIR)/wp-tests-config.php .php.test.init.composer
+
+.php.test.init.composer:
 	@# run composer install to fix: Error: The PHPUnit Polyfills library is a requirement
 	cd $(WP_TESTS_DIR) && composer install
 

@@ -19,7 +19,7 @@ __PHP_MAKEFILE__ := included
 # Options
 
 # supported php versions
-PHP_SUPPORTED_VERSIONS ?= 7.3|7.4
+PHP_SUPPORTED_VERSIONS ?= 7.3|7.4|8.0|8.1
 PHP := php
 
 SELF_DIR := $(dir $(lastword $(MAKEFILE_LIST)))
@@ -30,7 +30,7 @@ PHP_ROOT_DIR ?= $(SELF_DIR)/../..
 # The location of php application source code, relative to the PHP_ROOT_DIR
 PHP_SRC_DIR ?= src
 
-COMPOSER_VERSION ?= 1.10.5
+COMPOSER_VERSION ?= 2.3.5
 COMPOSER_DOWNLOAD_URL ?= https://getcomposer.org/download/$(COMPOSER_VERSION)/composer.phar
 $(eval $(call tool.download,composer,$(COMPOSER_VERSION),$(COMPOSER_DOWNLOAD_URL)))
 
