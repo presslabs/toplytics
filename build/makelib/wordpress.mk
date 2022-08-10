@@ -59,6 +59,13 @@ $(WP_TESTS_DIR)/src/wp-includes/version.php: $(WP_TESTS_ARCHIVE)
 $(WP_TESTS_DIR)/wp-tests-config.php: $(WP_TESTS_CONFIG) $(WP_TESTS_DIR)/src/wp-includes/version.php
 	@cp $(WP_TESTS_CONFIG) $@
 
+$(WP_TESTS_DIR)/includes: $(WP_TESTS_DIR)
+	@cp -r $(WP_TESTS_DIR)/tests/phpunit/includes $@
+
+$(WP_TESTS_DIR)/data: $(WP_TESTS_DIR)
+	@cp -r $(WP_TESTS_DIR)/tests/phpunit/data $@
+
+
 # add WP_TESTS_DIR env var for running tests
 .do.php.test: PHPUNIT:=WP_TESTS_DIR=$(WP_TESTS_DIR) $(PHPUNIT)
 
