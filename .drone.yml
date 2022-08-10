@@ -20,16 +20,12 @@ steps:
     depth: 0
     tags: true
 - commands:
-  - make build.tools
-  environment:
-    WP_CORE_DIR: /workspace/presslabs/toplytics/wordpress
-    WP_TEST_DIR: /workspace/presslabs/toplytics/wordpress-test-lib
-  image: quay.io/presslabs/build:latest
-  name: install deps
-- commands:
   - make test WP_VERSION=6.0.1
+  environment:
+    WORDPRESS_TEST_DB_HOST: database
   image: docker.io/presslabs/php-runtime:8.0
   name: test
+  user: root
 - commands:
   - /usr/local/bin/setup-credentials-helper.sh
   group: publish

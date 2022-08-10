@@ -115,4 +115,4 @@ $toplytics = $toplytics_engine->frontend;
  *
  * @since 3.0.0
  */
-require_once plugin_dir_path(__FILE__) . 'backward-compatibility.php';
+require_once plugin_dir_path(__FILE__) . 'src/backward-compatibility.php';

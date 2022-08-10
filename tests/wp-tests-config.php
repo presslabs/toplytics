@@ -37,13 +37,12 @@ define( 'WP_DEBUG', true );
  * DO NOT use a production database or one that is shared with something else.
  */
 
-define( 'DB_NAME', 'wordpress_test' );
-define( 'DB_USER', 'wordpress' );
-define( 'DB_PASSWORD', 'wordpress' );
-define( 'DB_HOST', 'localhost' );
+define( 'DB_HOST', getenv('WORDPRESS_TEST_DB_HOST', true) ?: '127.0.0.1' );
+define( 'DB_NAME', getenv('WORDPRESS_TEST_DB_NAME', true) ?: 'wordpress_test' );
+define( 'DB_USER', getenv('WORDPRESS_TEST_DB_USER', true) ?: 'wordpress' );
+define( 'DB_PASSWORD', getenv('WORDPRESS_TEST_DB_PASSWORD') ?: 'wordpress' );
 define( 'DB_CHARSET', 'utf8' );
 define( 'DB_COLLATE', '' );
-
 /**#@+
  * Authentication Unique Keys and Salts.
  *

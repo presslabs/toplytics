@@ -7,4 +7,4 @@ include build/makelib/common.mk
 include build/makelib/wordpress.mk
 include build/makelib/php.mk
 
-.php.test.init: $(WP_TESTS_DIR)/src/wp-includes/version.php $(WP_TESTS_DIR)/includes $(WP_TESTS_DIR)/data
+.php.test.init: $(WP_TESTS_DIR)/wp-tests-config.php $(WP_TESTS_DIR)/includes $(WP_TESTS_DIR)/data

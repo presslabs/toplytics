@@ -19,20 +19,12 @@ local Pipeline(php_version, wp_version) =
         }
       },
       {
-        name: "install deps",
-        image: "quay.io/presslabs/build:latest",
-        environment: {
-          WP_CORE_DIR: "/workspace/presslabs/toplytics/wordpress",
-          WP_TEST_DIR: "/workspace/presslabs/toplytics/wordpress-test-lib",
-        },
-        commands: [
-          // install build deps
-          "make build.tools",
-        ],
-      },
-      {
         name: "test",
         image: "docker.io/presslabs/php-runtime:%s" % php_version,
+        user: "root",
+        environment: {
+          WORDPRESS_TEST_DB_HOST: "database"
+        },
         commands: [
           "make test WP_VERSION=%s" % wp_version,
         ],
