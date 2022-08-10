@@ -1,5 +1,5 @@
 
-local Pipeline(php_version, wp_version = "latest") =
+local Pipeline(php_version, wp_version) =
   {
     kind: 'pipeline',
     name: 'php-' + php_version,
@@ -28,16 +28,13 @@ local Pipeline(php_version, wp_version = "latest") =
         commands: [
           // install build deps
           "make build.tools",
-          // install wordpress
-          "make wordpress.build WP_VERSION=%s" % wp_version,
         ],
       },
       {
         name: "test",
         image: "docker.io/presslabs/php-runtime:%s" % php_version,
         commands: [
-          "make test",
-          //"WP_MULTISITE=1 phpunit",
+          "make test WP_VERSION=%s" % wp_version,
         ],
       },
       {
@@ -71,6 +68,6 @@ local Pipeline(php_version, wp_version = "latest") =
   };
 
 [
-  Pipeline('8.0'),
+  Pipeline('8.0', '6.0.1'),
   //Pipeline('7.4'),
 ]

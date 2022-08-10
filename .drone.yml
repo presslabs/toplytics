@@ -21,14 +21,13 @@ steps:
     tags: true
 - commands:
   - make build.tools
-  - make wordpress.build WP_VERSION=latest
   environment:
     WP_CORE_DIR: /workspace/presslabs/toplytics/wordpress
     WP_TEST_DIR: /workspace/presslabs/toplytics/wordpress-test-lib
   image: quay.io/presslabs/build:latest
   name: install deps
 - commands:
-  - make test
+  - make test WP_VERSION=6.0.1
   image: docker.io/presslabs/php-runtime:8.0
   name: test
 - commands:
