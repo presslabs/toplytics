@@ -1,0 +1,95 @@
+kind: pipeline
+name: default
+
+clone:
+  disable: true
+
+workspace:
+  base: /workspace
+  path: src/github.com/presslabs/build
+
+steps:
+- name: clone
+  image: plugins/git
+  settings:
+    depth: 0
+    tags: true
+
+- name: install dependencies
+  image: presslabs/build:stable
+  commands:
+  - make -j4 build.tools
+
+- name: build
+  pull: true
+  image: presslabs/build:stable
+  environment:
+    DOCKER_HOST: "unix:///workspace/docker.sock"
+  commands:
+  - make -j4 build
+
+- name: publish
+  image: presslabs/build:stable
+  commands:
+  - /usr/local/bin/setup-credentials-helper.sh
+  - make publish
+  environment:
+    DOCKER_HOST: "unix:///workspace/docker.sock"
+    DOCKER_USERNAME: presslabsbot
+    DOCKER_PASSWORD:
+      from_secret: DOCKERHUB_TOKEN
+  when:
+    ref:
+    - refs/heads/master
+    - refs/heads/release-*
+
+services:
+- name: docker
+  image: docker:dind
+  privileged: true
+  commands:
+    - /usr/local/bin/dockerd-entrypoint.sh dockerd --host "unix:///workspace/docker.sock" --storage-driver overlay2 --log-level error
+
+
+trigger:
+  ref:
+    - refs/pull/**
+    - refs/heads/**
+  event:
+    exclude:
+      - promote
+      - tag
+
+---
+kind: pipeline
+name: promote
+
+clone:
+  disable: true
+
+workspace:
+  base: /workspace
+  path: src/github.com/presslabs/build
+
+steps:
+- name: clone
+  image: plugins/git
+  settings:
+    depth: 0
+    tags: true
+
+- name: promote
+  image: presslabs/build:stable
+  commands:
+  - /usr/local/bin/setup-credentials-helper.sh
+  - make promote CHANNEL=${DRONE_DEPLOY_TO} PROMOTE_IMAGE_TAG=${PUBLISH_TAG}
+  - '[ "$PUBLISH_TAG" = "" ] || make tag VERSION=${PUBLISH_TAG}'
+  environment:
+    DOCKER_HOST: "unix:///workspace/docker.sock"
+    DOCKER_USERNAME: presslabsbot
+    DOCKER_PASSWORD:
+      from_secret: DOCKERHUB_TOKEN
+
+trigger:
+  event:
+    - promote
