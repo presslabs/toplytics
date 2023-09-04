@@ -139,6 +139,8 @@ class Engine
         $this->loader->addAction('admin_init', $plugin_admin, 'privateAuthorization');
         $this->loader->addAction('admin_init', $plugin_admin, 'checkAuthorization');
         $this->loader->addAction('admin_init', $plugin_admin, 'serviceDisconnect');
+        $this->loader->addAction('admin_init', $plugin_admin, 'useGA4');
+        $this->loader->addAction('admin_init', $plugin_admin, 'useUA');
         $this->loader->addAction('admin_init', $plugin_admin, 'profileSelect');
         $this->loader->addAction('admin_init', $plugin_admin, 'switchProfile');
         $this->loader->addAction('admin_init', $plugin_admin, 'initSettings');

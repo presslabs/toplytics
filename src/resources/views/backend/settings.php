@@ -24,7 +24,7 @@ global $toplytics_engine;
     </div>
 
     <h2 class="nav-tab-wrapper">
-        <?php if ( isset( $profile ) && $profile ) : ?>
+        <?php if ( (isset( $profile ) && $profile) || ($use_ga4 && $property_id) ) : ?>
             <?php $nav_tab_active = ( isset( $_GET['tab'] ) ) ? ( ( $_GET['tab'] == 'overview' ) ? 'nav-tab-active' : '' ) : 'nav-tab-active'; ?>
             <a class="nav-tab <?php echo $nav_tab_active; ?>"
                 href="<?php echo admin_url( TOPLYTICS_SUBMENU_PAGE . '?page=' . TOPLYTICS_DOMAIN . '&amp;tab=' . 'overview' ); ?>"
@@ -48,7 +48,7 @@ global $toplytics_engine;
         <?php endif; ?>
     </h2>
 
-    <?php if ( isset( $profile ) && $profile ) : ?>
+    <?php if ( (isset( $profile ) && $profile) || ($use_ga4 && $property_id) ) : ?>
         <?php if ( isset( $_GET['tab'] ) ) : ?>
             <?php if ($_GET['tab'] == 'overview') : ?>
                 <?php include $toplytics_engine->backend->getWindow()->getView( 'backend.tabs.overview' ); ?>
@@ -58,6 +58,8 @@ global $toplytics_engine;
         <?php else : ?>
             <?php include $toplytics_engine->backend->getWindow()->getView( 'backend.tabs.overview' ); ?>
         <?php endif; ?>
+    <?php elseif ($use_ga4) : ?>
+        <?php include $toplytics_engine->backend->getWindow()->getView( 'backend.tabs.gav4' ); ?>
     <?php else : ?>
         <?php include $toplytics_engine->backend->getWindow()->getView( 'backend.tabs.profile' ); ?>
     <?php endif; ?>

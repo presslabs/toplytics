@@ -15,15 +15,17 @@
         }
     ],
     "require": {
-        "php": "~7.0",
-        "google/apiclient": "^2.10"
+        "php": "^8.1",
+        "google/apiclient": "^2.12",
+        "google/apiclient-services": "^0.311.0"
     },
     "scripts": {
         "pre-autoload-dump": "Google\\Task\\Composer::cleanup"
     },
     "extra": {
         "google/apiclient-services": [
-            "Analytics"
+            "Analytics",
+            "AnalyticsData"
         ]
     },
     "autoload": {

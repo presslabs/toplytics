@@ -14,7 +14,7 @@ use Toplytics\Deactivator;
  * Plugin Name:       Toplytics - Popular Posts Widget
  * Plugin URI:        https://www.presslabs.org/toplytics/
  * Description:       Display top posts in a widget without putting any pressure on your host and database. This plugin helps you achieve this using the Google Analytics API to get the data from there so your server will stay clear of the preasure of monitoring and counting every single page view to display top posts.
- * Version:           4.0.10
+ * Version:           4.1
  * Author:            Presslabs
  * Author URI:        https://www.presslabs.com/
  * License:           GPL-2.0+
@@ -31,7 +31,7 @@ if (! defined('WPINC')) {
 /**
  * Plugin default settings
  */
-define('TOPLYTICS_VERSION', '4.0.10');
+define('TOPLYTICS_VERSION', '4.1');
 define('TOPLYTICS_APP_NAME', 'Toplytics - Popular Posts Widget');
 define('TOPLYTICS_DOMAIN', 'toplytics');
 define('TOPLYTICS_ENTRY', 'toplytics.php');
@@ -54,8 +54,8 @@ define('TOPLYTICS_MAX_API_ERRORS_COUNT', 20);
  * already performed to the end user. This version needs to be the same with the Toplytics
  * version for the message to appear. We don't want this to show up for minor hotfixes.
  */
-define('TOPLYTICS_UPDATE_NOTICE_VERSION', '4.0.8');
-define('TOPLYTICS_UPDATE_NOTICE_MESSAGE', 'Thank you for updating to Toplytics v4.0.8. This is a minor release primarily containing bug fixes. Read our docs and FAQ here: https://www.presslabs.com/code/toplytics/how-to-use-toplytics/ Read the full changelog here: https://wordpress.org/plugins/toplytics/#developers');
+define('TOPLYTICS_UPDATE_NOTICE_VERSION', '4.1');
+define('TOPLYTICS_UPDATE_NOTICE_MESSAGE', 'Toplytics has been updated to version 4.1 which adds support for Google Analytics 4. Please make sure to re-authenticate your Google Analytics account in order to continue using the plugin with GA4.');
 
 /**
  * We load the composer dependencies at this stage and the
@@ -98,6 +98,32 @@ function toplytics_ready()
     $engine = new Engine();
     $engine->start();
     return $engine;
+}
+
+// DEBUG ONLY
+set_time_limit ( 9999999 );
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+if (!function_exists('dd')) {
+    function dd(...$dd) {
+        foreach($dd as $d) {
+            echo '<pre>';
+            print_r($d);
+            echo '</pre>';
+        }
+        exit;
+    }
+    
+}
+
+if (!function_exists('dbg')) {
+    function dbg($var) {
+        if (WP_DEBUG) {
+            trigger_error(print_r($var, true), E_USER_NOTICE);
+        }
+    }
 }
 
 /**

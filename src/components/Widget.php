@@ -82,8 +82,17 @@ class Widget extends \WP_Widget
      */
     public function widget($args, $instance)
     {
+
         ob_start();
 
+        $title = '';
+        $period = 'week';
+        $numberposts = 20;
+        $showviews = 0;
+        $loadViaJS = 0;
+        $category = 0;
+        $fallback_not_enough_ga_posts = 'recent';
+    
         extract($args);
         extract($instance);
 
@@ -209,8 +218,8 @@ class Widget extends \WP_Widget
         $instance['loadViaJS'] = isset($new_instance['loadViaJS']) ? 1 : 0;
 
         // If the category is set, add hook for refreshing the Toplytics posts for the categories.
-        if ( $instance['category'] != $old_instance['category'] ) {
-            add_action( 'update_option_widget_toplytics-widget', array( $this, 'update_additional_posts_data' ), 10, 3 );
+        if (isset($instance['category']) && isset($old_instance['category']) && $instance['category'] != $old_instance['category']) {
+            add_action('update_option_widget_toplytics-widget', array($this, 'update_additional_posts_data'), 10, 3);
         }
         
         return $instance;

@@ -282,10 +282,11 @@ class Frontend
     public function restApiInit()
     {
         if ($this->checkSetting('enable_rest_endpoint')) {
-            register_rest_route('toplytics/', 'results', array(
+            register_rest_route('toplytics', '/results/', array(
         
-            'methods' => 'GET',
+            'methods' => \WP_REST_Server::READABLE,
             'callback' => [$this, 'toplyticsMasterApiEndpoint'],
+            'permission_callback' => '__return_true',
             ));
         }
     }
