@@ -32,7 +32,7 @@ global $toplytics_engine;
 <form action="<?php echo esc_attr( $_SERVER['REQUEST_URI'] ); ?>" method="POST">
     <?php wp_nonce_field( 'toplytics-settings' ); ?>
 
-    <?php if ( isset( $profile ) && $profile ) : ?>
+    <?php if ( (isset( $profile ) && $profile) || ($use_ga4 && $property_id) ) : ?>
 
         <h3><?php _e( 'User profile info', TOPLYTICS_DOMAIN ); ?></h3>
         <p><?php _e( 'Below is the information regarding your connection and selected profile, as well as quick button controls to change them.', TOPLYTICS_DOMAIN ); ?></p>
@@ -51,12 +51,42 @@ global $toplytics_engine;
                     <?php endif; ?>
                 </td>
             </tr>
+
+            <?php if ($use_ga4) : ?>
+            <tr valign="top">
+                <th scope="row">
+                    <label><?php _e( 'Analytics Version', TOPLYTICS_DOMAIN ); ?></label>
+                </th>
+                <td>
+                    <?php _e( '<span>You are using the <strong>GA4</strong> version of Analytics.</span>', TOPLYTICS_DOMAIN ); ?>
+                </td>
+            </tr>
+            <tr valign="top">
+                <th scope="row">
+                    <label><?php _e( 'Property ID', TOPLYTICS_DOMAIN ); ?></label>
+                </th>
+                <td>
+                    <?php echo $property_id; ?>
+                </td>
+            </tr>
+
+            <?php else : ?>
+            <tr valign="top">
+                <th scope="row">
+                    <label><?php _e( 'Analytics Version', TOPLYTICS_DOMAIN ); ?></label>
+                </th>
+                <td>
+                    <?php _e( '<span>You are using the <strong>Universal Analytics</strong> version of Analytics.</span>', TOPLYTICS_DOMAIN ); ?>
+                </td>
+            </tr>
             <tr valign="top">
                 <th scope="row">
                     <label><?php _e( 'Active Profile', TOPLYTICS_DOMAIN ); ?></label>
                 </th>
                 <td><?php echo $profile['profile_info']; ?></td>
             </tr>
+            <?php endif; ?>
+
             <tr valign="top">
                 <th scope="row">
                     <label><?php _e( 'Last Data Update', TOPLYTICS_DOMAIN ); ?></label>
@@ -70,7 +100,7 @@ global $toplytics_engine;
                 <td><?php echo $lastUpdateCount; ?></td>
             </tr>
         </table>
-    <?php else : ?>
+    <?php /* else : ?>
         <?php // We show the google analytics profiles so the user can chose which one he wants to use. ?>
 
         <h3><?php _e( 'User profile selection', TOPLYTICS_DOMAIN ); ?></h3>
@@ -90,12 +120,12 @@ global $toplytics_engine;
             <?php $type = 'info'; ?>
             <?php $message = __( "Oh NO! There has been an error or there are no profiles to select for this account. You might want to add some or disconnect this Google Account using the button below.", TOPLYTICS_DOMAIN ); ?>
             <?php include $toplytics_engine->backend->getWindow()->getView( 'backend.partials.inlineNotification' ); ?>
-        <?php endif; ?>
+        <?php endif; */ ?>
     <?php endif; ?>
 
     <div class="submit">
         <?php // We show different submit buttons based on whether the user has chosen a profile or not. ?>
-        <?php if ( isset( $profile ) && $profile ) : ?>
+        <?php if ( (isset( $profile ) && $profile) || ($use_ga4 && $property_id) ) : ?>
             <a href="<?php echo admin_url('widgets.php'); ?>" class="button-primary"><?php _e( 'Widgets Management', TOPLYTICS_DOMAIN ); ?></a>&nbsp;&nbsp;
             <input type="submit" name="ToplyticsSubmitForceUpdate" class="button" value="<?php esc_attr_e( 'Update Top', TOPLYTICS_DOMAIN ); ?>" />&nbsp;&nbsp;
             <input type="submit" name="ToplyticsSubmitProfileSwitch" class="button" value="<?php esc_attr_e( 'Switch Analytics Profile', TOPLYTICS_DOMAIN ); ?>" />

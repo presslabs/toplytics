@@ -5,9 +5,20 @@ namespace Toplytics;
 use Exception;
 use Google\Client;
 use Toplytics\Activator;
-use Google\Service\Analytics;
+use Google\Service\AnalyticsData;
 use GuzzleHttp\Exception\RequestException;
 use Google\Service\Exception as GoogleServiceException;
+use Google\Analytics\Data\V1beta\BetaAnalyticsDataClient;
+
+use Google\Service\AnalyticsData\DateRange as Google_Service_AnalyticsData_DateRange;
+use Google\Service\AnalyticsData\Dimension as Google_Service_AnalyticsData_Dimension;
+use Google\Service\AnalyticsData\Metric as Google_Service_AnalyticsData_Metric;
+use Google\Service\AnalyticsData\OrderBy as Google_Service_AnalyticsData_OrderBy;
+use Google\Service\AnalyticsData\RunReportRequest as Google_Service_AnalyticsData_RunReportRequest;
+use Google\Service\AnalyticsData\FilterExpression as Google_Service_AnalyticsData_FilterExpression;
+use Google\Service\AnalyticsData\Filter as Google_Service_AnalyticsData_Filter;
+use Google\Service\AnalyticsData\StringFilter as Google_Service_AnalyticsData_StringFilter;
+use Google\Service\AnalyticsData\MetricOrderBy as Google_Service_AnalyticsData_MetricOrderBy;
 
 /**
  * The admin-specific functionality of the plugin.
@@ -59,6 +70,8 @@ class Backend
     private $service;
     private $settings;
 
+    private $use_ga4;
+
     private $_need_additional_posts_data;
     private $_widgets;
     private $_gapi_errors_count;
@@ -95,6 +108,11 @@ class Backend
          * top commented posts.
          */
         $this->_need_additional_posts_data = false;
+
+        /**
+         * We default to GAv4, but we can also support UA.
+         */
+        $this->use_ga4 = get_option('toplytics_use_ga4', true);
 
         /**
          * Initialize the list of Toplytics widgets data as null.
@@ -302,7 +320,7 @@ class Backend
 
         try {
             if ($this->serviceConnect()) {
-                return new Analytics($this->client);
+                return new AnalyticsData($this->client);
             }
         } catch (GoogleServiceException $e) {
             $this->window->notifyAdmins('error', __(
@@ -312,6 +330,32 @@ class Backend
         }
 
         return false;
+    }
+
+    public function useGA4() {
+        if (empty($_POST['ToplyticsUseGA4'])) {
+            return;
+        }
+        
+        update_option('toplytics_use_ga4', true, true);
+
+        $this->window->successRedirect(__(
+            'You have switched to use Google Analytics v4!',
+            TOPLYTICS_DOMAIN
+        ));
+    }
+
+    public function useUA() {
+        if (empty($_POST['ToplyticsUseUA'])) {
+            return;
+        }
+
+        update_option('toplytics_use_ga4', false, true);
+
+        $this->window->successRedirect(__(
+            'You have switched to use Universal Analytics!',
+            TOPLYTICS_DOMAIN
+        ));
     }
 
     /**
@@ -342,6 +386,7 @@ class Backend
         update_option('toplytics_private_auth_config', false);
         update_option('toplytics_google_token', false);
         update_option('toplytics_profile_data', false);
+        update_option('toplytics_property_id', false);
         update_option('toplytics_auth_config', false);
         update_option('toplytics_auth_code', false);
 
@@ -489,31 +534,31 @@ class Backend
             ]
         );
 
-        // Enable Daily Fetch
-        add_settings_field(
-            'fetch_today',
-            $this->getLabel(__('Daily Top', TOPLYTICS_DOMAIN), 'fetch_today'),
-            [$this, 'printInput'],
-            'toplytics',
-            'toplytics_settings',
-            [
-                'id' => 'fetch_today',
-                'tooltip' => __('Enables the fetch of the most visited posts per day from Google Analytics in the local DB. Default: Enabled', TOPLYTICS_DOMAIN),
-            ]
-        );
+        // // Enable Daily Fetch
+        // add_settings_field(
+        //     'fetch_today',
+        //     $this->getLabel(__('Daily Top', TOPLYTICS_DOMAIN), 'fetch_today'),
+        //     [$this, 'printInput'],
+        //     'toplytics',
+        //     'toplytics_settings',
+        //     [
+        //         'id' => 'fetch_today',
+        //         'tooltip' => __('Enables the fetch of the most visited posts per day from Google Analytics in the local DB. Default: Enabled', TOPLYTICS_DOMAIN),
+        //     ]
+        // );
 
-        // Enable Realtime Fetch
-        add_settings_field(
-            'fetch_realtime',
-            $this->getLabel(__('Realtime Top', TOPLYTICS_DOMAIN), 'fetch_realtime'),
-            [$this, 'printInput'],
-            'toplytics',
-            'toplytics_settings',
-            [
-                'id' => 'fetch_realtime',
-                'tooltip' => __('Enables the fetch of the most visited posts in realtime from Google Analytics in the local DB. Default: Disabled', TOPLYTICS_DOMAIN),
-            ]
-        );
+        // // Enable Realtime Fetch
+        // add_settings_field(
+        //     'fetch_realtime',
+        //     $this->getLabel(__('Realtime Top', TOPLYTICS_DOMAIN), 'fetch_realtime'),
+        //     [$this, 'printInput'],
+        //     'toplytics',
+        //     'toplytics_settings',
+        //     [
+        //         'id' => 'fetch_realtime',
+        //         'tooltip' => __('Enables the fetch of the most visited posts in realtime from Google Analytics in the local DB. Default: Disabled', TOPLYTICS_DOMAIN),
+        //     ]
+        // );
 
         // The custom post variables that will be included in the JSON output when fetching posts from DB
         add_settings_field(
@@ -758,7 +803,7 @@ class Backend
             'json_path' => 'toplytics.json',
             'fetch_month' => '1',
             'fetch_week' => '1',
-            'fetch_today' => '1',
+            'fetch_today' => '0',
             'fetch_realtime' => '0',
             'custom_output_post_variables' => '',
             'include_featured_image_in_json' => '0',
@@ -789,6 +834,7 @@ class Backend
         check_admin_referer('toplytics-settings');
 
         update_option('toplytics_profile_data', false);
+        update_option('toplytics_property_id', false);
 
         $this->window->successRedirect(__('Ok. Go ahead and select another profile.', TOPLYTICS_DOMAIN));
     }
@@ -802,10 +848,24 @@ class Backend
      */
     public function profileSelect()
     {
-        if (empty($_POST['ToplyticsProfileSelect']) || empty($_POST['profile_id'])) {
+        if (empty($_POST['ToplyticsProfileSelect']) || (empty($_POST['profile_id']) && empty($_POST['property_id']))) {
             return false;
         }
 
+        if ($this->use_ga4) {
+            $property_id = filter_input(INPUT_POST, 'property_id', FILTER_VALIDATE_INT);
+
+            if (!$property_id) $this->window->errorRedirect(__('Invalid property ID. Please use a valid one!', TOPLYTICS_DOMAIN));
+
+            update_option('toplytics_property_id', $property_id);
+        } else {
+            $this->finish_setup_for_ua();
+        }
+
+        $this->window->successRedirect(__('Well done. You have selected your analytics profile.', TOPLYTICS_DOMAIN));
+    }
+
+    protected function finish_setup_for_ua() {
         foreach ($this->getProfilesList() as $profile_id => $profile_info) {
             if ($_POST['profile_id'] == $profile_id) {
                 update_option(
@@ -821,8 +881,6 @@ class Backend
                 break;
             }
         }
-
-        $this->window->successRedirect(__('Well done. You have selected your analytics profile.', TOPLYTICS_DOMAIN));
     }
 
     /**
@@ -880,8 +938,7 @@ class Backend
 
         // Do an initial fetch of the regular GA stats and store them in the database.
         $is_updated += $this->updateAnalyticsDataResults();
-        // Do an initial fetch of the realtime GA stats and store them in the database.
-        $is_updated += $this->updateAnalyticsRealTimeDataResults();
+        // $is_updated += $this->updateAnalyticsRealTimeDataResults();
 
         // Maybe also update category posts data and top posts data.
         if ( $this->_need_additional_posts_data ) {
@@ -895,9 +952,6 @@ class Backend
 
         return $is_updated;
     }
-
-
-
 
     /**
      * We update our database with the latest data from GA.
@@ -1144,71 +1198,89 @@ class Backend
      */
     private function getAnalyticsData( $extended_fetch = false )
     {
-        $optParams = [
-            'quotaUser'   => md5(home_url()),
-            'dimensions'  => 'ga:pagePath',
-            'sort'        => '-ga:pageviews',
-            'max-results' => $this->checkSetting('max_posts_fetch_limit') ? (int)$this->settings['max_posts_fetch_limit'] : TOPLYTICS_MAX_RESULTS,
-        ];
+        $propertyId = get_option('toplytics_property_id', false);
+
+        if (!$propertyId) return false;
+        
+        $propertyId = 'properties/'.$propertyId;
+        
+        $is_updated = 0;
+        
+        $dimension = new Google_Service_AnalyticsData_Dimension([
+            'name' => 'pagePath',
+        ]);
+        
+        $metric = new Google_Service_AnalyticsData_Metric([
+            'name' => 'eventCount',
+        ]);
+        
+        $orderMetric = new Google_Service_AnalyticsData_MetricOrderBy();
+        $orderMetric->setMetricName('eventCount');
+
+        $orderBy = new Google_Service_AnalyticsData_OrderBy();
+        $orderBy->setMetric($orderMetric);
+        $orderBy->setDesc(true);
+
+        $orderBys = [$orderBy];
+
+        $limit = $this->checkSetting('max_posts_fetch_limit') ? (int)$this->settings['max_posts_fetch_limit'] : TOPLYTICS_MAX_RESULTS;
 
         if ( $extended_fetch ) {
             // Retrieve extra posts.
-            $optParams['max-results'] += TOPLYTICS_NUM_EXTRA_RESULTS;
+            $limit += TOPLYTICS_NUM_EXTRA_RESULTS;
         }
-        
+
+        // TODO: Make these settings configurable.
+        $results_ranges = [
+            'month' => date_i18n('Y-m-d', strtotime('-29 days')),
+            'week'  => date_i18n('Y-m-d', strtotime('-6 days')),
+            // 'today' => date_i18n('Y-m-d', strtotime('today')),
+            // 'realtime' => 0,
+        ];
+
         $result = [];
-        $profile_id = get_option('toplytics_profile_data')['profile_id'];
-        if ($profile_id) {
-            // Fetch results ranges from option. Create the option, if it does not exist.
-            $results_ranges = get_option( 'toplytics_results_ranges', false );
-            if ( ! $results_ranges ) {
-                Activator::addDefaultOptions();
-                // Fetch the option, once again; it is now initialized.
-                $results_ranges = get_option( 'toplytics_results_ranges' );
-            }
 
-	    // update dates!
-            $results_ranges = [
-                'month' => date_i18n('Y-m-d', strtotime('-29 days')),
-                'week'  => date_i18n('Y-m-d', strtotime('-6 days')),
-                'today' => date_i18n('Y-m-d', strtotime('today')),
-                'realtime' => 0,
-            ];
-
-            foreach ( $results_ranges as $when => $start_date ) {
+        foreach ( $results_ranges as $when => $start_date ) {
                 // We make sure fetching is enabled in settings
                 if ( ! $start_date || ! $this->checkSetting( 'fetch_' . $when ) ) {
                     continue;
                 }
 
-                $filters = apply_filters('toplytics_analytics_filters', '', $when, 'ga:pageviews');
-                if (! empty($filters)) {
-                    $optParams['filters'] = $filters;
-                }
-                $data = $this->service->data_ga->get(
-                    'ga:' . $profile_id,
-                    $start_date,
-                    date_i18n('Y-m-d', time()),
-                    'ga:pageviews',
-                    $optParams
-                );
-                apply_filters(
-                    'toplytics_analytics_data',
-                    $when,
-                    $data->selfLink,
-                    $data->modelData['query'],
-                    $data->modelData['profileId']
-                );
-                $result[ $when ] = [];
-                if ($data->rows) {
-                    foreach ($data->rows as $item) {
-                        $result[ $when ][ $item[0] ] = $item[1];
-                    }
-                }
+            $dateRange = new Google_Service_AnalyticsData_DateRange([
+                'start_date' => $start_date,
+                'end_date' => date_i18n('Y-m-d', time()),
+            ]);
 
-                apply_filters('toplytics_analytics_data_result', $result[ $when ], $when);
+            $request = new Google_Service_AnalyticsData_RunReportRequest([
+                'property' => $propertyId,
+                'date_ranges' => [$dateRange],
+                'dimensions' => [$dimension],
+                'metrics' => [$metric],
+                'limit' => $limit,
+                'dimension_filter' => new Google_Service_AnalyticsData_FilterExpression([
+                    'filter' => new Google_Service_AnalyticsData_Filter([
+                        'field_name' => 'eventName',
+                        'string_filter' => new Google_Service_AnalyticsData_StringFilter([
+                            'value' => 'page_view',
+                        ]),
+                    ]),
+                ]),
+                'order_bys' => $orderBys,
+            ]);
+            
+            $response = $this->service->properties->runReport($propertyId, $request);
+            
+            $result[ $when ] = [];
+
+            if ($response) {
+                foreach ($response->getRows() as $row) {
+                    $result[ $when ][ $row->getDimensionValues()[0]->getValue() ] = $row->getMetricValues()[0]->getValue();
+                }
             }
+
+            apply_filters('toplytics_analytics_data_result', $result[ $when ], $when);
         }
+
         return apply_filters('toplytics_analytics_data_allresults', $result);
     }
 
@@ -1374,7 +1446,7 @@ class Backend
             }
 
             try {
-                $accessToken = $this->client->authenticate($authCode);
+                $accessToken = $this->client->fetchAccessTokenWithAuthCode($authCode);
 
                 if (isset($accessToken['error']) && $accessToken['error']) {
                     update_option('toplytics_auth_code', false);
@@ -1457,7 +1529,7 @@ class Backend
 
             $profiles = false;
 
-            if (!$profile) {
+            if (!$profile && !$this->use_ga4) {
                 $profiles = $this->getProfilesList();
             }
 
@@ -1478,6 +1550,9 @@ class Backend
                     error_log('Toplytics Debug: The new md5 of the widget file is ' . md5_file(TOPLYTICS_FOLDER_ROOT . 'resources/views/frontend/widget.template.php'));
                 }
             }
+
+            $use_ga4 = $this->use_ga4;
+            $property_id = get_option('toplytics_property_id', false);
 
             include $this->window->getView( 'backend.settings' );
 
@@ -1752,6 +1827,7 @@ class Backend
         $options = [
             'toplytics_private_auth_config',
             'toplytics_profile_data',
+            'toplytics_property_id',
             'toplytics_auth_config',
             'toplytics_google_token',
             'toplytics_auth_code',
