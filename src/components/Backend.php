@@ -1229,12 +1229,13 @@ class Backend
         }
 
         // TODO: Make these settings configurable.
-        $results_ranges = [
-            'month' => date_i18n('Y-m-d', strtotime('-29 days')),
-            'week'  => date_i18n('Y-m-d', strtotime('-6 days')),
-            // 'today' => date_i18n('Y-m-d', strtotime('today')),
-            // 'realtime' => 0,
-        ];
+        // Fetch results ranges from option. Create the option, if it does not exist.
+        $results_ranges = get_option( 'toplytics_results_ranges', false );
+        if ( ! $results_ranges ) {
+            Activator::addDefaultOptions();
+            // Fetch the option, once again; it is now initialized.
+            $results_ranges = get_option( 'toplytics_results_ranges' );
+        }
 
         $result = [];
 
@@ -1249,7 +1250,7 @@ class Backend
                 'end_date' => date_i18n('Y-m-d', time()),
             ]);
 
-            $request = new Google_Service_AnalyticsData_RunReportRequest([
+            $request = new Google_Service_AnalyticsData_RunReportRequest( apply_filters('toplytics_analytics_params_v4', [
                 'property' => $propertyId,
                 'date_ranges' => [$dateRange],
                 'dimensions' => [$dimension],
@@ -1264,7 +1265,7 @@ class Backend
                     ]),
                 ]),
                 'order_bys' => [$orderBy],
-            ]);
+            ], $when, $start_date));
             
             $response = $this->service->properties->runReport($propertyId, $request);
             
