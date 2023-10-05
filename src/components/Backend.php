@@ -1221,8 +1221,6 @@ class Backend
         $orderBy->setMetric($orderMetric);
         $orderBy->setDesc(true);
 
-        $orderBys = [$orderBy];
-
         $limit = $this->checkSetting('max_posts_fetch_limit') ? (int)$this->settings['max_posts_fetch_limit'] : TOPLYTICS_MAX_RESULTS;
 
         if ( $extended_fetch ) {
@@ -1266,7 +1264,7 @@ class Backend
                         ]),
                     ]),
                 ]),
-                'order_bys' => $orderBys,
+                'order_bys' => [$orderBy],
             ], $when, $start_date));
             
             $response = $this->service->properties->runReport($propertyId, $request);
