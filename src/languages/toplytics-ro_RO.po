@@ -444,8 +444,8 @@ msgstr "Autorizare Cont Google"
 
 #: resources/views/backend/authorization.blade.php:20
 #: resources/views/backend/tabs/publicConnect.blade.php:12
-msgid "Public Authorization"
-msgstr "Autorizare Publică"
+msgid "Quick Connect"
+msgstr "Conectare rapidă"
 
 #: resources/views/backend/authorization.blade.php:26
 msgid "Private Authorization (Advanced)"

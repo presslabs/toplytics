@@ -47,7 +47,7 @@ global $toplytics_engine;
                     <?php if ( isset( $auth ) && $auth == 'private' ) : ?>
                     <?php _e( '<span>You are using the <strong>Private</strong> Authorization method. Good choice.</span>', TOPLYTICS_DOMAIN ); ?>
                     <?php else : ?>
-                        <?php _e('<span>You are using the Presslabs public authorization method.</span>', TOPLYTICS_DOMAIN ); ?>
+                        <?php _e('<span>You are using the Presslabs quick connect method.</span>', TOPLYTICS_DOMAIN ); ?>
                     <?php endif; ?>
                 </td>
             </tr>

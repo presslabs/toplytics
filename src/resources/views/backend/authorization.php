@@ -28,14 +28,14 @@ global $toplytics_engine;
         <a class="nav-tab <?php echo $nav_tab_active; ?>"
             href="<?php echo admin_url( TOPLYTICS_SUBMENU_PAGE . '?page=' . TOPLYTICS_DOMAIN . '&amp;tab=' . 'public' ); ?>"
             title="<?php esc_attr_e( 'This is for the everyday user and small websites.', TOPLYTICS_DOMAIN ); ?>">
-            <?php _e( 'Public Authorization', TOPLYTICS_DOMAIN ); ?>
+            <?php _e( 'Quick Connect', TOPLYTICS_DOMAIN ); ?>
         </a>
 
         <?php $nav_tab_active = ( isset( $_GET['tab'] )  && ( $_GET['tab'] == 'private' ) ) ? 'nav-tab-active' : ''; ?>
         <a class="nav-tab <?php echo $nav_tab_active; ?>"
             href="<?php echo admin_url( TOPLYTICS_SUBMENU_PAGE . '?page=' . TOPLYTICS_DOMAIN . '&amp;tab=' . 'private' ); ?>"
             title="<?php esc_attr_e( 'This is for the the pros that value their privacy.', TOPLYTICS_DOMAIN ); ?>">
-            <?php _e( 'Private Authorization (Advanced)', TOPLYTICS_DOMAIN ); ?>
+            <?php _e( 'Manual Connect (Advanced)', TOPLYTICS_DOMAIN ); ?>
         </a>
     </h2>
 

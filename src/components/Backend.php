@@ -1710,7 +1710,7 @@ class Backend
 
     /**
      * Decoding the actual JSON config file we read from
-     * the presslabs.org site for public authorization.
+     * the presslabs.org site for quick connect.
      *
      * @since 4.0.0
      * @param string $config The JSON content to be decoded
@@ -1733,7 +1733,7 @@ class Backend
 
     /**
      * This is the place where we arrive after pressing the
-     * Public Authorization button. Here we redirect the user
+     * Quick Connect button. Here we redirect the user
      * to the Public Google page.
      *
      * @return Redirect Redirect to Google Authorization
