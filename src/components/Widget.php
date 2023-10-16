@@ -156,6 +156,10 @@ class Widget extends \WP_Widget
         }
 
         if ($loadViaJS && ($this->frontend->checkSetting('enable_json') || $this->frontend->checkSetting('enable_rest_endpoint'))) {
+
+            // make sure id is defined
+            $widget_id = isset($widget_id) ? $widget_id : 'widget-' . uniqid();
+
             $toplytics_args = array(
                 'widget_id' => $widget_id . '-inner',
                 'period' => $period,
