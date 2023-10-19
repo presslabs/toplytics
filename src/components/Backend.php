@@ -535,30 +535,31 @@ class Backend
         );
 
         // // Enable Daily Fetch
-        // add_settings_field(
-        //     'fetch_today',
-        //     $this->getLabel(__('Daily Top', TOPLYTICS_DOMAIN), 'fetch_today'),
-        //     [$this, 'printInput'],
-        //     'toplytics',
-        //     'toplytics_settings',
-        //     [
-        //         'id' => 'fetch_today',
-        //         'tooltip' => __('Enables the fetch of the most visited posts per day from Google Analytics in the local DB. Default: Enabled', TOPLYTICS_DOMAIN),
-        //     ]
-        // );
+        add_settings_field(
+            'fetch_today',
+            $this->getLabel(__('Daily Top', TOPLYTICS_DOMAIN), 'fetch_today'),
+            [$this, 'printInput'],
+            'toplytics',
+            'toplytics_settings',
+            [
+                'id' => 'fetch_today',
+                'tooltip' => __('Enables the fetch of the most visited posts per day from Google Analytics in the local DB. Default: Enabled', TOPLYTICS_DOMAIN),
+            ]
+        );
 
         // // Enable Realtime Fetch
-        // add_settings_field(
-        //     'fetch_realtime',
-        //     $this->getLabel(__('Realtime Top', TOPLYTICS_DOMAIN), 'fetch_realtime'),
-        //     [$this, 'printInput'],
-        //     'toplytics',
-        //     'toplytics_settings',
-        //     [
-        //         'id' => 'fetch_realtime',
-        //         'tooltip' => __('Enables the fetch of the most visited posts in realtime from Google Analytics in the local DB. Default: Disabled', TOPLYTICS_DOMAIN),
-        //     ]
-        // );
+        add_settings_field(
+            'fetch_realtime',
+            $this->getLabel(__('Realtime Top', TOPLYTICS_DOMAIN), 'fetch_realtime'),
+            [$this, 'printInput'],
+            'toplytics',
+            'toplytics_settings',
+            [
+                'id' => 'fetch_realtime',
+                'tooltip' => __('This feature is currently unavailable. We are working on it and will release it soon. Default: Disabled', TOPLYTICS_DOMAIN),
+                'disabled' => true,
+            ]
+        );
 
         // The custom post variables that will be included in the JSON output when fetching posts from DB
         add_settings_field(
@@ -803,7 +804,7 @@ class Backend
             'json_path' => 'toplytics.json',
             'fetch_month' => '1',
             'fetch_week' => '1',
-            'fetch_today' => '0',
+            'fetch_today' => '1',
             'fetch_realtime' => '0',
             'custom_output_post_variables' => '',
             'include_featured_image_in_json' => '0',
@@ -893,16 +894,33 @@ class Backend
      * @param array $updated_settings The updated set of settings
      * @return array The updated settings, after processing
      */
-    public function act_before_settings_update( $updated_settings ) {
+    public function act_before_settings_update($updated_settings)
+    {
         // Fetch the current set of Toplytics settings from the DB.
-        $current_settings = get_option( 'toplytics_settings' );
+        $current_settings = get_option('toplytics_settings');
+
+        $settings_to_check = [
+            'include_featured_image_in_json',
+            'custom_featured_image_size',
+            'allowed_post_types',
+            'ignore_posts_ids',
+        ];
+
+        $trigger = false;
+
+        foreach ($settings_to_check as $setting) {
+            if (!isset($updated_settings[$setting]) || !isset($current_settings[$setting])) continue;
+
+            if ($updated_settings[$setting] != $current_settings[$setting]) {
+                $trigger = true;
+                break;
+            }
+        }
+
         // If certain settings have changed, trigger an update of the analytics data.
-        if ( ( $updated_settings['include_featured_image_in_json'] != $current_settings['include_featured_image_in_json'] ) ||
-                ( $updated_settings['custom_featured_image_size'] != $current_settings['custom_featured_image_size'] ) ||
-                ( $updated_settings['allowed_post_types'] != $current_settings['allowed_post_types'] ) ||
-                ( $updated_settings['ignore_posts_ids'] != $current_settings['ignore_posts_ids'] ) ) {
+        if ($trigger) {
             // Schedule a late call for updating the analytics data.
-            add_action( 'shutdown', array( $this, 'updateAnalyticsDataOnSettingsUpdate' ) );
+            add_action('shutdown', array($this, 'updateAnalyticsDataOnSettingsUpdate'));
         }
 
         return $updated_settings;
@@ -1228,7 +1246,6 @@ class Backend
             $limit += TOPLYTICS_NUM_EXTRA_RESULTS;
         }
 
-        // TODO: Make these settings configurable.
         // Fetch results ranges from option. Create the option, if it does not exist.
         $results_ranges = get_option( 'toplytics_results_ranges', false );
         if ( ! $results_ranges ) {
@@ -1240,14 +1257,15 @@ class Backend
         $result = [];
 
         foreach ( $results_ranges as $when => $start_date ) {
-                // We make sure fetching is enabled in settings
-                if ( ! $start_date || ! $this->checkSetting( 'fetch_' . $when ) ) {
-                    continue;
-                }
+
+            // We make sure fetching is enabled in settings
+            if ( ! $start_date || ! $this->checkSetting( 'fetch_' . $when ) ) {
+                continue;
+            }
 
             $dateRange = new Google_Service_AnalyticsData_DateRange([
                 'start_date' => $start_date,
-                'end_date' => date_i18n('Y-m-d', time()),
+                'end_date' => apply_filters('toplytics_end_date', 'today', $when, $start_date)
             ]);
 
             $request = new Google_Service_AnalyticsData_RunReportRequest( apply_filters('toplytics_analytics_params_v4', [

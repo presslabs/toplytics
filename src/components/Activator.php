@@ -105,9 +105,9 @@ class Activator
 
         $options = [
             'toplytics_results_ranges' => [
-                'month' => date_i18n('Y-m-d', strtotime('-29 days')),
-                'week'  => date_i18n('Y-m-d', strtotime('-6 days')),
-                'today' => date_i18n('Y-m-d', strtotime('today')),
+                'month' => '30daysAgo',
+                'week'  => '7daysAgo',
+                'today' => 'yesterday',
                 'realtime' => 0,
             ],
             'toplytics_private_auth_config' => false,
