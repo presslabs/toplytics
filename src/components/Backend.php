@@ -152,7 +152,11 @@ class Backend
         }
 
         // we run our updates
-        return $this->runDBUpdates($db_version);
+        $updates = $this->runDBUpdates($db_version);
+
+        update_option('toplytics_db_version', $this->version);
+
+        return $updates;
     }
 
     /**
