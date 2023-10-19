@@ -143,6 +143,7 @@ class Backend
 
         // if db_version is empty, set it to current version
         if (empty($db_version)) {
+            $db_version = '1.0.0';
             update_option('toplytics_db_version', $this->version);
         }
 
@@ -152,7 +153,7 @@ class Backend
         }
 
         // we run our updates
-        $updates = $this->runDBUpdates($db_version);
+        $updates = $this->runDBUpdates($this->version);
 
         update_option('toplytics_db_version', $this->version);
 
@@ -175,13 +176,16 @@ class Backend
         switch ($version) {
             case '4.1.0':
                 if (in_array('4.1.0', $alreadyApplied)) break;
+
                 update_option('toplytics_results_ranges', [
                     'month' => '30daysAgo',
                     'week'  => '7daysAgo',
                     'today' => 'yesterday',
                     'realtime' => 0,
                 ]);
+
                 update_option('toplytics_db_updates_applied', array_merge($alreadyApplied, ['4.1.0']));
+                
                 $updates++;
         }
 
