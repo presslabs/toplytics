@@ -92,6 +92,8 @@ class Backend
 
         $this->window = $window;
 
+        $this->checkAndUpdateDB();
+
         // TODO: This should become it's own class in the future
         $this->settings = $settings ?: get_option('toplytics_settings', null);
 
@@ -129,6 +131,52 @@ class Backend
             add_action('wp', [ $this, 'setupScheduleEvent' ]);
             add_action('toplytics_cron_event', [ $this, 'updateAnalyticsData' ]);
         }
+    }
+
+    /**
+     * Checks current and older version of toplytics TOPLYTICS_DB_VERSION
+     * 
+     * @return int
+     */
+    public function checkAndUpdateDB() {
+        $db_version = get_option('toplytics_db_version');
+
+        // if db_version is empty, set it to current version
+        if (empty($db_version)) {
+            update_option('toplytics_db_version', TOPLYTICS_DB_VERSION);
+        }
+
+        if ($db_version == TOPLYTICS_DB_VERSION) {
+            return 0;
+        }
+
+        return $this->runDBUpdates((int)$db_version);
+    }
+
+    /**
+     * This will run DB updates and return the number of updates ran
+     * 
+     * @param int $version
+     * 
+     * @return int
+     */
+    public function runDBUpdates($version) {
+
+        $updates = 0;
+
+        // TODO: Rethink this logic.
+        switch ($version) {
+            case 1:
+                update_option('toplytics_results_ranges', [
+                    'month' => '30daysAgo',
+                    'week'  => '7daysAgo',
+                    'today' => 'yesterday',
+                    'realtime' => 0,
+                ]);
+                $updates++;
+        }
+
+        return $updates;
     }
 
     private function _increment_gapi_errors_count() {

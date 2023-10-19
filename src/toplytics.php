@@ -31,7 +31,8 @@ if (! defined('WPINC')) {
 /**
  * Plugin default settings
  */
-define('TOPLYTICS_VERSION', '4.1');
+define('TOPLYTICS_VERSION', '4.1.0');
+define('TOPLYTICS_DB_VERSION', '1');
 define('TOPLYTICS_APP_NAME', 'Toplytics - Popular Posts Widget');
 define('TOPLYTICS_DOMAIN', 'toplytics');
 define('TOPLYTICS_ENTRY', 'toplytics.php');
