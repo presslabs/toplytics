@@ -170,7 +170,7 @@ class Backend
 
         switch ($version) {
             case '4.1.0':
-                if (in_array('4.1.0', $alreadyApplied)) continue;
+                if (in_array('4.1.0', $alreadyApplied)) break;
                 update_option('toplytics_results_ranges', [
                     'month' => '30daysAgo',
                     'week'  => '7daysAgo',
