@@ -12,7 +12,7 @@ global $toplytics_engine;
 
 ?>
 
-<h3><?php _e( 'Public Authorization', TOPLYTICS_DOMAIN ); ?></h3>
+<h3><?php _e( 'Quick Connect', TOPLYTICS_DOMAIN ); ?></h3>
 <p><?php _e( 'This authorization method is using the Presslabs public API key to authenticate you to the Google Analytics API.<br />If you are concerned about privacy or are having any API related errors using this method, please use the private method.', TOPLYTICS_DOMAIN ); ?></p>
 
 <form action="<?php echo esc_attr( $_SERVER['REQUEST_URI'] ); ?>" method="POST">
@@ -24,5 +24,11 @@ global $toplytics_engine;
     <?php include $toplytics_engine->backend->getWindow()->getView( 'backend.partials.inlineNotification' ); ?>
 
     <input type="submit" title="Log in with your Google Account" name="ToplyticsSubmitPublicAuthorization" class="button-primary" style="margin: 20px;" value="<?php esc_attr_e( 'Log in with your Google Account via Presslabs.org', TOPLYTICS_DOMAIN ); ?>" />
+
+    <?php
+        // TODO: Use Official Google login buton and JS method. 
+        // https://developers.google.com/identity/gsi/web/guides/display-button#html_2
+        // Maybe use button generator: https://developers.google.com/identity/gsi/web/tools/configurator
+    ?>
 
 </form>

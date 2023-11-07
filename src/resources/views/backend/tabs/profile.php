@@ -34,7 +34,7 @@ global $toplytics_engine;
 
     <?php // We show the google analytics profiles so the user can chose which one he wants to use. ?>
 
-    <h3><?php _e( 'User profile selection', TOPLYTICS_DOMAIN ); ?></h3>
+    <h3><?php _e( 'User profile selection for Universal Analytics', TOPLYTICS_DOMAIN ); ?></h3>
     <p><?php _e( 'Select from the list of profiles the one you wish to use for this site.', TOPLYTICS_DOMAIN ); ?></p>
 
     <?php if ( isset( $profiles ) && $profiles ) : ?>
@@ -59,6 +59,10 @@ global $toplytics_engine;
         <?php if ( isset( $profiles ) && $profiles ) : ?>
             <input type="submit" name="ToplyticsProfileSelect" class="button-primary" value="<?php esc_attr_e( 'Select Profile', TOPLYTICS_DOMAIN ); ?>" />
         <?php endif; ?>
+        
+        &nbsp;&nbsp;
+
+        <input type="submit" name="ToplyticsUseGA4" class="button" value="<?php esc_attr_e( 'Click here to use GA4 instead of UA!', TOPLYTICS_DOMAIN ); ?>" />
 
         &nbsp;&nbsp;
 

@@ -10,8 +10,8 @@
  */
 ?>
 
-<h2><?php _e( 'Private Authorization', TOPLYTICS_DOMAIN ); ?></h2>
-<p><?php _e( 'The private authorization is the recommended way for connecting to your Google account, even if it is a bit more difficult and cumbersome. <br />It offers you complete control over the connection by using your very own API keys and application for granting access.', TOPLYTICS_DOMAIN ); ?></p>
+<h2><?php _e( 'Manual Connect', TOPLYTICS_DOMAIN ); ?></h2>
+<p><?php _e( 'The manual connect is the recommended way for connecting to your Google account, even if it is a bit more difficult and cumbersome. <br />It offers you complete control over the connection by using your very own API keys and application for granting access.', TOPLYTICS_DOMAIN ); ?></p>
 
 <form action="<?php echo esc_attr( $_SERVER['REQUEST_URI'] ); ?>" method="POST">
 

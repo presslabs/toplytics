@@ -49,13 +49,13 @@ This WordPress plugin can be found at [wordpress.org/plugins/toplytics/](https:/
 
 Alternatively, go into your WordPress dashboard and click on *Plugins -> Add Plugin* and search for Toplytics. Then click on *Install*, then on *Activate Now*.
 
-We offer two possibilities to use Toplytics: through **Public Authorization** or the **Private Authorization**, for more configuration details check [Toplytics installation](https://www.presslabs.com/code/toplytics/installation/).
+We offer two possibilities to use Toplytics: through **Quick Connect** or the **Manual Connect**, for more configuration details check [Toplytics installation](https://www.presslabs.com/code/toplytics/installation/).
 
-The **Public Authorization** method is using the Presslabs public API key to authenticate you to the Google Analytics API, and you don't have to set up your own API keys. To use this method, simply press the **Log in with your Google Account via Presslabs.org** button and you will be redirected to the Google Authorization screen where you will be asked for read access to your analytics profiles.
+The **Quick Connect** method is using the Presslabs public API key to authenticate you to the Google Analytics API, and you don't have to set up your own API keys. To use this method, simply press the **Log in with your Google Account via Presslabs.org** button and you will be redirected to the Google Authorization screen where you will be asked for read access to your analytics profiles.
 
 Then you need to select your profile and you are all set.
 
-The private authorization is the recommended way in using Toplytics, as it offers you complete control over the connection by using your very own API keys and application for granting access.
+The manual connect is the recommended way in using Toplytics, as it offers you complete control over the connection by using your very own API keys and application for granting access.
 
 You need to enter your Client ID and Client Secret from your Google Analytics account. The next steps will guide you in configuring your Google Analytics account to Toplytics. Keep in mind that you will need the **Redirect URL** mentioned in this page further in configuring Toplytics.
 
@@ -70,14 +70,14 @@ In this step please register a new client application with Google. To register a
 
 After you set up your product name, you can create your credentials. Go back to the **Dashboard** section, click on the arrow of the button **Create credentials** and choose the **OAuth Client ID** option.
 
-When asked to choose your application type choose the **Web application** option. You will be asked to introduce the **Javascript Origins** and **Redirects URI's**. As **Authorized JavaScipt Origins** introduce your domain name, and as **Authorized redirect URI** you need to introduce the Redirect URL from `Settings -> Toplytics -> Private Authorization`.
+When asked to choose your application type choose the **Web application** option. You will be asked to introduce the **Javascript Origins** and **Redirects URI's**. As **Authorized JavaScipt Origins** introduce your domain name, and as **Authorized redirect URI** you need to introduce the Redirect URL from `Settings -> Toplytics -> Manual Connect`.
 
 Your newly created credentials will appear on the **Credentials** page and the **Client ID** and **Client secret** you need to authorize the **Private Authentification** will appear in a pop up. You can also see them by pressing the **Edit OAuth Client** button from the Credentials section.
 
 = Configuration step 2 =
 In this step you will need to authorize requests.
 
-1. Copy the Client ID and the Client Secret keys from the **Credentials section**, then go back to `Settings -> Toplytics -> Private Authorization` to paste these credentials. By using these keys the client application will avoid sharing the username and/or password with any other Toplytics users.
+1. Copy the Client ID and the Client Secret keys from the **Credentials section**, then go back to `Settings -> Toplytics -> Manual Connect` to paste these credentials. By using these keys the client application will avoid sharing the username and/or password with any other Toplytics users.
 
 2. Click the **Private Authorize** button and after logging in you need to agree that the newly created app will access your Analytics data and you are all set.
 
