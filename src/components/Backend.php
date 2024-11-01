@@ -550,7 +550,7 @@ class Backend
             'toplytics_settings',
             [
                 'id' => 'enable_json',
-                'tooltip' => __('Enables and disables the JSON output on a custom endpoint. Use the WP REST API endpoint for common tasks. The endpoint is: ', TOPLYTICS_DOMAIN) . esc_url(home_url('/' . $this->checkSetting('json_path') ? $this->settings['json_path'] : '')) . __(' Default: Disabled', TOPLYTICS_DOMAIN),
+                'tooltip' => __('Enables and disables the JSON output on a custom endpoint. Use the WP REST API endpoint for common tasks. The endpoint is: ', TOPLYTICS_DOMAIN) . esc_url(home_url('/' . $this->checkSetting('json_path') && isset($this->settings['json_path']) ? $this->settings['json_path'] : '')) . __(' Default: Disabled', TOPLYTICS_DOMAIN),
             ]
         );
 
