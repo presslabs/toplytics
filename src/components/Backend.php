@@ -123,6 +123,8 @@ class Backend
 
         $this->_gapi_errors_count = get_option('toplytics_gapi_errors_count', 0);
 
+        add_action('update_option_toplytics_settings', [ $this, 'onSettingsSaved' ], 10, 2);
+
         /**
          * If the initialization above worked, we then try to schedule
          * the CRON for data retrival.
@@ -131,6 +133,12 @@ class Backend
             add_action('wp', [ $this, 'setupScheduleEvent' ]);
             add_action('toplytics_cron_event', [ $this, 'updateAnalyticsData' ]);
         }
+    }
+
+    public function onSettingsSaved($old_value, $new_value)
+    {
+        $this->settings = $new_value;
+        $this->setupScheduleEvent();
     }
 
     /**
@@ -648,7 +656,11 @@ class Backend
                 'id' => 'cron_exec_interval',
                 'option' => 'toplytics_settings',
                 'input' => 'select',
-                'options' => ['hourly', 'twicedaily', 'daily'],
+                'options' => [
+                    'hourly' => 'Hourly',
+                    'twicedaily' => 'Twice Daily',
+                    'daily' => 'Daily',
+                ],
                 'tooltip' => __('How often do you want your data refreshed for your top? Default: hourly', TOPLYTICS_DOMAIN),
             ]
         );
@@ -1587,8 +1599,18 @@ class Backend
      */
     public function setupScheduleEvent()
     {
-        if (! wp_next_scheduled('toplytics_cron_event')) {
-            wp_schedule_event(time(), $this->checkSetting('cron_exec_interval') ? $this->settings['cron_exec_interval'] : 'hourly', 'toplytics_cron_event');
+        // Clear any previously scheduled event
+        $timestamp = wp_next_scheduled('toplytics_cron_event');
+        if ($timestamp) {
+            wp_unschedule_event($timestamp, 'toplytics_cron_event');
+        }
+
+        // Schedule a new one
+        $interval = $this->checkSetting('cron_exec_interval') ? $this->settings['cron_exec_interval'] : 'hourly';
+
+        // Only schedule if it's a valid WordPress interval
+        if (in_array($interval, array('hourly', 'twicedaily', 'daily'))) {
+            wp_schedule_event(time(), $interval, 'toplytics_cron_event');
         }
     }
 
