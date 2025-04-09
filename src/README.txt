@@ -1,16 +1,14 @@
 === Toplytics ===
 Contributors: PressLabs, cristianuibar
 Donate link: http://www.presslabs.com/
-Tags: presslabs, analytics, posts, top, most visited, most viewed posts, top content, toplytics, popular, google analytics, high traffic, popular posts, oauth, server resources, settings, widget, embed code, javascript, json, json file, simple, post views
+Tags: analytics, most viewed posts, google analytics, high traffic, popular posts, post views
 Requires at least: 4.7.3
 Tested up to: 6.0
-Stable tag: 4.0.10
+Stable tag: 4.1.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 Displays the most visited posts as a widget using data from Google Analytics. Designed to be used under high-traffic or low server resources.
-
-For more details check the [official Toplytics documentation](https://www.presslabs.com/code/toplytics/).
 
 == About the makers ==
 This plugin was developed by the crafty people at Presslabs—the Smart Managed WordPress Hosting Platform. Here we bring high-performance hosting and business intelligence for WordPress sites. In our spare time, we contribute to the global open-source community with our plugins.
@@ -19,7 +17,7 @@ We built this plugin in 2013 to provide a less resource consuming alternative to
 
 == What is Toplytics? ==
 This plugin displays the most visited posts as a widget, using data extracted from Google Analytics. Toplytics is designed to work with high-traffic sites and all types of caching.
-
+For more details check the [official Toplytics documentation](https://www.presslabs.com/code/toplytics/).
 == Why Toplytics? ==
 You can use this plugin if you want to display the most visited posts of your site in a safe and reliable manner, with no risk of downtime or slowness. The plugin is built for high-traffic sites where counting every visitor’s click loads up the DB and presents the potential of crashing the site. Of course, you need an active Google Analytics setup on your site to use this plugin.
 
@@ -246,8 +244,24 @@ The outcome will look like this:
 
 == Changelog ==
 
-= 4.0.10 =
+= 4.1.1 =
+* Fix cron interval settings 
 
+= 4.1 =
+* Add support for analytics v4
+* Match var set up of dimension, etc.
+* Add filter hook for GA4 API params
+* Re-add getting result ranges & settings from WP options to allow for adding an option filter hook
+* Quick connect and manual connect rename
+* fix null widget id warning
+* Improve results ranges and reactivate daily
+* Update settings on update
+* improve db update logic
+* break not continue in this first case
+* Update db version as well
+* Use current version when updating DB version
+
+= 4.0.10 =
 * Tweek: Added an error count threshold to prevent "sudden disconnect syndrome"
 * Tweek: Improved class handling by importing the required ones where needed
 * Improved: Exception handling and display of cURL errors
@@ -256,28 +270,22 @@ The outcome will look like this:
 * Fixed: Array offset warning on first activation (#156)
 
 = 4.0.9 =
-
 * Fixed: Widgets button on the Overview page was not working
 
 = 4.0.8 =
-
 * Fixed: Not retrieving the list of GA profiles when empty property present in account. Thanks to @bapman for finding this problem: https://wordpress.org/support/topic/not-retrieving-the-list-of-ga-profiles/
 
 = 4.0.7 =
-
 * Fixed: Status messages were not being displayed on the admin settings pages
 
 = 4.0.6 =
-
 * Optimized vendor dependencies for a smaller package footprint
 
 = 4.0.5 =
-
 * Updating vendor dependencies
 * Fix updating date ranges before every update
 
 = 4.0.4 =
-
 * Fix #150 - set proper size for featured image
 * Fix #146 - Update analytics data on saving plugin settings
 * Fix #145 - Create option toplytics_results_ranges, if not exists
@@ -297,7 +305,6 @@ You can see a list of fixed issues that came with this complete rewrite here: ht
 Simplify the auth process using our own API keys.
 
 = 3.1 =
-
 * Allow multiple post types via filter
 * Add shortcode to features list fix #115
 * Remove PDF. Change documentation link from PDF docs to Presslabs site
@@ -312,7 +319,6 @@ Simplify the auth process using our own API keys.
 * Add the filter `toplytics_widget_args`
 
 = 3.0 =
-
 **This is a major update and you need to re-authenticate with Google Analytics for the plugin to work!**
 
 * Google Analytics API v3.0 is being used from now on
@@ -339,15 +345,11 @@ action:
 * removed `2weeks` from the data range.
 * removed Romanian translation
 
-
 = 2.1.1 =
-
 * fixed a possible infinite loop
 * `WP_DEBUG` enables toplytics debug mode
 
-
 = 2.1 =
-
 * added new filters and actions
 filters:
   `toplytics_ga_api_url_$name`
@@ -359,9 +361,7 @@ action:
 * added toplytics debug page
 * added `2weeks` in the data range.
 
-
 = 2.0 =
-
 * Implemented OAuth login method.
 * Added `Display posts in real time` option.
 * Fixed some display bugs.
