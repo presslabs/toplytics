@@ -3,7 +3,7 @@ Contributors: PressLabs, cristianuibar
 Donate link: http://www.presslabs.com/
 Tags: analytics, most viewed posts, google analytics, high traffic, popular posts, post views
 Requires at least: 4.7.3
-Tested up to: 6.0
+Tested up to: 6.8
 Stable tag: 4.1.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
