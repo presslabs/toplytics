@@ -15,9 +15,9 @@
         }
     ],
     "require": {
-        "php": "^7.4",
-        "google/apiclient": "^2.12",
-        "google/apiclient-services": "^0.311.0"
+        "php": "^8.0",
+        "google/apiclient": "^2.15",
+        "google/apiclient-services": "^0.410.0"
     },
     "scripts": {
         "pre-autoload-dump": "Google\\Task\\Composer::cleanup"
