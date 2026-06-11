@@ -1084,7 +1084,7 @@ class Backend
             }
         }
 
-        if ( $num_stats == 0 ) {
+        if ( $num_stats == 0 && ! $extended_fetch ) {
             // Do another fetch, requesting a higher number of results.
             $num_stats = $this->updateAnalyticsDataResults( true );
         }
