@@ -1568,8 +1568,20 @@ class Backend
 
         if ($this->client->isAccessTokenExpired()) {
             if (isset($googleToken['refresh_token']) && $refresh_token = $googleToken['refresh_token']) {
-                $this->client->refreshToken($refresh_token);
-                update_option('toplytics_google_token', $this->client->getAccessToken());
+                // Wrap the refresh in try/catch so transient network failures
+                // (DNS, timeouts, offline laptops) don't fatal the whole admin.
+                try {
+                    $this->client->refreshToken($refresh_token);
+                    update_option('toplytics_google_token', $this->client->getAccessToken());
+                } catch (\Throwable $e) {
+                    $this->window->notifyAdmins('warning', sprintf(
+                        /* translators: %s: error message returned by Google/Guzzle */
+                        __('Toplytics could not refresh the Google Analytics access token: %s', TOPLYTICS_DOMAIN),
+                        $e->getMessage()
+                    ));
+
+                    return false;
+                }
             }
         }
 
