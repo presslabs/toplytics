@@ -497,10 +497,12 @@ class Backend
 
         $update = $this->updateAnalyticsData();
 
-        if ($update) {
-            $this->window->successRedirect(__('The data has been updated.', TOPLYTICS_DOMAIN));
-        } else {
+        if ($update === false) {
             $this->window->errorRedirect(__('Update failed. Check your logs for more info.', TOPLYTICS_DOMAIN));
+        } elseif ($update == 0) {
+            $this->window->redirect(__('No data available from Google Analytics yet. It may take up to 24 hours for data to appear after the initial setup.', TOPLYTICS_DOMAIN), 'warning');
+        } else {
+            $this->window->successRedirect(__('The data has been updated.', TOPLYTICS_DOMAIN));
         }
     }
 
@@ -1024,12 +1026,16 @@ class Backend
      */
     public function updateAnalyticsData()
     {
-        // At this point we get and process the normal Analytics data
-        $is_updated = false;
+        $result = $this->updateAnalyticsDataResults();
+        // $result += $this->updateAnalyticsRealTimeDataResults();
 
-        // Do an initial fetch of the regular GA stats and store them in the database.
-        $is_updated += $this->updateAnalyticsDataResults();
-        // $is_updated += $this->updateAnalyticsRealTimeDataResults();
+        if ($result === false) {
+            update_option('toplytics_last_update_status', [
+                'time' => time(),
+                'count' => 0,
+            ]);
+            return false;
+        }
 
         // Maybe also update category posts data and top posts data.
         if ( $this->_need_additional_posts_data ) {
@@ -1038,10 +1044,10 @@ class Backend
 
         update_option('toplytics_last_update_status', [
             'time' => time(),
-            'count' => $is_updated,
+            'count' => $result,
         ]);
 
-        return $is_updated;
+        return $result;
     }
 
     /**
