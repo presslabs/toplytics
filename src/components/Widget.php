@@ -89,6 +89,7 @@ class Widget extends \WP_Widget
         $period = 'week';
         $numberposts = 20;
         $showviews = 0;
+        $showthumbnail = 0;
         $loadViaJS = 0;
         $category = 0;
         $fallback_not_enough_ga_posts = 'recent';
@@ -167,6 +168,7 @@ class Widget extends \WP_Widget
                 'category' => $category,
                 'fallback_not_enough_ga_posts' => $fallback_not_enough_ga_posts,
                 'showviews' => $showviews,
+                'showthumbnail' => $showthumbnail,
                 'loadViaJS' => $loadViaJS,
                 'before_title' => $before_title,
                 'title' => $title,
@@ -219,6 +221,7 @@ class Widget extends \WP_Widget
         $instance['fallback_not_enough_ga_posts'] = ( isset( $new_instance['fallback_not_enough_ga_posts'] ) ) ? $new_instance['fallback_not_enough_ga_posts'] : 'none';
 
         $instance['showviews'] = isset($new_instance['showviews']) ? 1 : 0;
+        $instance['showthumbnail'] = isset($new_instance['showthumbnail']) ? 1 : 0;
         $instance['loadViaJS'] = isset($new_instance['loadViaJS']) ? 1 : 0;
 
         // If the category is set, add hook for refreshing the Toplytics posts for the categories.
@@ -247,6 +250,10 @@ class Widget extends \WP_Widget
         $showviews_checked = '';
         if (isset($instance['showviews'])) {
             $showviews_checked = $instance['showviews'] ? ' checked="checked"' : '';
+        }
+        $showthumbnail_checked = '';
+        if (isset($instance['showthumbnail'])) {
+            $showthumbnail_checked = $instance['showthumbnail'] ? ' checked="checked"' : '';
         }
         $loadViaJS_checked = '';
         if (isset($instance['loadViaJS'])) {
@@ -302,7 +309,14 @@ class Widget extends \WP_Widget
         <p>
             <input class="checkbox" type="checkbox"<?php echo $showviews_checked; ?> id="<?php echo $this->get_field_id('showviews'); ?>" name="<?php echo $this->get_field_name('showviews'); ?>" /> <label for="<?php echo $this->get_field_id('showviews'); ?>"><?php echo __('Display post views', 'toplytics'); ?>?</label>
         </p>
-        
+
+        <p>
+            <input class="checkbox" type="checkbox"<?php echo $showthumbnail_checked; ?> id="<?php echo $this->get_field_id('showthumbnail'); ?>" name="<?php echo $this->get_field_name('showthumbnail'); ?>" /> <label for="<?php echo $this->get_field_id('showthumbnail'); ?>"><?php echo __('Display featured image', 'toplytics'); ?>?</label>
+            <?php if (!$this->frontend->checkSetting('include_featured_image_in_json')) : ?>
+                <br /><small><?php echo __('Note: enable "Include Featured Image in JSON Output" under the Toplytics Settings page for images to be available here.', 'toplytics'); ?></small>
+            <?php endif; ?>
+        </p>
+
         <?php
         if ($this->frontend->checkSetting('enable_json') || $this->frontend->checkSetting('enable_rest_endpoint')) {
             ?>

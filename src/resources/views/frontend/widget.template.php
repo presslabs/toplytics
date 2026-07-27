@@ -17,20 +17,25 @@
  * 
  * (object) $posts - all the posts to be displayed in the top with the following format
  *     {
- *         'permalink' = 'https://permalink.com/',
- *         'title'     = 'This is the post title',
- *         'views'     = 123
+ *         'permalink'      = 'https://permalink.com/',
+ *         'title'          = 'This is the post title',
+ *         'views'          = 123
+ *         'featured_image' = 'https://permalink.com/image.jpg' (only if the "Include Featured
+ *                            Image in JSON Output" setting is enabled, otherwise empty)
  *     } => default: none / required
- * 
+ *
  * (boolean) $showviews - if we should display the view count or not
  *     true / false => default: false
- * 
+ *
+ * (boolean) $showthumbnail - if we should display the featured image or not
+ *     true / false => default: false
+ *
  * (string) $target - the target for the url window to open on
  *     blank / self / parent / top => default: self
- * 
+ *
  * (bool) $loadViaJS - if JS loading was requested by the user or not.
  *     true / false => default: false
- * 
+ *
  */
 ?>
 
@@ -46,6 +51,18 @@
 
     .toplytics-list.toplytics-views-count {
         float: right;
+    }
+
+    .toplytics-list-item {
+        overflow: hidden;
+    }
+
+    .toplytics-thumbnail {
+        float: left;
+        width: 50px;
+        height: 50px;
+        margin-right: 10px;
+        object-fit: cover;
     }
 </style>
 
@@ -111,9 +128,10 @@
                 counter = 0;
                 for ( var index in results ) {
                     if ( results.hasOwnProperty( index ) ) {
-                        var permalink = results[ index ].permalink;
-                        var title     = results[ index ].title;
-                        var views     = results[ index ].pageviews;
+                        var permalink      = results[ index ].permalink;
+                        var title          = results[ index ].title;
+                        var views          = results[ index ].pageviews;
+                        var featured_image = results[ index ].featured_image;
                         counter++;
                         if ( counter > args.numberposts ) { break; }
 
@@ -122,8 +140,13 @@
                             views_html = '<span class="post-views">' + views + ' views</span>';
                         }
 
+                        var thumbnail_html = '';
+                        if ( args.showthumbnail && featured_image ) {
+                            thumbnail_html = '<img class="toplytics-thumbnail" src="' + featured_image + '" alt="" />';
+                        }
+
                         if ( permalink && title ) {
-                            html = html + '<li class="toplytics-list-item"><a href="' + permalink + '">' + title + '</a>&nbsp;' + views_html + '</li>';
+                            html = html + '<li class="toplytics-list-item">' + thumbnail_html + '<a href="' + permalink + '">' + title + '</a>&nbsp;' + views_html + '</li>';
                         }
                     }
                 }
@@ -143,6 +166,10 @@
         <ol class="toplytics-list">
             <?php foreach ( $posts as $post ) : ?>
                 <li class="toplytics-list-item">
+                    <?php if ( isset( $showthumbnail ) && $showthumbnail && ! empty( $post['featured_image'] ) ) : ?>
+                        <img class="toplytics-thumbnail" src="<?php echo esc_url( $post['featured_image'] ); ?>" alt="" />
+                    <?php endif; ?>
+
                     <a class="toplytics-anchor" href="<?php echo $post['permalink']; ?>" title="<?php echo $post['title']; ?>" target="<?php echo ( isset( $target ) && $target ) ? $target : 'self'; ?>">
                         <?php echo $post['title']; ?>
                     </a>
