@@ -709,7 +709,7 @@ class Backend
                 'option' => 'toplytics_settings',
                 'input' => 'select',
                 'disabled' => $this->checkSetting('skip_local_post_discovery'),
-                'options' => get_intermediate_image_sizes(),
+                'options' => array_combine(get_intermediate_image_sizes(), get_intermediate_image_sizes()),
                 'tooltip' => __('The image size name. See <a href="https://developer.wordpress.org/reference/functions/add_image_size/" target="_blank" title="Registering a new image size.">Add Image Size docs</a> for the name. Default: post-thumbnail', TOPLYTICS_DOMAIN),
             ]
         );
@@ -1481,8 +1481,12 @@ class Backend
             }
         }
 
-        // sort the results (revert order)
-        // arsort($new_data);
+        // Sort the results by pageviews, descending, preserving post_id keys.
+        if (isset($new_data[$when])) {
+            uasort($new_data[$when], function ($a, $b) {
+                return $b['pageviews'] <=> $a['pageviews'];
+            });
+        }
 
         return apply_filters('toplytics_convert_data_to_posts', $new_data, $data, $when);
     }
@@ -1495,20 +1499,13 @@ class Backend
      */
     private function _get_featured_image( $post_id )
     {
-        $featured_image = $image_size = ''; // Sensible default.
+        $featured_image = '';
         if ( $this->checkSetting( 'include_featured_image_in_json' ) ) {
-            // Check if a value is set for the featured image size.
-            if ( $this->checkSetting('custom_featured_image_size') ) {
-                // Fetch the list of image sizes active for the site - numeric array.
-                $theme_sizes = get_intermediate_image_sizes();
-                // Set the image size if the selected index is in the list of available sizes.
-                if ( isset( $theme_sizes[ $this->settings['custom_featured_image_size'] ] ) ) {
-                    $image_size = $theme_sizes[ $this->settings['custom_featured_image_size'] ];
-                }
-            }
-            // Set "post-thumbnail" as default image size if no other configured.
-            if ( ! $image_size ) {
-                $image_size = 'post-thumbnail';
+            // Default to "post-thumbnail" unless a valid registered size name is configured.
+            $image_size = 'post-thumbnail';
+            $custom_size = isset( $this->settings['custom_featured_image_size'] ) ? $this->settings['custom_featured_image_size'] : '';
+            if ( $custom_size && in_array( $custom_size, get_intermediate_image_sizes(), true ) ) {
+                $image_size = $custom_size;
             }
             // Now fetch the URL of the featured image.
             $featured_image = get_the_post_thumbnail_url( $post_id, $image_size );
