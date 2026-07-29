@@ -2,9 +2,9 @@
 Contributors: PressLabs, cristianuibar
 Donate link: http://www.presslabs.com/
 Tags: analytics, most viewed posts, google analytics, high traffic, popular posts, post views
-Requires at least: 4.7.3
+Requires at least: 5.6
 Tested up to: 7.0
-Stable tag: 4.1.4
+Stable tag: 4.1.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -252,6 +252,14 @@ The outcome will look like this:
 == Screenshots ==
 
 == Changelog ==
+
+= 4.1.5 =
+* Updated dependencies.
+* Add the flag "showimage" for shortcode to display the featured image when the option is active in the settings
+* Fix bug for the option that enables showing featured images
+* Sort the posts by views in DESC order
+* Add some adjustments to the default template styling
+* Add flag in widget to display the featured image
 
 = 4.1.4 =
 * Resolved an infinite recursion issue that was leading to memory exhaustion.
