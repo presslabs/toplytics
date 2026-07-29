@@ -25,17 +25,17 @@ class Shortcode
             'period'      => 'today',
             'numberposts' => '15',
             'showviews'   => false,
+            'showimage'   => false,
         ), $atts);
         return $this->showTheTop($atts);
     }
 
     private function validateArgs($args)
     {
-        if ( ! empty( $args['showviews'] ) ) { // showviews (true/false - default=false)
-            $args['showviews'] = true;
-        } else {
-            $args['showviews'] = false;
-        }
+        // filter_var(..., FILTER_VALIDATE_BOOLEAN) correctly treats the string "false" (and "0", "no", "off", "")
+        // as false, unlike empty(), which only "false" as a non-empty string would otherwise fail to catch.
+        $args['showviews'] = filter_var( $args['showviews'], FILTER_VALIDATE_BOOLEAN );
+        $args['showimage'] = filter_var( $args['showimage'], FILTER_VALIDATE_BOOLEAN );
         if (! isset($args['period'])) { // set default value
             $args['period'] = 'month';
         }
@@ -66,28 +66,32 @@ class Shortcode
         }
 
         $counter = 0;
-        $out = '<ol>';
+        $out = '<ul style="list-style:none;margin:0;padding:0;">';
         foreach ( $results as $post_id => $post_data ) {
             // Don't add post to list if must render category posts and post not in category.
             if ( $category && ! in_array( $category, $post_data['categories'] ) ) {
                 continue;
             }
             $counter++;
-            $out .= '<li><a href="' . $post_data['permalink']
-                . '" title="' . esc_attr( $post_data['title'] ) . '">'
-                . $post_data['title'] . '</a>';
+            $out .= '<li style="margin-bottom:10px;"><a href="' . $post_data['permalink']
+                . '" title="' . esc_attr( $post_data['title'] ) . '" style="display:flex;align-items:center;gap:10px;text-decoration:none;">';
+            if ( $args['showimage'] && ! empty( $post_data['featured_image'] ) ) {
+                $out .= '<img class="toplytics-featured-image" src="' . esc_url( $post_data['featured_image'] )
+                    . '" alt="' . esc_attr( $post_data['title'] ) . '">';
+            }
+            $out .= $post_data['title'];
 
             if ($args['showviews']) {
                 $out .= '<span class="post-views">&nbsp;'
                     . sprintf( __( '%d Views', 'toplytics' ), $post_data['pageviews'] )
                     . '</span>';
             }
-            $out .= '</li>';
+            $out .= '</a></li>';
             if ($args['numberposts'] == $counter) {
                 break;
             }
         }
-        $out .= '</ol>';
+        $out .= '</ul>';
 
         // If no posts to render in the shortcode (e.g. no post fits the shortcode category), return no HTML.
         if ( $counter == 0 ) {

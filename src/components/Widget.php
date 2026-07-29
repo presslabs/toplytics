@@ -89,6 +89,7 @@ class Widget extends \WP_Widget
         $period = 'week';
         $numberposts = 20;
         $showviews = 0;
+        $showimage = 0;
         $loadViaJS = 0;
         $category = 0;
         $fallback_not_enough_ga_posts = 'recent';
@@ -143,10 +144,17 @@ class Widget extends \WP_Widget
 
         $posts = array_slice($posts, 0, $numberposts, true);
 
+        // Only cap the featured image to a small fixed size when the configured
+        // image size is the small built-in "thumbnail" size; other sizes should
+        // just behave responsively (max-width: 100%).
+        $featured_image_size = isset($this->settings['custom_featured_image_size']) ? $this->settings['custom_featured_image_size'] : 'post-thumbnail';
+        $isThumbnailImageSize = ( $featured_image_size === 'thumbnail' );
+
         // variables for backward compatibilty
         $widget_period = $period;
         $widget_numberposts = $numberposts;
         $widget_showviews = $showviews;
+        $widget_showimage = $showimage;
         $widget_loadViaJS = $loadViaJS;
 
         echo $before_widget;
@@ -167,6 +175,10 @@ class Widget extends \WP_Widget
                 'category' => $category,
                 'fallback_not_enough_ga_posts' => $fallback_not_enough_ga_posts,
                 'showviews' => $showviews,
+                'showimage' => $showimage,
+                // Cast to int: realtimeScriptArgs() interpolates values directly into a JS literal,
+                // and PHP string-interpolates boolean false as an empty string, producing invalid JS.
+                'isThumbnailImageSize' => (int) $isThumbnailImageSize,
                 'loadViaJS' => $loadViaJS,
                 'before_title' => $before_title,
                 'title' => $title,
@@ -218,8 +230,9 @@ class Widget extends \WP_Widget
         $instance['category'] = isset($new_instance['category']) ? intval( $new_instance['category'] ) : 0;
         $instance['fallback_not_enough_ga_posts'] = ( isset( $new_instance['fallback_not_enough_ga_posts'] ) ) ? $new_instance['fallback_not_enough_ga_posts'] : 'none';
 
-        $instance['showviews'] = isset($new_instance['showviews']) ? 1 : 0;
-        $instance['loadViaJS'] = isset($new_instance['loadViaJS']) ? 1 : 0;
+        $instance['showviews'] = ! empty($new_instance['showviews']) ? 1 : 0;
+        $instance['showimage'] = ! empty($new_instance['showimage']) ? 1 : 0;
+        $instance['loadViaJS'] = ! empty($new_instance['loadViaJS']) ? 1 : 0;
 
         // If the category is set, add hook for refreshing the Toplytics posts for the categories.
         if (isset($instance['category']) && isset($old_instance['category']) && $instance['category'] != $old_instance['category']) {
@@ -247,6 +260,10 @@ class Widget extends \WP_Widget
         $showviews_checked = '';
         if (isset($instance['showviews'])) {
             $showviews_checked = $instance['showviews'] ? ' checked="checked"' : '';
+        }
+        $showimage_checked = '';
+        if (isset($instance['showimage'])) {
+            $showimage_checked = $instance['showimage'] ? ' checked="checked"' : '';
         }
         $loadViaJS_checked = '';
         if (isset($instance['loadViaJS'])) {
@@ -300,14 +317,23 @@ class Widget extends \WP_Widget
         </p>
 
         <p>
-            <input class="checkbox" type="checkbox"<?php echo $showviews_checked; ?> id="<?php echo $this->get_field_id('showviews'); ?>" name="<?php echo $this->get_field_name('showviews'); ?>" /> <label for="<?php echo $this->get_field_id('showviews'); ?>"><?php echo __('Display post views', 'toplytics'); ?>?</label>
+            <input type="hidden" name="<?php echo $this->get_field_name('showviews'); ?>" value="0" />
+            <input class="checkbox" type="checkbox" value="1"<?php echo $showviews_checked; ?> id="<?php echo $this->get_field_id('showviews'); ?>" name="<?php echo $this->get_field_name('showviews'); ?>" /> <label for="<?php echo $this->get_field_id('showviews'); ?>"><?php echo __('Display post views', 'toplytics'); ?>?</label>
         </p>
-        
+
+        <?php if ($this->frontend->checkSetting('include_featured_image_in_json')) { ?>
+        <p>
+            <input type="hidden" name="<?php echo $this->get_field_name('showimage'); ?>" value="0" />
+            <input class="checkbox" type="checkbox" value="1"<?php echo $showimage_checked; ?> id="<?php echo $this->get_field_id('showimage'); ?>" name="<?php echo $this->get_field_name('showimage'); ?>" /> <label for="<?php echo $this->get_field_id('showimage'); ?>"><?php echo __('Display featured image', 'toplytics'); ?>?</label>
+        </p>
+        <?php } ?>
+
         <?php
         if ($this->frontend->checkSetting('enable_json') || $this->frontend->checkSetting('enable_rest_endpoint')) {
             ?>
         <p>
-            <input class="checkbox" type="checkbox"<?php echo $loadViaJS_checked; ?> id="<?php echo $this->get_field_id('loadViaJS'); ?>" name="<?php echo $this->get_field_name('loadViaJS'); ?>" /> <label for="<?php echo $this->get_field_id('loadViaJS'); ?>"><?php echo __('Load via Javascript AJAX', 'toplytics'); ?>?</label>
+            <input type="hidden" name="<?php echo $this->get_field_name('loadViaJS'); ?>" value="0" />
+            <input class="checkbox" type="checkbox" value="1"<?php echo $loadViaJS_checked; ?> id="<?php echo $this->get_field_id('loadViaJS'); ?>" name="<?php echo $this->get_field_name('loadViaJS'); ?>" /> <label for="<?php echo $this->get_field_id('loadViaJS'); ?>"><?php echo __('Load via Javascript AJAX', 'toplytics'); ?>?</label>
         </p>
             <?php
         }

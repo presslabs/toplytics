@@ -13,7 +13,7 @@ This plugin displays the most visited posts as a widget, using data extracted fr
 You can use this plugin if you want to display the most visited posts of your site in a safe and reliable manner, with no risk of downtime or slowness. The plugin is built for high-traffic sites where counting every visitor’s click loads up the DB and presents the potential of crashing the site. Of course, you need an active Google Analytics setup on your site to use this plugin.
 
 ### Toplytics features:
-- shortcodes are now supported for easier integration into posts/pages or other widgets. Here is a quick example: `[toplytics period="week" numberposts="3" showviews="true"]`;
+- shortcodes are now supported for easier integration into posts/pages or other widgets. Here is a quick example: `[toplytics period="week" numberposts="3" showviews="true" showimage="true"]`;
 - connect with Google Analytics Account using OAuth 2.0 method;
 - starting with the plugin version 3.0 we have switched to GA API v3. Toplytics
 provides a widget displaying the most visited posts as simple links (no styling);

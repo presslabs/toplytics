@@ -17,14 +17,23 @@
  * 
  * (object) $posts - all the posts to be displayed in the top with the following format
  *     {
- *         'permalink' = 'https://permalink.com/',
- *         'title'     = 'This is the post title',
- *         'views'     = 123
+ *         'permalink'      = 'https://permalink.com/',
+ *         'title'          = 'This is the post title',
+ *         'views'          = 123,
+ *         'featured_image' = 'https://permalink.com/image.jpg'
  *     } => default: none / required
- * 
+ *
  * (boolean) $showviews - if we should display the view count or not
  *     true / false => default: false
- * 
+ *
+ * (boolean) $showimage - if we should display the featured image or not
+ *     true / false => default: false
+ *
+ * (boolean) $isThumbnailImageSize - whether the configured featured image size is
+ *     the small built-in "thumbnail" size, in which case the image is capped at
+ *     100px wide; any other configured size just gets a responsive max-width: 100%.
+ *     true / false => default: false
+ *
  * (string) $target - the target for the url window to open on
  *     blank / self / parent / top => default: self
  * 
@@ -109,25 +118,39 @@
                 }
                 
                 counter = 0;
-                for ( var index in results ) {
+                // Object keys are not guaranteed to preserve the pageviews-descending order
+                // the server sent them in (JS enumerates integer-like keys in ascending order),
+                // so sort explicitly by pageviews before rendering.
+                var indexes = Object.keys( results ).sort( function( a, b ) {
+                    return ( results[ b ].pageviews || 0 ) - ( results[ a ].pageviews || 0 );
+                } );
+                for ( var i = 0; i < indexes.length; i++ ) {
+                    var index = indexes[ i ];
                     if ( results.hasOwnProperty( index ) ) {
                         var permalink = results[ index ].permalink;
                         var title     = results[ index ].title;
                         var views     = results[ index ].pageviews;
+                        var image     = results[ index ].featured_image;
                         counter++;
                         if ( counter > args.numberposts ) { break; }
 
                         var views_html = '';
                         if ( args.showviews ) {
-                            views_html = '<span class="post-views">' + views + ' views</span>';
+                            views_html = '<br><span class="post-views">' + views + ' views</span>';
+                        }
+
+                        var image_html = '';
+                        if ( args.showimage && image ) {
+                            var image_style = args.isThumbnailImageSize ? 'max-width:100px;height:auto;' : 'max-width:100%;height:auto;';
+                            image_html = '<a href="' + permalink + '"><img class="toplytics-featured-image" src="' + image + '" alt="' + title + '" style="' + image_style + '"></a>';
                         }
 
                         if ( permalink && title ) {
-                            html = html + '<li class="toplytics-list-item"><a href="' + permalink + '">' + title + '</a>&nbsp;' + views_html + '</li>';
+                            html = html + '<li class="toplytics-list-item" style="margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:10px;">' + image_html + '<span style="text-align:right;"><a href="' + permalink + '" style="text-decoration:none;">' + title + '</a>' + views_html + '</span></li>';
                         }
                     }
                 }
-                document.getElementById( args.widget_id ).innerHTML = '<ol class="toplytics-list">' + html + '</ol>';
+                document.getElementById( args.widget_id ).innerHTML = '<ul class="toplytics-list" style="list-style:none;margin:0;padding:0;">' + html + '</ul>';
             });
         }
 
@@ -140,19 +163,26 @@
 <?php else : ?>
 
     <div id="<?php echo $widget_id . '-inner'; ?>" class="toplytics-widget-inner">
-        <ol class="toplytics-list">
+        <ul class="toplytics-list" style="list-style:none;margin:0;padding:0;">
             <?php foreach ( $posts as $post ) : ?>
-                <li class="toplytics-list-item">
-                    <a class="toplytics-anchor" href="<?php echo $post['permalink']; ?>" title="<?php echo $post['title']; ?>" target="<?php echo ( isset( $target ) && $target ) ? $target : 'self'; ?>">
-                        <?php echo $post['title']; ?>
-                    </a>
-
-                    <?php if ( isset( $showviews ) && $showviews && ! ( isset( $using_fallback_posts ) && $using_fallback_posts ) ) : ?>
-                        <span class="toplytics-views-count">&nbsp;<?php echo $post['pageviews'] . __( ' Views', TOPLYTICS_DOMAIN ); ?></span>
+                <li class="toplytics-list-item" style="margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:10px;">
+                    <?php if ( isset( $showimage ) && $showimage && ! empty( $post['featured_image'] ) ) : ?>
+                        <a href="<?php echo $post['permalink']; ?>" title="<?php echo $post['title']; ?>" target="<?php echo ( isset( $target ) && $target ) ? $target : 'self'; ?>">
+                            <img class="toplytics-featured-image" src="<?php echo esc_url( $post['featured_image'] ); ?>" alt="<?php echo esc_attr( $post['title'] ); ?>" style="<?php echo ( isset( $isThumbnailImageSize ) && $isThumbnailImageSize ) ? 'max-width:100px;height:auto;' : 'max-width:100%;height:auto;'; ?>">
+                        </a>
                     <?php endif; ?>
+                    <span style="text-align:right;">
+                        <a class="toplytics-anchor" href="<?php echo $post['permalink']; ?>" title="<?php echo $post['title']; ?>" target="<?php echo ( isset( $target ) && $target ) ? $target : 'self'; ?>" style="text-decoration:none;">
+                            <?php echo $post['title']; ?>
+                        </a>
+
+                        <?php if ( isset( $showviews ) && $showviews && ! ( isset( $using_fallback_posts ) && $using_fallback_posts ) ) : ?>
+                            <br><span class="toplytics-views-count"><?php echo $post['pageviews'] . __( ' Views', TOPLYTICS_DOMAIN ); ?></span>
+                        <?php endif; ?>
+                    </span>
                 </li>
             <?php endforeach; ?>
-        </ol>
+        </ul>
     </div>
 
 <?php endif;

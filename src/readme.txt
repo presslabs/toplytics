@@ -106,11 +106,17 @@ The priority regarding template files is the following:
 * Then it will look for the file `custom.template.php` in `toplytics/resorces/views/frontend/` folder, and if it does not exist, it will display the default template, which is `widget.template.php`
 
 = How can I use the shortcode? =
-The shortcode has 3 parameters: period -> default=month (today/week/month), numberposts -> default=5 (min=1/max=250), showviews -> default=false (true/false)
+The shortcode has 5 parameters:
+
+* `period` -> default=month (today/week/month)
+* `numberposts` -> default=5 (min=1/max=250)
+* `showviews` -> default=false (true/false)
+* `showimage` -> default=false (true/false); displays the post's featured image. This requires the **Include Featured Image in JSON Output** setting to be enabled from `Settings -> Toplytics`, otherwise no image will be available to display;
+* `category` -> default=0; restricts the top to posts belonging to the given category ID, e.g. `category="5"`.
 
 Shortcode example:
 
-`[toplytics period="week" numberposts="3" showviews="true"]`
+`[toplytics period="week" numberposts="3" showviews="true" showimage="true"]`
 
 The shortcode can be used within post/pages and in other widgets from the sidebar. For any parameter that is not used, the default value will be used.
 
@@ -143,6 +149,9 @@ However, there are some rare cases when you want to display on your site a top f
 For example, if you have a post with the URL `/code/kubernetes-mysql-operator-digital-ocean/`, Toplytics will generate the title **Code Kubernetes Mysql Operator Digital Ocean**.
 
 Along with **Skip Local Posts Discovery**, you will also need to specify the **Custom domain** for the site, since Google Analytics doesn't give us the domain in the URLs it returns. We need the domain to create the links to the articles in the top.
+
+= How can I display the featured image in the widget? =
+First enable **Include Featured Image in JSON Output** from `Settings -> Toplytics`. Then, in the Toplytics widget settings (`Appearance -> Widgets`), check **Display featured image?** - this option only appears once the setting above is enabled. This works both for the default (PHP) rendering and for the **Load via Javascript AJAX** option.
 
 = Why are pages showing up in my Toplytics Most Viewed Posts Top? =
 In the Toplytics settings, you have an option called **Posts to fetch from GA**, which sets up how many articles, pages and other custom post types will be returned by the Google Analytics API.
