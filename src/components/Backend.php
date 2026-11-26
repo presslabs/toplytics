@@ -2033,6 +2033,12 @@ class Backend
             $apiconfig = @file_get_contents($this->getRemoteConfigUri());
             $apiconfig = $this->decodeApiConfig($apiconfig);
 
+            // The remote config can be unreachable or invalid; bail out
+            // instead of calling count() on null (TypeError on PHP 8).
+            if (!$apiconfig || !is_array($apiconfig->files) || !count($apiconfig->files)) {
+                return false;
+            }
+
             $googleconfig = @file_get_contents($this->getRemoteConfigUri(
                 $apiconfig->subdir,
                 $apiconfig->files[mt_rand(0, count($apiconfig->files) - 1)]
