@@ -3,8 +3,8 @@ Contributors: PressLabs, cristianuibar
 Donate link: http://www.presslabs.com/
 Tags: analytics, most viewed posts, google analytics, high traffic, popular posts, post views
 Requires at least: 5.6
-Tested up to: 7.1
-Stable tag: 4.1.6
+Tested up to: 7.2
+Stable tag: 4.1.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -252,6 +252,10 @@ The outcome will look like this:
 == Screenshots ==
 
 == Changelog ==
+
+= 4.1.7 =
+* Fix fatal error on activation (PHP 8) when the public auth config cannot be fetched.
+* Tested up to WP 7.2
 
 = 4.1.6 =
 * Tested up to WP 7.1
